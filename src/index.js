@@ -97,13 +97,34 @@ ${formatNatspec(node)}`)
 
 // TODO: Actually parse natspec comments
 function formatNatspec(node) {
-  const str = node.natspec;
-  if (!str) return '';
-  return str
+  if (!node.natspec) return '';
+
+  const str = node.natspec
     .replace(/^(\s*\/\*\*\s*)/mg, '')
     .replace(/^(\s*\*+\/\s*)/mg, '')
     .replace(/^(\s*\**\s*)/mg, '')
-    .replace(/^(\s*\/\/\/\s*)/mg, '')
+    .replace(/^(\s*\/\/\/\s*)/mg, '');
+
+  const docs = {};
+
+  const entry = /@(\w+)\s+([\s\S]*?)(?=(?:@\w|$))/g;
+
+  while (true) {
+    const match = entry.exec(str);
+
+    if (match === null) {
+      break;
+    }
+
+    docs[match[1]] = (docs[match[1]] || []).concat(match[2]);
+  }
+
+//   return `
+// ${(docs.dev || []).join('\n')}
+// ${(docs.notice || []).join('\n')}
+// `
+
+  return str
 }
 
 try {

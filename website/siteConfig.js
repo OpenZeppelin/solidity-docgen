@@ -19,11 +19,10 @@ const siteConfig = {
   title: 'OpenZeppelin' /* title for your website */,
   tagline: 'OpenZeppelin is an open framework of reusable and secure smart contracts in the Solidity language.',
   url: 'https://openzeppelin.org' /* your website url */,
-  baseUrl: '/test-docs/' /* base url for your project */,
+  baseUrl: '/' /* base url for your project */,
   projectName: 'openzeppelin',
   headerLinks: [
-    {doc: 'api', label: 'API'},
-    {page: 'help', label: 'Help'},
+    {href: 'https://openzeppelin.org', label: 'Home'},
   ],
   users,
   /* path to images for header/footer */
@@ -37,7 +36,7 @@ const siteConfig = {
   },
   // This copyright info is used in /core/Footer.js and blog rss/atom feeds.
   copyright:
-    'Copyright © 2017 Zeppelin Solutions',
+    'Copyright © 2017 Smart Contract Solutions',
   // organizationName: 'deltice', // or set an env variable ORGANIZATION_NAME
   // projectName: 'test-site', // or set an env variable PROJECT_NAME
   highlight: {

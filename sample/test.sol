@@ -25,9 +25,10 @@ contract Foo is Base {
   /**
    * @dev A function that foos
    * @param anInt an integer parameter
+   * @param aBoolean a boolean parameter
    * @return a boolean flag
    */
-  function foo(uint anInt) onlySometimes public returns (bool);
+  function foo(uint anInt, bool aBoolean) onlySometimes public returns (bool);
 }
 
 /// @title Bar

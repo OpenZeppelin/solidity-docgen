@@ -5,46 +5,51 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-/* List of projects/orgs using your project for the users page */
-const users = [
-  {
-    caption: 'User1',
-    image: '/test-site/img/docusaurus.svg',
-    infoLink: 'https://www.facebook.com',
-    pinned: true,
-  },
-];
-
 const siteConfig = {
-  title: 'OpenZeppelin' /* title for your website */,
+  title: 'OpenZeppelin',
   tagline: 'OpenZeppelin is an open framework of reusable and secure smart contracts in the Solidity language.',
-  url: 'https://openzeppelin.org' /* your website url */,
-  baseUrl: '/' /* base url for your project */,
+  url: 'https://openzeppelin.org',
+  baseUrl: '/api/',
   projectName: 'openzeppelin',
   headerLinks: [
-    {href: 'https://openzeppelin.org', label: 'Home'},
+    {
+      href: 'https://openzeppelin.org',
+      label: 'Home'
+    },
+    {
+      href: 'https://github.com/OpenZeppelin',
+      label: 'Github'
+    },
+    {
+      href: 'https://blog.zeppelin.solutions/guides/home',
+      label: 'Guides'
+    },
+    {
+      href: 'https://blog.zeppelin.solutions',
+      label: 'Blog'
+    },
+    {
+      href: '#',
+      label: 'Documentation'
+    }
   ],
-  users,
-  /* path to images for header/footer */
-  headerIcon: 'img/docusaurus.svg',
-  footerIcon: 'img/docusaurus.svg',
+  headerIcon: 'img/logo-zeppelin.png',
+  footerIcon: 'img/symbol-zeppelin.png',
   favicon: 'img/favicon.png',
-  /* colors for website */
   colors: {
-    primaryColor: '#5cb6e4',
-    secondaryColor: '#205C3B',
+    primaryColor: '#5CB6E4',
+    secondaryColor: 'white',
   },
-  // This copyright info is used in /core/Footer.js and blog rss/atom feeds.
   copyright:
-    'Copyright © 2017 Smart Contract Solutions',
-  // organizationName: 'deltice', // or set an env variable ORGANIZATION_NAME
-  // projectName: 'test-site', // or set an env variable PROJECT_NAME
+    'Copyright © 2018 Smart Contract Solutions',
   highlight: {
-    // Highlight.js theme to use for syntax highlighting in code blocks
     theme: 'default',
   },
   scripts: ['https://buttons.github.io/buttons.js'],
-  // You may provide arbitrary config keys to be used as needed by your template.
+  stylesheets: [
+    'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css',
+    'https://fonts.googleapis.com/css?family=Lato:100,200,300,400,500,700,400italic,700italic'
+  ],
   repoUrl: 'https://github.com/OpenZeppelin/zeppelin-solidity',
 };
 

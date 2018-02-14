@@ -1,0 +1,15 @@
+{
+  "docs-contracts": {
+    "INTRODUCTION": [
+      "open-zeppelin",
+      "get-started"
+    ],
+    {{#sections}}
+    "{{{sectionId}}}": [
+      {{#docs}}
+        "{{docId}}"{{^last}},{{/last}}
+      {{/docs}}
+    ]{{^last}},{{/last}}
+    {{/sections}}
+  }
+}

@@ -27,10 +27,6 @@ const siteConfig = {
     {
       href: 'https://blog.zeppelin.solutions',
       label: 'Blog'
-    },
-    {
-      href: '#',
-      label: 'Documentation'
     }
   ],
   headerIcon: 'img/logo-zeppelin.png',

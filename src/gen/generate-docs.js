@@ -8,6 +8,7 @@
 import { buildDocId } from './util'
 import AstNodeType from '../ast/ast-node-type'
 import AstWalker from '../ast/ast-walker'
+import checkPathExists from '../util/check-path-exists'
 import Document from '../components/document'
 import fs from 'fs'
 import get from '../util/safe-get'
@@ -20,12 +21,14 @@ import ReactDOMServer from 'react-dom/server'
  * Generates a doc file for each contract.
  */
 export default function (sources, contractsPath, version, repoBaseUrl, docusaurusPath) {
+  const docsPath = path.resolve(docusaurusPath, 'docs')
+  checkPathExists(docsPath)
   const docTemplate = fs.readFileSync(getDocTemplatePath(), 'utf-8')
   const idToHyperlink = buildIdToHyperlink(sources, contractsPath)
   const docViews = buildDocViews(sources, contractsPath, idToHyperlink, version, repoBaseUrl)
   for (const docView of docViews) {
     const docContent = Mustache.render(docTemplate, docView)
-    fs.writeFileSync(getDocOutputPath(docusaurusPath, docView.docId), docContent)
+    fs.writeFileSync(getDocOutputPath(docsPath, docView.docId), docContent)
   }
 }
 
@@ -151,6 +154,6 @@ function buildBaseAstWalker () {
 /**
  * Get output path for the given doc's markdown file.
  */
-function getDocOutputPath (docusaurusPath, docId) {
-  return path.resolve(docusaurusPath, 'docs', `api_${docId}.md`)
+function getDocOutputPath (docsPath, docId) {
+  return path.resolve(docsPath, `api_${docId}.md`)
 }

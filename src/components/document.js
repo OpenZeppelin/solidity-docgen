@@ -663,8 +663,11 @@ function getParameterTypeName (parameter) {
   if (get(parameter, 'parameter', 'constant')) {
     type.push('constant')
   }
-  if (get(typeName, 'typeName', 'nodeType') === 'ArrayTypeName') {
+  const nodeType = get(typeName, 'typeName', 'nodeType')
+  if (nodeType === AstNodeType.ARRAY_TYPE_NAME) {
     type.push(`${get(typeName, 'typeName', 'baseType.name')}[]`)
+  } else if (nodeType === AstNodeType.FUNCTION_TYPE_NAME) {
+    type.push(get(typeName, 'typeName', 'typeDescriptions.typeString'))
   } else {
     type.push(get(typeName, 'typeName', 'name'))
   }

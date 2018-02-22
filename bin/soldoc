@@ -7,20 +7,38 @@
  * See LICENSE file in project's root directory.
  */
 
-const soldoc = require('..').default
+const path = require('path')
+const fs = require('fs')
+const assert = require('assert')
 const program = require('commander')
+const soldoc = require('..').default
 const version = require('../package.json').version
 
 program
   .version(version, '-v, --version')
-  .arguments('<project_path> <docusaurus_path>')
-  .option('-x, --exclude <paths>', 'Comma-separated list of paths to exclude')
-  .action((projectPath, docusaurusPath, options) => {
-    let excludeDirectories = []
-    if (options.exclude) {
-      excludeDirectories = options.exclude.split(',')
-    }
-    soldoc(projectPath, docusaurusPath, excludeDirectories)
+  .arguments('<project_path> <contracts_path> <docusaurus_path>')
+  .option(
+    '-x, --exclude <paths>',
+    'Comma-separated list of paths to exclude (relative to contracts directory)'
+  )
+  .action((projectPathInput, contractsPathInput, docusaurusPathInput, options) => {
+    const projectPath = path.resolve(projectPathInput)
+    const contractsPath = path.resolve(contractsPathInput)
+    const docusaurusPath = path.resolve(docusaurusPathInput)
+    assert(fs.existsSync(projectPath), 'Project directory does not exist.')
+    assert(fs.existsSync(contractsPath), 'Contracts directory does not exist.')
+    assert(fs.existsSync(docusaurusPath), 'Docusaurus directory does not exist.')
+    const excludePaths = parseExcludeOption(contractsPath, options)
+    soldoc(projectPath, contractsPath, docusaurusPath, excludePaths)
   })
+
+function parseExcludeOption (contractsPath, options) {
+  if (!options.exclude) {
+    return []
+  }
+  return options.exclude.split(',').map(input => {
+    return path.resolve(contractsPath, input)
+  })
+}
 
 program.parse(process.argv)

@@ -33,46 +33,18 @@ const COMBINED_JSON_OPTIONS = [
 /**
  * Generate Docusaurus docs for the project's API.
  */
-export default function (projectPath, docusaurusPath, excludeDirectories) {
+export default function (projectPath, contractsPath, docusaurusPath, excludePaths) {
   checkPathExists(projectPath)
-  ensureDocusaurusExists(docusaurusPath)
+  checkPathExists(contractsPath)
+  checkPathExists(docusaurusPath)
+  excludePaths.forEach(excludePath => checkPathExists(excludePath))
   const solidityCompilerPath = getSolidityCompilerPath(process.env)
-  const packageJson = getPackage(path.resolve(projectPath, 'package.json'))
+  const packageJson = getPackage(projectPath)
   const version = get(packageJson, 'package.json', 'version')
   const repoBaseUrl = getRepoBaseUrl(packageJson)
-  const contractsPath = path.resolve(projectPath, 'contracts')
-  const excludePaths = excludeDirectories.map(directory => {
-    return path.resolve(contractsPath, directory)
-  })
   const { contracts, sources } = parseProject(solidityCompilerPath, contractsPath)
   generateSidebar(contracts, contractsPath, excludePaths, docusaurusPath)
   generateDocs(sources, contractsPath, version, repoBaseUrl, docusaurusPath)
-  updateDocusaurusVersion(docusaurusPath, version)
-}
-
-/**
- * Creates a docusuaurus template in docusaurusPath if it
- * does not yet exist.
- */
-function ensureDocusaurusExists (docusaurusPath) {
-  if (!fs.existsSync(docusaurusPath)) {
-    try {
-      handleErrorCode(shell.mkdir('-p', docusaurusPath))
-      shell.pushd('-q', docusaurusPath)
-      handleErrorCode(shell.exec('npm init -y', { silent: true }))
-      handleErrorCode(shell.exec('npm install docusaurus-init', { silent: true }))
-      handleErrorCode(shell.exec('npx docusaurus-init'))
-      shell.pushd('-q', 'website')
-      handleErrorCode(shell.exec('npm run examples versions', { silent: true }))
-      shell.popd('-q')
-      shell.mv('docs-examples-from-docusaurus', 'docs')
-      shell.mv('website/blog-examples-from-docusaurus', 'website/blog')
-      shell.popd('-q')
-    } catch (err) {
-      shell.rm('-rf', docusaurusPath)
-      throw err
-    }
-  }
 }
 
 /**
@@ -90,9 +62,10 @@ function getSolidityCompilerPath (env) {
 }
 
 /**
- * Get the project's version from package.json.
+ * Get the project's package from package.json.
  */
-function getPackage (packagePath) {
+function getPackage (projectPath) {
+  const packagePath = path.resolve(projectPath, 'package.json')
   checkPathExists(packagePath)
   return JSON.parse(fs.readFileSync(packagePath))
 }
@@ -101,8 +74,17 @@ function getPackage (packagePath) {
  * Get the project's base url.
  */
 function getRepoBaseUrl (packageJson) {
-  const { type, url } = get(packageJson, 'package.json', 'repository')
-  return url.slice(0, url.length - type.length - 1)
+  const repository = get(packageJson, 'package.json', 'repository')
+  if (typeof repository === 'string') {
+    if (repository.length > 0 && repository[repository.length - 1] !== '/') {
+      return `${repository}/`
+    }
+    return repository
+  } else {
+    const type = get(repository, 'repository', 'type')
+    const url = get(repository, 'repository', 'url')
+    return url.slice(0, url.length - type.length - 1)
+  }
 }
 
 /**
@@ -118,15 +100,6 @@ function parseProject (solidityCompilerPath, contractsPath) {
   ].join(' '), { silent: true })
   handleErrorCode(commandOutput)
   return JSON.parse(commandOutput.stdout)
-}
-
-/**
- * Update Docusaurus docs to new version.
- */
-function updateDocusaurusVersion (docusaurusPath, version) {
-  const websitePath = path.resolve(docusaurusPath, 'website')
-  shell.cd(websitePath)
-  handleErrorCode(shell.exec(`npm run version ${version}`))
 }
 
 /**

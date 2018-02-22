@@ -1,8 +1,16 @@
+/**
+ * @license
+ * MIT Licensed.
+ * Copyright (c) 2018 OpenZeppelin.
+ * See LICENSE file in project's root directory.
+ */
 
 /**
- *
+ * Parse the contents of a documentation comment to retrieve NatSpec
+ * encoded tags. See the NatSpec specification for more details:
+ * https://github.com/ethereum/wiki/wiki/Ethereum-Natural-Specification-Format
  */
-export function parseNatspec(docString) {
+export default function parseNatspec (docString) {
   if (docString === null || docString.length === 0) {
     return {}
   }
@@ -24,12 +32,10 @@ export function parseNatspec(docString) {
         content = content.substr(content.indexOf(' ') + 1).trim()
       }
       linesPerTag[currentTag] = [content]
-    }
-    else {
+    } else {
       if (readingTag) {
         linesPerTag[currentTag].push(line)
-      }
-      else {
+      } else {
         extraLines.push(line)
       }
     }

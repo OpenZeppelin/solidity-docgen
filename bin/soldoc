@@ -1,0 +1,26 @@
+#! /usr/bin/env node
+
+/**
+ * @license
+ * MIT Licensed.
+ * Copyright (c) 2018 OpenZeppelin.
+ * See LICENSE file in project's root directory.
+ */
+
+const soldoc = require('..').default
+const program = require('commander')
+const version = require('../package.json').version
+
+program
+  .version(version, '-v, --version')
+  .arguments('<project_path> <docusaurus_path>')
+  .option('-x, --exclude <paths>', 'Comma-separated list of paths to exclude')
+  .action((projectPath, docusaurusPath, options) => {
+    let excludeDirectories = []
+    if (options.exclude) {
+      excludeDirectories = options.exclude.split(',')
+    }
+    soldoc(projectPath, docusaurusPath, excludeDirectories)
+  })
+
+program.parse(process.argv)

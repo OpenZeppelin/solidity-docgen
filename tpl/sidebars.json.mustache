@@ -1,0 +1,11 @@
+{
+  "docs-api": {
+    {{#sections}}
+    "{{{sectionId}}}": [
+      {{#docs}}
+      "{{docId}}"{{^last}},{{/last}}
+      {{/docs}}
+    ]{{^last}},{{/last}}
+    {{/sections}}
+  }
+}

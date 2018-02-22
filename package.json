@@ -1,32 +1,41 @@
 {
-  "name": "solidity-docgen",
+  "name": "soldoc",
   "version": "0.1.0",
-  "description": "",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "make-docs": "babel-node src/index.js data/zeppelin-solidity/v1.6.0.json",
-    "examples": "cd website && docusaurus-examples",
-    "start": "cd website && docusaurus-start",
-    "build": "cd website && docusaurus-build",
-    "publish-gh-pages": "cd website && docusaurus-publish",
-    "write-translations": "cd website && docusaurus-write-translations",
-    "version": "cd website && docusaurus-version",
-    "rename-version": "cd website && docusaurus-rename-version"
+  "description": "Solidity API documentation automatic generator.",
+  "main": "lib/index.js",
+  "bin": {
+    "soldoc": "./bin/soldoc"
   },
-  "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "docusaurus": "^1.0.4",
-    "babel-cli": "^6.26.0",
-    "babel-plugin-transform-es2015-spread": "^6.22.0",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-react": "^6.24.1",
+  "scripts": {
+    "lint": "standard src/*.js src/**/*.js bin/* test/*.js test/**/*.js",
+    "build": "babel src --out-dir lib",
+    "build:watch": "babel src --out-dir lib --watch",
+    "test": "mocha --require babel-core/register"
+  },
+  "dependencies": {
+    "commander": "^2.14.1",
+    "lodash": "^4.17.5",
+    "mocha": "^5.0.1",
     "mustache": "^2.3.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-router": "^4.2.0"
+    "shelljs": "^0.8.1"
   },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-es2015-spread": "^6.22.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "standard": "^11.0.0"
+  },
+  "keywords": [
+    "solidity",
+    "api",
+    "documentation",
+    "automatic",
+    "generator"
+  ],
   "author": "spalladino@gmail.com",
   "license": "MIT"
 }

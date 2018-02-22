@@ -1,6 +1,0 @@
----
-id: ECRecovery
-title: ECRecovery
----
-
-<div class="contract-doc"><div class="contract"><h2 class="contract-header"><span class="contract-kind">library</span> ECRecovery</h2><div class="source">Source: <a href="https://github.com/OpenZeppelin/zeppelin-solidity/blob/v1.6.0/contracts/ECRecovery.sol" target="_blank">ECRecovery.sol</a></div></div><div class="index"><h2>Index</h2><ul><li><a href="ECRecovery.html#recover">recover</a></li></ul></div><div class="reference"><h2>Reference</h2><div class="functions"><h3>Functions</h3><ul><li><div class="item function"><span id="recover" class="anchor-marker"></span><h4 class="name">recover</h4><div class="body"><code class="signature">function <strong>recover</strong><span>(bytes32 hash, bytes sig) </span><span>public </span><span>pure </span><span>returns  (address) </span></code><hr/><div class="description"><p>Recover signer address from a message by using his signature.</p></div><dl><dt><span class="label-parameters">Parameters:</span></dt><dd><div><code>hash</code> - bytes32 message, the hash is the signed message. What is recovered is the signer address.</div><div><code>sig</code> - bytes signature, the signature is generated using web3.eth.sign()</div></dd></dl></div></div></li></ul></div></div></div>

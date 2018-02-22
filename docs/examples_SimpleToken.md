@@ -1,6 +1,0 @@
----
-id: examples_SimpleToken
-title: SimpleToken
----
-
-<div class="contract-doc"><div class="contract"><h2 class="contract-header"><span class="contract-kind">contract</span> SimpleToken</h2><p class="base-contracts"><span>is</span> <a href="token_ERC20_StandardToken.html">StandardToken</a></p><p class="description">Very simple ERC20 Token example, where all tokens are pre-assigned to the creator. Note they can later distribute these tokens as they wish using `transfer` and other `StandardToken` functions.</p><div class="source">Source: <a href="https://github.com/OpenZeppelin/zeppelin-solidity/blob/v1.6.0/contracts/examples/SimpleToken.sol" target="_blank">examples/SimpleToken.sol</a></div></div><div class="index"><h2>Index</h2><ul><li><a href="examples_SimpleToken.html#SimpleToken">SimpleToken</a></li></ul></div><div class="reference"><h2>Reference</h2><div class="functions"><h3>Functions</h3><ul><li><div class="item function"><span id="SimpleToken" class="anchor-marker"></span><h4 class="name">SimpleToken</h4><div class="body"><code class="signature">function <strong>SimpleToken</strong><span>() </span><span>public </span></code><hr/><div class="description"><p>Constructor that gives msg.sender all of existing tokens.</p></div></div></div></li></ul></div></div></div>

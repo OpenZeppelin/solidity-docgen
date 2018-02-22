@@ -76,5 +76,5 @@ To develop `soldoc`, the following commands will come in handy:
 
 ## TODOs
 
-- [ ] Remove all references to OpenZeppelin, so the generator can be used for any project.
-- [ ] Add tests for every step.
+- [ ] Add more tests.
+- [ ] Continuous Integration.

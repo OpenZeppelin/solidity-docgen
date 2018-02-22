@@ -17,11 +17,12 @@ import path from 'path'
 export default function (contracts, contractsPath, excludePaths, docusaurusPath) {
   const sidebarPath = getSidebarPath(docusaurusPath)
   checkPathExists(sidebarPath)
-  const previousSidebarView = JSON.parse(fs.readFileSync(sidebarPath))
   const sidebarTemplate = fs.readFileSync(getSidebarTemplatePath(), 'utf-8')
   const sidebarView = buildSidebarView(contracts, contractsPath, excludePaths)
-  const sidebarContent = Mustache.render(sidebarTemplate, Object.assign({}, sidebarView, previousSidebarView))
-  fs.writeFileSync(sidebarPath, sidebarContent)
+  const sidebarApi  = Mustache.render(sidebarTemplate, sidebarView)
+  const previousSidebar = JSON.parse(fs.readFileSync(sidebarPath))
+  const sidebarContent = Object.assign({}, previousSidebar, JSON.parse(sidebarApi))
+  fs.writeFileSync(sidebarPath, JSON.stringify(sidebarContent, null, 2))
 }
 
 /**

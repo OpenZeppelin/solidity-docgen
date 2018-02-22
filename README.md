@@ -50,7 +50,7 @@ You can also install this package locally with the following command:
 npm install --save-dev soldoc
 ```
 
-You can still use `soldoc` as an executable found at `<project_root>/node_modules/.bin/soldoc` or with the help of `npx soldoc`.
+You can still use `soldoc` as an executable found at `<project_root>/node_modules/.bin/soldoc` or with the help of [npx](https://www.npmjs.com/package/npx).
 
 ### Programatically
 
@@ -63,7 +63,7 @@ soldoc('~/dev/smartcontractz/', '~/dev/smartcontractz/contracts/', '~/dev/smartc
 
 ## How Does it Work?
 
-Given a [Docusarus](https://docusaurus.io/) template project, `soldoc` uses the combined-json output produced by the [Solidity compiler](https://github.com/ethereum/solidity) to generate a Docusaurus document for every Solidity contract in the `<contracts_path>` directory. Thereafter, the Docusaurus project can be modified as desired, by customizing styles or adding new introductory documents for example.
+Given a [Docusarus](https://docusaurus.io/) template project, `soldoc` uses the combined-json output produced by the [Solidity compiler](https://github.com/ethereum/solidity) to generate a Docusaurus document for every Solidity contract in the `<contracts_path>` directory. You can modify the Docusaurus project, for example by customizing styles or adding new introductory documents, and re-run `soldoc` at a later stage.
 
 ## Development
 

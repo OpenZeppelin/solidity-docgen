@@ -31,6 +31,8 @@ Usage: soldoc [options] <project_path> <docusaurus_path>
     -h, --help             output usage information
 ```
 
+where `project_path` is the path to any directory containing a `package.json` file and a `contracts` subdirectory where all the project's Solidity contracts are contained. `docusaurus_path` is the output path where the Docusaurus project will be created.
+
 For example, if your [Truffle](http://truffleframework.com/) project is at location `~/dev/smartcontractz`, you can use the following commands to generate API documentation for your project:
 
 ```sh
@@ -49,9 +51,27 @@ npm install --save-dev soldoc
 
 You can still use `soldoc` as an executable found at `<project_root>/node_modules/.bin/soldoc` or with the help of `npx soldoc`.
 
+### Programatically
+
+If you wish to call `soldoc` from your code, you can simply `require` the project and use it as a function:
+
+```javascript
+const soldoc = require('soldoc').default
+soldoc('~/dev/smartcontractz/', '~/dev/smartcontractz/docs/', ['examples'])
+```
+
 ## How Does it Work?
 
 As a first step, a [Docusarus](https://docusaurus.io/) template project is created with `docusaurus-init`. Next, `soldoc` uses the combined-json output produced by the [Solidity compiler](https://github.com/ethereum/solidity) to generate a Docusaurus document for every Solidity contract in the `<project_path>/contracts/` directory.
+
+## Development
+
+To develop `soldoc`, the following commands will come in handy:
+
+* `npm run lint`: Runs the [StandardJS](https://standardjs.com/) linter on the codebase.
+* `npm run build`: Babelifies the `src` directory into the `lib` directory.
+* `npm run build:watch`: Like the previous, but repeats the build after any changes on the `src` directory.
+* `npm run test`: Runs all tests.
 
 ## TODOs
 

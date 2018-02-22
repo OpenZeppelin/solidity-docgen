@@ -8,8 +8,10 @@ Builds a fully customizable [Docusaurus](https://docusaurus.io/)-powered website
 
 * [Node.js](https://nodejs.org/en/): 8.x.
 * [npm](https://nodejs.org/en/): 5.6.x.
-* [solc](https://github.com/ethereum/solidity): v0.4.21.
+* [solc](https://github.com/ethereum/solidity): v0.4.21 &ast;.
 * [Docusaurus](http://docusaurus.io/): existing Docusaurus project.
+
+&ast; For `soldoc` to work properly, a bug-fix was submitted via pull request to the Solidity compiler. Any release after the corresponding [commit](https://github.com/ethereum/solidity/commit/ca6957da37454ddd474b1feeaf02f7d06cba06b0) should include the bug-fix.
 
 ## Installation and Usage
 

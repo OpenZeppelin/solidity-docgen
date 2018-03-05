@@ -1,4 +1,4 @@
-# Solidity documentation generator
+# Solidity Documentation Generator
 
 Simple documentation generator for Solidity files currently used for [OpenZeppelin](https://github.com/OpenZeppelin/zeppelin-solidity).
 
@@ -19,7 +19,7 @@ Builds a fully customizable [Docusaurus](https://docusaurus.io/)-powered website
 
 You may wish to install this package globally:
 
-```
+```sh
 npm install -g soldoc
 ```
 
@@ -61,6 +61,29 @@ If you wish to call `soldoc` from your code, you can simply `require` the projec
 ```javascript
 const soldoc = require('soldoc').default
 soldoc('~/dev/smartcontractz/', '~/dev/smartcontractz/contracts/', '~/dev/smartcontractz/docs/', ['examples'])
+```
+
+## Dealing with Imports
+
+If your project uses imports from code which is external to your codebase - like is often the case when using [Truffle](http://truffleframework.com/) - `solc` needs to know where to find the external modules.
+
+For example, if you have the following code in your project:
+
+```solidity
+pragma solidity ^0.4.18;
+
+import 'zeppelin-solidity/contracts/crowdsale/Crowdsale.sol';
+
+contract MyCrowdsale is Crowdsale {
+  // ...
+}
+```
+
+You can run `soldoc` with the following command in order for `solc` to parse your project correctly:
+
+```sh
+SOLC_ARGS='zeppelin-solidity=~/dev/smartcontractz/node_modules/zeppelin-solidity' \
+soldoc ~/dev/smartcontractz ~/dev/smartcontractz/contracts ~/dev/smartcontractz/docs
 ```
 
 ## How Does it Work?

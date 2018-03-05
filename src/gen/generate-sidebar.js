@@ -19,7 +19,7 @@ export default function (contracts, contractsPath, excludePaths, docusaurusPath)
   checkPathExists(sidebarPath)
   const sidebarTemplate = fs.readFileSync(getSidebarTemplatePath(), 'utf-8')
   const sidebarView = buildSidebarView(contracts, contractsPath, excludePaths)
-  const sidebarApi  = Mustache.render(sidebarTemplate, sidebarView)
+  const sidebarApi = Mustache.render(sidebarTemplate, sidebarView)
   const previousSidebar = JSON.parse(fs.readFileSync(sidebarPath))
   const sidebarContent = Object.assign({}, previousSidebar, JSON.parse(sidebarApi))
   fs.writeFileSync(sidebarPath, JSON.stringify(sidebarContent, null, 2))
@@ -61,7 +61,8 @@ function getDocsPerSection (contracts, contractsPath, excludePaths) {
   const docsPerSection = {}
   for (const contract of Object.keys(contracts)) {
     const [path, contractName] = contract.split(':')
-    if (excludePaths.some(prefix => path.startsWith(prefix))) {
+    if (!path.startsWith(contractsPath) ||
+        excludePaths.some(prefix => path.startsWith(prefix))) {
       continue
     }
     const sectionId = buildSectionId(path, contractsPath)

@@ -39,10 +39,14 @@ export default function (projectPath, contractsPath, docusaurusPath, excludePath
   checkPathExists(docusaurusPath)
   excludePaths.forEach(excludePath => checkPathExists(excludePath))
   const solidityCompilerPath = getSolidityCompilerPath(process.env)
+  const solidityCompilerExtraArgs = getSolidityCompilerExtraArgs(process.env)
   const packageJson = getPackage(projectPath)
   const version = get(packageJson, 'package.json', 'version')
   const repoBaseUrl = getRepoBaseUrl(packageJson)
-  const { contracts, sources } = parseProject(solidityCompilerPath, contractsPath)
+  const {
+    contracts,
+    sources
+  } = parseProject(solidityCompilerPath, solidityCompilerExtraArgs, contractsPath)
   generateSidebar(contracts, contractsPath, excludePaths, docusaurusPath)
   generateDocs(sources, contractsPath, version, repoBaseUrl, docusaurusPath)
 }
@@ -59,6 +63,14 @@ function getSolidityCompilerPath (env) {
     ].join(' '))
   }
   return env.SOLC_PATH || 'solc'
+}
+
+/**
+ * Get optional extra arguments for the Solidity compiler
+ * from the SOLC_ARGS environment variable.
+ */
+function getSolidityCompilerExtraArgs (env) {
+  return env.SOLC_ARGS || ''
 }
 
 /**
@@ -90,13 +102,14 @@ function getRepoBaseUrl (packageJson) {
 /**
  * Parse the project using the Solidity compiler.
  */
-function parseProject (solidityCompilerPath, contractsPath) {
+function parseProject (solidityCompilerPath, solidityCompilerExtraArgs, contractsPath) {
   const commandOutput = shell.exec([
     `${solidityCompilerPath}`,
     `  --pretty-json`,
     `  --allow-paths ${contractsPath}`,
     `  --combined-json ${COMBINED_JSON_OPTIONS.join(',')}`,
-    `  ${contractsPath}/*.sol ${contractsPath}/**/*.sol`
+    `  ${solidityCompilerExtraArgs}`,
+    `  $(find ${contractsPath} -type f -name "*.sol")`
   ].join(' '), { silent: true })
   handleErrorCode(commandOutput)
   return JSON.parse(commandOutput.stdout)

@@ -4,7 +4,7 @@
   "description": "Solidity API documentation automatic generator.",
   "main": "lib/index.js",
   "bin": {
-    "soldoc": "./bin/soldoc"
+    "solidity-docgen": "./bin/solidity-docgen"
   },
   "scripts": {
     "lint": "standard src/*.js src/**/*.js bin/* test/*.js test/**/*.js",
@@ -37,5 +37,8 @@
     "generator"
   ],
   "author": "spalladino@gmail.com",
+  "contributors": [
+    "Emilio Almansi <ealmansi@gmail.com> (http://ealmansi.github.io/)"
+  ],
   "license": "MIT"
 }

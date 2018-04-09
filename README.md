@@ -11,7 +11,7 @@ Builds a fully customizable [Docusaurus](https://docusaurus.io/)-powered website
 * [solc](https://github.com/ethereum/solidity): v0.4.21 &ast;.
 * [Docusaurus](http://docusaurus.io/): existing Docusaurus project.
 
-&ast; For `soldoc` to work properly, a bug-fix was submitted via pull request to the Solidity compiler. Any release after the corresponding [commit](https://github.com/ethereum/solidity/commit/ca6957da37454ddd474b1feeaf02f7d06cba06b0) should include the bug-fix.
+&ast; For `solidity-docgen` to work properly, a bug-fix was submitted via pull request to the Solidity compiler. Any release after the corresponding [commit](https://github.com/ethereum/solidity/commit/ca6957da37454ddd474b1feeaf02f7d06cba06b0) should include the bug-fix.
 
 ## Installation and Usage
 
@@ -20,13 +20,13 @@ Builds a fully customizable [Docusaurus](https://docusaurus.io/)-powered website
 You may wish to install this package globally:
 
 ```sh
-npm install -g soldoc
+npm install -g solidity-docgen
 ```
 
-This will allow you to use `soldoc` as an executable with the following command-line interface:
+This will allow you to use `solidity-docgen` as an executable with the following command-line interface:
 
 ```
-Usage: soldoc [options] <project_path> <contracts_path> <docusaurus_path>
+Usage: solidity-docgen [options] <project_path> <contracts_path> <docusaurus_path>
   Options:
 
     -v, --version          output the version number
@@ -39,7 +39,7 @@ where `project_path` is the path to any directory containing a `package.json` fi
 For example, if your [Truffle](http://truffleframework.com/) project is at location `~/dev/smartcontractz` and your Docusaurus project for documentation is at location `~/dev/smartcontractz/docs`, you can use the following commands to generate API documentation for your project:
 
 ```sh
-soldoc --exclude examples ~/dev/smartcontractz ~/dev/smartcontractz/contracts ~/dev/smartcontractz/docs
+solidity-docgen --exclude examples ~/dev/smartcontractz ~/dev/smartcontractz/contracts ~/dev/smartcontractz/docs
 ```
 
 which will generate a Docusaurus document for every contract in your codebase.
@@ -49,18 +49,18 @@ which will generate a Docusaurus document for every contract in your codebase.
 You can also install this package locally with the following command:
 
 ```sh
-npm install --save-dev soldoc
+npm install --save-dev solidity-docgen
 ```
 
-You can still use `soldoc` as an executable found at `<project_root>/node_modules/.bin/soldoc` or with the help of [npx](https://www.npmjs.com/package/npx).
+You can still use `solidity-docgen` as an executable found at `<project_root>/node_modules/.bin/solidity-docgen` or with the help of [npx](https://www.npmjs.com/package/npx).
 
 ### Programatically
 
-If you wish to call `soldoc` from your code, you can simply `require` the project and use it as a function:
+If you wish to call `solidity-docgen` from your code, you can simply `require` the project and use it as a function:
 
 ```javascript
-const soldoc = require('soldoc').default
-soldoc('~/dev/smartcontractz/', '~/dev/smartcontractz/contracts/', '~/dev/smartcontractz/docs/', ['examples'])
+const docgen = require('solidity-docgen').default
+docgen('~/dev/smartcontractz/', '~/dev/smartcontractz/contracts/', '~/dev/smartcontractz/docs/', ['examples'])
 ```
 
 ## Dealing with Imports
@@ -79,20 +79,20 @@ contract MyCrowdsale is Crowdsale {
 }
 ```
 
-You can run `soldoc` with the following command in order for `solc` to parse your project correctly:
+You can run `solidity-docgen` with the following command in order for `solc` to parse your project correctly:
 
 ```sh
 SOLC_ARGS='zeppelin-solidity=~/dev/smartcontractz/node_modules/zeppelin-solidity' \
-soldoc ~/dev/smartcontractz ~/dev/smartcontractz/contracts ~/dev/smartcontractz/docs
+solidity-docgen ~/dev/smartcontractz ~/dev/smartcontractz/contracts ~/dev/smartcontractz/docs
 ```
 
 ## How Does it Work?
 
-Given a [Docusarus](https://docusaurus.io/) template project, `soldoc` uses the combined-json output produced by the [Solidity compiler](https://github.com/ethereum/solidity) to generate a Docusaurus document for every Solidity contract in the `<contracts_path>` directory. You can modify the Docusaurus project, for example by customizing styles or adding new introductory documents, and re-run `soldoc` at a later stage.
+Given a [Docusarus](https://docusaurus.io/) template project, `solidity-docgen` uses the combined-json output produced by the [Solidity compiler](https://github.com/ethereum/solidity) to generate a Docusaurus document for every Solidity contract in the `<contracts_path>` directory. You can modify the Docusaurus project, for example by customizing styles or adding new introductory documents, and re-run `solidity-docgen` at a later stage.
 
 ## Development
 
-To develop `soldoc`, the following commands will come in handy:
+To develop `solidity-docgen`, the following commands will come in handy:
 
 * `npm run lint`: Runs the [StandardJS](https://standardjs.com/) linter on the codebase.
 * `npm run build`: Babelifies the `src` directory into the `lib` directory.

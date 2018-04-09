@@ -11,7 +11,7 @@ const path = require('path')
 const fs = require('fs')
 const assert = require('assert')
 const program = require('commander')
-const soldoc = require('..').default
+const solidityDocgen = require('..').default
 const version = require('../package.json').version
 
 program
@@ -29,7 +29,7 @@ program
     assert(fs.existsSync(contractsPath), 'Contracts directory does not exist.')
     assert(fs.existsSync(docusaurusPath), 'Docusaurus directory does not exist.')
     const excludePaths = parseExcludeOption(contractsPath, options)
-    soldoc(projectPath, contractsPath, docusaurusPath, excludePaths)
+    solidityDocgen(projectPath, contractsPath, docusaurusPath, excludePaths)
   })
 
 function parseExcludeOption (contractsPath, options) {

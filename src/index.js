@@ -110,7 +110,7 @@ function parseProject (solidityCompilerPath, solidityCompilerExtraArgs, contract
     `  --combined-json ${COMBINED_JSON_OPTIONS.join(',')}`,
     `  ${solidityCompilerExtraArgs}`,
     `  $(find ${contractsPath} -type f -name "*.sol")`
-  ].join(' '), { silent: true })
+  ].join(' '), { silent: true, maxBuffer: 102400000 })
   handleErrorCode(commandOutput)
   return JSON.parse(commandOutput.stdout)
 }

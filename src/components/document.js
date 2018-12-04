@@ -641,7 +641,7 @@ function compareItemDefinitionsByName (itemDefinition1, itemDefinition2) {
  * Display name for fallback & constructor function.
  */
 const FUNCTION_NAME_FALLBACK = 'fallback'
-var FUNCTION_NAME_CONSTRUCTOR = 'constructor';
+const FUNCTION_NAME_CONSTRUCTOR = 'constructor';
 
 /**
  * Get an item's name.

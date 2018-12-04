@@ -638,9 +638,10 @@ function compareItemDefinitionsByName (itemDefinition1, itemDefinition2) {
 }
 
 /**
- * Display name for fallback function.
+ * Display name for fallback & constructor function.
  */
 const FUNCTION_NAME_FALLBACK = 'fallback'
+var FUNCTION_NAME_CONSTRUCTOR = 'constructor';
 
 /**
  * Get an item's name.
@@ -649,6 +650,9 @@ function getItemName (itemDefinition) {
   const nodeType = get(itemDefinition, 'item', 'nodeType')
   const name = get(itemDefinition, 'item', 'name')
   if (nodeType === AstNodeType.FUNCTION_DEFINITION && name === '') {
+    const isConstructor = get(itemDefinition, 'item', 'isConstructor');
+    if(isConstructor)
+      return FUNCTION_NAME_CONSTRUCTOR
     return FUNCTION_NAME_FALLBACK
   }
   return name

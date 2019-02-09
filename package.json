@@ -7,28 +7,20 @@
     "solidity-docgen": "./bin/solidity-docgen"
   },
   "scripts": {
-    "lint": "standard src/*.js src/**/*.js bin/* test/*.js test/**/*.js",
-    "build": "babel src --out-dir lib",
-    "build:watch": "babel src --out-dir lib --watch",
-    "test": "mocha --require babel-core/register",
-    "prepublish": "npm run build"
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "npm run test -- --watch"
   },
   "dependencies": {
+    "@types/jest": "^24.0.0",
     "commander": "^2.14.1",
-    "lodash": "^4.17.5",
-    "mocha": "^5.0.1",
-    "mustache": "^2.3.0",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
-    "shelljs": "^0.8.1"
+    "lodash": "^4.17.11"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-plugin-transform-es2015-spread": "^6.22.0",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-react": "^6.24.1",
-    "standard": "^11.0.0"
+    "@types/node": "^10.12.24",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.5",
+    "typescript": "^3.3.3"
   },
   "keywords": [
     "solidity",

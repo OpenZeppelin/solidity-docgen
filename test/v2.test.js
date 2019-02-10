@@ -1,6 +1,6 @@
 const assert = require('assert');
 
-const { getContractsWithASTNodes, groupByDirectory, getFunctions, generateContractDocumentation } = require('../src/v2.ts');
+const { getContractsWithASTNodes, groupByDirectory, getFunctions, generateContractDocumentation } = require('../src/v2');
 
 describe('getContractsWithASTNodes', function () {
   test('one contract in one file', function () {

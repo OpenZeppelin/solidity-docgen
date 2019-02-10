@@ -7,21 +7,18 @@
     "solidity-docgen": "./bin/solidity-docgen"
   },
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc -w",
-    "test": "npm run build && jest",
-    "test:watch": "concurrently -rki 'jest --watchAll' 'npm:build:watch > /dev/null'"
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "commander": "^2.14.1",
     "lodash": "^4.17.11"
   },
   "devDependencies": {
-    "concurrently": "^4.1.0",
-    "@types/jest": "^24.0.0",
-    "@types/node": "^10.12.24",
-    "jest": "^24.1.0",
-    "typescript": "^3.3.3"
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.3.1",
+    "jest": "^24.1.0"
   },
   "keywords": [
     "solidity",

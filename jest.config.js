@@ -1,3 +1,4 @@
 module.exports = {
-  preset: 'ts-jest',
-}
+  rootDir: 'build',
+  snapshotResolver: '../jestSnapshotResolver.js',
+};

@@ -1,6 +1,12 @@
 import path from 'path';
 import _ from 'lodash';
 
+export function getContractDocsPerDirectory(solcOutput) {
+  const contractsPerFile = getContractsPerFile(solcOutput);
+  const contractsPerDirectory = groupByDirectory(contractsPerFile);
+  return _.mapValues(contractsPerDirectory, contracts => contracts.map(getContractDocs));
+}
+
 export function getContractsPerFile(solcOutput) {
   return _.mapValues(solcOutput.contracts, function (contracts, file) {
     return _.map(contracts, function (contract, contractName) {

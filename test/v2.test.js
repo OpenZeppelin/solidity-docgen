@@ -1,6 +1,6 @@
-const assert = require('assert');
+import assert from 'assert';
 
-import { getContractsPerFile, groupByDirectory, getFunctions, getContractDocs } from '../src/v2';
+import { getContractsPerFile, groupByDirectory, getFunctions, getContractDocs, getContractDocsPerDirectory } from '../src/v2';
 
 describe('getContractsPerFile', function () {
   test('one contract in one file', function () {
@@ -288,5 +288,45 @@ describe('getContractDocs', function () {
     assert.deepEqual(getContractDocs(contract), documentation);
   });
 });
+
+describe('getContractDocsPerDirectory', function () {
+  test('1 contract in 1 subdirectory', function () {
+    const astNode = {
+      nodeType: 'ContractDefinition',
+      name: 'Foo',
+    };
+
+    const devdoc = Symbol('devdoc');
+
+    const solcOutput = {
+      contracts: {
+        'a/Foo.sol': {
+          'Foo': {
+            devdoc: {
+              details: devdoc,
+            },
+          },
+        },
+      },
+      sources: {
+        'a/Foo.sol': {
+          ast: {
+            nodes: [ astNode ],
+          },
+        },
+      },
+    };
+
+    const docsData = {
+      'a': [
+        {
+          name: 'Foo',
+          devdoc,
+          functions: [],
+        },
+      ],
+    };
+
+    assert.deepEqual(getContractDocsPerDirectory(solcOutput), docsData);
   });
 });

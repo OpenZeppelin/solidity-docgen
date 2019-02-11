@@ -1,8 +1,8 @@
 const assert = require('assert');
 
-const { getContractsWithASTNodes, groupByDirectory, getFunctions, generateContractDocumentation } = require('../src/v2');
+import { getContractsPerFile, groupByDirectory, getFunctions, getContractDocs } from '../src/v2';
 
-describe('getContractsWithASTNodes', function () {
+describe('getContractsPerFile', function () {
   test('one contract in one file', function () {
     const astNode = {
       nodeType: 'ContractDefinition',
@@ -25,9 +25,16 @@ describe('getContractsWithASTNodes', function () {
       },
     };
 
-    const contractsWithASTNodes = getContractsWithASTNodes(solcOutput);
+    const contractsPerFile = {
+      'Foo.sol': [
+        {
+          contractName: 'Foo',
+          astNode,
+        }
+      ],
+    };
 
-    assert.strictEqual(contractsWithASTNodes['Foo.sol']['Foo'].astNode, astNode);
+    assert.deepEqual(getContractsPerFile(solcOutput), contractsPerFile);
   });
 });
 
@@ -39,14 +46,14 @@ describe('groupByDirectory', function () {
 
   test('depth 1', function () {
     const contracts = {
-      'a/A1.sol': { A1 },
-      'a/A2.sol': { A2 },
-      'b/B1.sol': { B1 },
+      'a/A1.sol': [ A1 ],
+      'a/A2.sol': [ A2 ],
+      'b/B1.sol': [ B1 ],
     };
 
     const groupedContracts = {
-      'a': { A1, A2 },
-      'b': { B1 },
+      'a': [ A1, A2 ],
+      'b': [ B1 ],
     };
 
     assert.deepEqual(groupByDirectory(contracts), groupedContracts);
@@ -54,16 +61,16 @@ describe('groupByDirectory', function () {
 
   test('depth 1 and 2', function () {
     const contracts = {
-      'a/A1.sol': { A1 },
-      'a/A2.sol': { A2 },
-      'b/B1.sol': { B1 },
-      'b/c/C1.sol': { C1 },
+      'a/A1.sol': [ A1 ],
+      'a/A2.sol': [ A2 ],
+      'b/B1.sol': [ B1 ],
+      'b/c/C1.sol': [ C1 ],
     };
 
     const groupedContracts = {
-      'a': { A1, A2 },
-      'b': { B1 },
-      'b/c': { C1 },
+      'a': [ A1, A2 ],
+      'b': [ B1 ],
+      'b/c': [ C1 ],
     };
 
     assert.deepEqual(groupByDirectory(contracts), groupedContracts);
@@ -219,12 +226,13 @@ describe('getFunctions', function () {
   });
 });
 
-describe('generateContractDocumentation', function () {
+describe('getContractDocs', function () {
   test('no functions', function () {
-    const name = Symbol('name');
+    const contractName = Symbol('name');
     const devdoc = Symbol('devdoc');
 
     const contract = {
+      contractName,
       astNode: { nodes: [] },
       devdoc: {
         details: devdoc,
@@ -232,16 +240,16 @@ describe('generateContractDocumentation', function () {
     };
 
     const documentation = {
-      name,
+      name: contractName,
       devdoc,
       functions: [],
     };
 
-    assert.deepEqual(generateContractDocumentation(contract, name), documentation);
+    assert.deepEqual(getContractDocs(contract), documentation);
   });
 
   test('1 function', function () {
-    const name = Symbol('name');
+    const contractName = Symbol('name');
     const devdoc = Symbol('devdoc');
 
     const foo = {
@@ -255,6 +263,7 @@ describe('generateContractDocumentation', function () {
     };
 
     const contract = {
+      contractName,
       astNode: {
         nodes: [
           foo.astNode,
@@ -271,11 +280,13 @@ describe('generateContractDocumentation', function () {
     };
 
     const documentation = {
-      name,
+      name: contractName,
       devdoc,
       functions: [ foo ],
     };
 
-    assert.deepEqual(generateContractDocumentation(contract, name), documentation);
+    assert.deepEqual(getContractDocs(contract), documentation);
+  });
+});
   });
 });

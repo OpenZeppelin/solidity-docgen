@@ -21,3 +21,12 @@ Array [
   "devdoc",
 ]
 `;
+
+exports[`FunctionDocs basic function 1`] = `
+Array [
+  <h2>
+    foo()
+  </h2>,
+  "foo.devdoc",
+]
+`;

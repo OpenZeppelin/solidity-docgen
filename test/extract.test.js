@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { getContractsPerFile, groupByDirectory, getFunctions, getContractDocs, getContractDocsPerDirectory } from '../src/v2';
+import { getContractsPerFile, groupByDirectory, getFunctions, getContractDocs, getContractDocsPerDirectory } from '../src/extract';
 
 describe('getContractsPerFile', function () {
   test('one contract in one file', function () {

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ContractDocs 1 function 1`] = `
+exports[`1 function 1`] = `
 Array [
   <h2>
     Foo
@@ -13,20 +13,11 @@ Array [
 ]
 `;
 
-exports[`ContractDocs no functions 1`] = `
+exports[`no functions 1`] = `
 Array [
   <h2>
     Foo
   </h2>,
   "devdoc",
-]
-`;
-
-exports[`FunctionDocs basic function 1`] = `
-Array [
-  <h2>
-    foo()
-  </h2>,
-  "foo.devdoc",
 ]
 `;

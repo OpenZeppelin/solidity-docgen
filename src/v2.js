@@ -2,23 +2,17 @@ import path from 'path';
 import _ from 'lodash';
 
 export function getContractsWithASTNodes(solcOutput) {
-  const res = {};
-
-  for (const file of Object.keys(solcOutput.contracts)) {
-    res[file] = {};
-
-    for (const contract of Object.keys(solcOutput.contracts[file])) {
+  return _.mapValues(solcOutput.contracts, function (contracts, file) {
+    return _.mapValues(contracts, function (contract, contractName) {
       const { ast } = solcOutput.sources[file];
 
-      const astNode = ast.nodes.find(function (node) {
-        return node.nodeType === 'ContractDefinition' && node.name === contract;
-      });
+      const astNode = _(ast.nodes)
+        .filter(['nodeType', 'ContractDefinition'])
+        .find(['name', contractName]);
 
-      res[file][contract] = Object.assign({ astNode }, solcOutput.contracts[file][contract]);
-    }
-  }
-
-  return res;
+      return _.assign({ astNode }, contract);
+    });
+  });
 }
 
 export function groupByDirectory(contracts) {

@@ -20,12 +20,12 @@ import ReactDOMServer from 'react-dom/server'
 /**
  * Generates a doc file for each contract.
  */
-export default function (sources, contractsPath, version, repoBaseUrl, docusaurusPath) {
+export default function (sources, contractsPath, version, repoBaseUrl, docusaurusPath, repositoryRoot) {
   const docsPath = path.resolve(docusaurusPath, 'docs')
   checkPathExists(docsPath)
   const docTemplate = fs.readFileSync(getDocTemplatePath(), 'utf-8')
   const idToHyperlink = buildIdToHyperlink(sources, contractsPath)
-  const docViews = buildDocViews(sources, contractsPath, idToHyperlink, version, repoBaseUrl)
+  const docViews = buildDocViews(sources, contractsPath, idToHyperlink, version, repoBaseUrl, repositoryRoot)
   for (const docView of docViews) {
     const docContent = Mustache.render(docTemplate, docView)
     fs.writeFileSync(getDocOutputPath(docsPath, docView.docId), docContent)
@@ -93,7 +93,7 @@ function buildIdToHyperlink (sources, contractsPath) {
 /**
  * Builds view objects for all doc files' Mustache templates.
  */
-function buildDocViews (sources, contractsPath, idToHyperlink, version, repoBaseUrl) {
+function buildDocViews (sources, contractsPath, idToHyperlink, version, repoBaseUrl, repositoryRoot) {
   let state = { docs: [], contractsPath, idToHyperlink, version, repoBaseUrl }
   const astWalker = buildBaseAstWalker()
   astWalker.setStartFunction(AstNodeType.CONTRACT_DEFINITION, contractDefinitionStartFunction)
@@ -115,6 +115,7 @@ function buildDocViews (sources, contractsPath, idToHyperlink, version, repoBase
         idToHyperlink={idToHyperlink}
         version={version}
         repoBaseUrl={repoBaseUrl}
+        repositoryRoot={repositoryRoot}
       />
     )
     return {

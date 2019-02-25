@@ -16,20 +16,22 @@ const version = require('../package.json').version
 
 program
   .version(version, '-v, --version')
-  .arguments('<project_path> <contracts_path> <docusaurus_path>')
+  .arguments('<project_path> <contracts_path> <docusaurus_path> [repository_root]')
   .option(
     '-x, --exclude <paths>',
     'Comma-separated list of paths to exclude (relative to contracts directory)'
   )
-  .action((projectPathInput, contractsPathInput, docusaurusPathInput, options) => {
+  .action((projectPathInput, contractsPathInput, docusaurusPathInput, repositoryRootInput, options) => {
     const projectPath = path.resolve(projectPathInput)
     const contractsPath = path.resolve(contractsPathInput)
     const docusaurusPath = path.resolve(docusaurusPathInput)
+    const repositoryRoot = path.resolve(repositoryRootInput || projectPathInput)
     assert(fs.existsSync(projectPath), 'Project directory does not exist.')
     assert(fs.existsSync(contractsPath), 'Contracts directory does not exist.')
     assert(fs.existsSync(docusaurusPath), 'Docusaurus directory does not exist.')
+    assert(fs.existsSync(repositoryRoot), 'Repository root directory does not exist.')
     const excludePaths = parseExcludeOption(contractsPath, options)
-    solidityDocgen(projectPath, contractsPath, docusaurusPath, excludePaths)
+    solidityDocgen(projectPath, contractsPath, docusaurusPath, repositoryRoot, excludePaths)
   })
 
 function parseExcludeOption (contractsPath, options) {

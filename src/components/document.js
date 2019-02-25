@@ -95,7 +95,7 @@ function BaseContracts (props) {
 function ContractSource (props) {
   const { contractsPath, absolutePath, version, repoBaseUrl, repositoryRoot } = props
   const relativePath = path.relative(absolutePath, repositoryRoot)
-  const href = `${repoBaseUrl.replace('git+', '')}/blob/v${version}/${relativePath}`
+  const href = `${repoBaseUrl.replace(/^git\+/, '')}/blob/v${version}/${relativePath}`
   return (
     <div className='source'>
       Source:&nbsp;<a href={href} target='_blank'>{relativePath}</a>

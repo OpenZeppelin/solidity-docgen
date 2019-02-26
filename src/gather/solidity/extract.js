@@ -41,7 +41,7 @@ export function getFunctions(contract) {
   return _(contract.astNode.nodes)
     .filter(['nodeType', 'FunctionDefinition'])
     .map(function (astNode) {
-      const { name, parameters } = astNode;
+      const { name, parameters: { parameters } } = astNode;
       const args = _(parameters).map('typeDescriptions.typeString').join(',');
       const methodIdentifier = `${name}(${args})`;
 

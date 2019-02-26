@@ -30,7 +30,7 @@ describe('getContractsPerFile', function () {
         {
           contractName: 'Foo',
           astNode,
-        }
+        },
       ],
     };
 
@@ -84,7 +84,9 @@ describe('getFunctions', function () {
       astNode: {
         nodeType: 'FunctionDefinition',
         name: 'foo',
-        parameters: [],
+        parameters: {
+          parameters: [],
+        },
       },
       devdoc: Symbol('foo.devdoc'),
     };
@@ -113,13 +115,15 @@ describe('getFunctions', function () {
       astNode: {
         nodeType: 'FunctionDefinition',
         name: 'foo',
-        parameters: [
-          {
-            typeDescriptions: {
-              typeString: 'uint256',
+        parameters: {
+          parameters: [
+            {
+              typeDescriptions: {
+                typeString: 'uint256',
+              },
             },
-          },
-        ],
+          ],
+        },
       },
       devdoc: Symbol('foo.devdoc'),
     };
@@ -148,18 +152,20 @@ describe('getFunctions', function () {
       astNode: {
         nodeType: 'FunctionDefinition',
         name: 'foo',
-        parameters: [
-          {
-            typeDescriptions: {
-              typeString: 'uint256',
+        parameters: {
+          parameters: [
+            {
+              typeDescriptions: {
+                typeString: 'uint256',
+              },
             },
-          },
-          {
-            typeDescriptions: {
-              typeString: 'uint256',
+            {
+              typeDescriptions: {
+                typeString: 'uint256',
+              },
             },
-          },
-        ],
+          ],
+        },
       },
       devdoc: Symbol('foo.devdoc'),
     };
@@ -188,7 +194,9 @@ describe('getFunctions', function () {
       astNode: {
         nodeType: 'FunctionDefinition',
         name: 'foo',
-        parameters: [],
+        parameters: {
+          parameters: [],
+        },
       },
       devdoc: Symbol('foo.devdoc'),
     };
@@ -198,7 +206,9 @@ describe('getFunctions', function () {
       astNode: {
         nodeType: 'FunctionDefinition',
         name: 'bar',
-        parameters: [],
+        parameters: {
+          parameters: [],
+        },
       },
       devdoc: Symbol('bar.devdoc'),
     };
@@ -257,7 +267,9 @@ describe('getContractDocs', function () {
       astNode: {
         nodeType: 'FunctionDefinition',
         name: 'foo',
-        parameters: [],
+        parameters: {
+          parameters: [],
+        },
       },
       devdoc: Symbol('foo.devdoc'),
     };

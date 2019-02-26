@@ -26,6 +26,7 @@ describe('Document', function () {
           idToHyperlink={{}}
           version={'1.0.0'}
           repoBaseUrl={'http://gitlab.com/somerepo/'}
+          repositoryRoot={''}
         />
       )
       assert.doesNotThrow(() => {

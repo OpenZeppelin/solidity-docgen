@@ -11,7 +11,7 @@
     "build": "babel src --out-dir lib",
     "build:watch": "babel src --out-dir lib --watch",
     "test": "mocha --require babel-core/register",
-    "prepublish": "npm run build"
+    "prepare": "npm run build"
   },
   "dependencies": {
     "commander": "^2.14.1",

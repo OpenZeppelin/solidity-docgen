@@ -26,7 +26,7 @@ npm install -g solidity-docgen
 This will allow you to use `solidity-docgen` as an executable with the following command-line interface:
 
 ```
-Usage: solidity-docgen [options] <project_path> <contracts_path> <docusaurus_path>
+Usage: solidity-docgen [options] <project_path> <contracts_path> <docusaurus_path> [repository_root]
   Options:
 
     -v, --version          output the version number
@@ -34,7 +34,7 @@ Usage: solidity-docgen [options] <project_path> <contracts_path> <docusaurus_pat
     -h, --help             output usage information
 ```
 
-where `project_path` is the path to any directory containing a `package.json` file, `contracts_path` is the path to the directory containing all the project's Solidity contracts, and `docusaurus_path` is path to an existing Docusaurus project where all API documents will be created.
+where `project_path` is the path to any directory containing a `package.json` file, `contracts_path` is the path to the directory containing all the project's Solidity contracts, and `docusaurus_path` is path to an existing Docusaurus project where all API documents will be created. If your project is a monorepo with multiple packages, for source code links to be correct you need to pass the optional argument `repository_root` with the path to the root of the repository.
 
 For example, if your [Truffle](http://truffleframework.com/) project is at location `~/dev/smartcontractz` and your Docusaurus project for documentation is at location `~/dev/smartcontractz/docs`, you can use the following commands to generate API documentation for your project:
 

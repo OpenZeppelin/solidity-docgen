@@ -26,6 +26,7 @@ program
     const contractsPath = path.resolve(contractsPathInput)
     const docusaurusPath = path.resolve(docusaurusPathInput)
     const repositoryRoot = path.resolve(repositoryRootInput || projectPathInput)
+    assert(projectPath.indexOf(repositoryRoot) === 0, 'Project path is not a subdirectory of repository root.')
     assert(fs.existsSync(projectPath), 'Project directory does not exist.')
     assert(fs.existsSync(contractsPath), 'Contracts directory does not exist.')
     assert(fs.existsSync(docusaurusPath), 'Docusaurus directory does not exist.')

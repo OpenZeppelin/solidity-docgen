@@ -11,9 +11,13 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@resolver-engine/imports": "^0.3.2",
+    "@resolver-engine/imports-fs": "^0.3.2",
     "commander": "^2.14.1",
+    "glob": "^7.1.3",
     "lodash": "^4.17.11",
-    "react": "^16.8.1"
+    "react": "^16.8.1",
+    "solc": "^0.5.4"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",

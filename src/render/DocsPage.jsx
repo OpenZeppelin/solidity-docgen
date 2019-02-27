@@ -1,10 +1,12 @@
 import React from 'react';
 
+import { ContractDocs } from './ContractDocs';
+
 export function DocsPage(props) {
-  const { readme, contracts } = props;
+  const { head, contracts } = props;
 
   return [ 
-    readme,
+    head,
     contracts.map(contract => <ContractDocs { ...contract } />),
   ];
 }

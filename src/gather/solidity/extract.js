@@ -1,9 +1,9 @@
 import path from 'path';
 import _ from 'lodash';
 
-export function extractDocsPerDirectory(solcOutput) {
+export function extractDocsPerDirectory(solcOutput, relativeTo) {
   const contractsPerFile = getContractsPerFile(solcOutput);
-  const contractsPerDirectory = groupByDirectory(contractsPerFile);
+  const contractsPerDirectory = groupByDirectory(contractsPerFile, relativeTo);
   return _.mapValues(contractsPerDirectory, contracts => contracts.map(extractDocs));
 }
 
@@ -21,11 +21,11 @@ export function getContractsPerFile(solcOutput) {
   });
 }
 
-export function groupByDirectory(contractsPerFile) {
+export function groupByDirectory(contractsPerFile, relativeTo) {
   const groupedContracts = {};
 
   for (const file of Object.keys(contractsPerFile)) {
-    const dir = path.dirname(file);
+    const dir = path.relative(relativeTo, path.dirname(file));
 
     if (!groupedContracts[dir]) {
       groupedContracts[dir] = [];

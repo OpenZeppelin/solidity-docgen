@@ -1,12 +1,5 @@
 #!/usr/bin/env node
 
-/**
- * @license
- * MIT Licensed.
- * Copyright (c) 2018 OpenZeppelin.
- * See LICENSE file in project's root directory.
- */
-
 const path = require('path')
 const fs = require('fs')
 const assert = require('assert')

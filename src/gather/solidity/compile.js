@@ -1,13 +1,13 @@
 import _ from 'lodash';
 import path from 'path';
+import fs from 'fs';
 import glob from 'glob';
 import solc from 'solc';
 import process from 'process';
 import { promisify } from 'util';
-import { gatherSources } from '@resolver-engine/imports';
-import { ImportsFsEngine } from '@resolver-engine/imports-fs';
 
 const globAsync = promisify(glob);
+const readFileAsync = promisify(fs.readFile);
 
 const compilerSettings = {
   outputSelection: {
@@ -26,8 +26,10 @@ const compilerSettings = {
 
 export async function compile(directory) {
   const files = await globAsync(path.join(directory, '**/*.sol'));
-  const sourceObjects = await gatherSources(files, process.cwd(), ImportsFsEngine());
-  const sources = _.fromPairs(sourceObjects.map(source => [source.name, { content: source.source }]));
+  const sources = _.fromPairs(await Promise.all(files.map(async file => [
+    file,
+    { content: await readFileAsync(file, 'utf8') },
+  ])));
 
   const inputJSON = {
     language: "Solidity",

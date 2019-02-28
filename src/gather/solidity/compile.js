@@ -40,7 +40,7 @@ export async function compile(directory) {
   const solcOutputString = solc.compile(JSON.stringify(inputJSON));
   const solcOutput = JSON.parse(solcOutputString);
 
-  if (solcOutput.errors) {
+  if (_.some(solcOutput.errors, ['severity', 'error'])) {
     console.error(solcOutput.errors);
     throw new Error();
   }

@@ -40,12 +40,13 @@ export function groupByDirectory(contractsPerFile, relativeTo) {
 export function getFunctions(contract) {
   return _(contract.astNode.nodes)
     .filter(['nodeType', 'FunctionDefinition'])
+    .reject(['visibility', 'internal'])
     .map(function (astNode) {
       const { name, parameters: { parameters } } = astNode;
       const args = _(parameters).map('typeDescriptions.typeString').join(',');
       const methodIdentifier = `${name}(${args})`;
 
-      const devdoc = contract.devdoc.methods[methodIdentifier].details;
+      const devdoc = _.get(contract.devdoc.methods[methodIdentifier], 'details', '');
 
       return {
         astNode,

@@ -9,11 +9,12 @@ export function ContractDocs(props) {
     <FunctionDocs key={ fn.methodIdentifier } {...fn} />
   ));
 
-  return (
-    <>
-      <h2>{ name }</h2>
-      { devdoc }
-      { functionDocs }
-    </>
-  );
+  return [
+    <h2>{ name }</h2>,
+    '\n\n',
+    devdoc,
+    '\n\n',
+    functionDocs,
+    '\n\n',
+  ];
 }

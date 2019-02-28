@@ -7,6 +7,7 @@ export function DocsPage(props) {
 
   return [ 
     head,
+    '\n\n',
     contracts.map(contract => <ContractDocs { ...contract } />),
   ];
 }

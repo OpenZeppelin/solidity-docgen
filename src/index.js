@@ -25,3 +25,8 @@ export async function writeDocs(docs, outputDirectory) {
     await writeFileAsync(outputFile, docs[name]);
   }));
 }
+
+export async function renderAndWriteDirectoryDocs(directory, outputDirectory) {
+  const docs = await renderDirectoryDocs(directory);
+  await writeDocs(docs, outputDirectory);
+}

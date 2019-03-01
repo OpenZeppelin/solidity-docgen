@@ -2,9 +2,8 @@
   "name": "solidity-docgen",
   "version": "0.1.0",
   "description": "Solidity API documentation automatic generator.",
-  "main": "lib/index.js",
   "bin": {
-    "solidity-docgen": "./bin/solidity-docgen"
+    "solidity-docgen": "./dist/cli.js"
   },
   "scripts": {
     "build": "babel --out-dir dist src",

@@ -8,6 +8,8 @@ export function DocsPage(props) {
   return [ 
     head,
     '\n\n',
-    contracts.map(contract => <ContractDocs { ...contract } />),
+    contracts.map(contract => (
+      <ContractDocs key={ contract.name } { ...contract } />
+    )),
   ];
 }

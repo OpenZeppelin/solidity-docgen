@@ -6,7 +6,7 @@ export function ContractDocs(props) {
   const { name, devdoc, functions } = props;
 
   const functionDocs = functions.map(fn => (
-    <FunctionDocs key={ fn.methodIdentifier } {...fn} />
+    <FunctionDocs key={ fn.identifier } {...fn} />
   ));
 
   return [

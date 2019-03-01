@@ -80,7 +80,7 @@ describe('groupByDirectory', function () {
 describe('getFunctions', function () {
   test('no arguments', function () {
     const foo = {
-      methodIdentifier: 'foo()',
+      identifier: 'foo()',
       astNode: {
         nodeType: 'FunctionDefinition',
         name: 'foo',
@@ -97,7 +97,7 @@ describe('getFunctions', function () {
       },
       devdoc: {
         methods: {
-          [foo.methodIdentifier]: {
+          [foo.identifier]: {
             details: foo.devdoc,
           },
         },
@@ -111,7 +111,7 @@ describe('getFunctions', function () {
 
   test('1 argument', function () {
     const foo = {
-      methodIdentifier: 'foo(uint256)',
+      identifier: 'foo(uint256)',
       astNode: {
         nodeType: 'FunctionDefinition',
         name: 'foo',
@@ -134,7 +134,7 @@ describe('getFunctions', function () {
       },
       devdoc: {
         methods: {
-          [foo.methodIdentifier]: {
+          [foo.identifier]: {
             details: foo.devdoc,
           },
         },
@@ -148,7 +148,7 @@ describe('getFunctions', function () {
 
   test('2 arguments', function () {
     const foo = {
-      methodIdentifier: 'foo(uint256,uint256)',
+      identifier: 'foo(uint256,uint256)',
       astNode: {
         nodeType: 'FunctionDefinition',
         name: 'foo',
@@ -176,7 +176,7 @@ describe('getFunctions', function () {
       },
       devdoc: {
         methods: {
-          [foo.methodIdentifier]: {
+          [foo.identifier]: {
             details: foo.devdoc,
           },
         },
@@ -190,7 +190,7 @@ describe('getFunctions', function () {
 
   test('2 functions', function () {
     const foo = {
-      methodIdentifier: 'foo()',
+      identifier: 'foo()',
       astNode: {
         nodeType: 'FunctionDefinition',
         name: 'foo',
@@ -202,7 +202,7 @@ describe('getFunctions', function () {
     };
 
     const bar = {
-      methodIdentifier: 'bar()',
+      identifier: 'bar()',
       astNode: {
         nodeType: 'FunctionDefinition',
         name: 'bar',
@@ -220,10 +220,10 @@ describe('getFunctions', function () {
       },
       devdoc: {
         methods: {
-          [bar.methodIdentifier]: {
+          [bar.identifier]: {
             details: bar.devdoc,
           },
-          [foo.methodIdentifier]: {
+          [foo.identifier]: {
             details: foo.devdoc,
           },
         },
@@ -263,7 +263,7 @@ describe('extractDocs', function () {
     const devdoc = Symbol('devdoc');
 
     const foo = {
-      methodIdentifier: 'foo()',
+      identifier: 'foo()',
       astNode: {
         nodeType: 'FunctionDefinition',
         name: 'foo',
@@ -284,7 +284,7 @@ describe('extractDocs', function () {
       devdoc: {
         details: devdoc,
         methods: {
-          [foo.methodIdentifier]: {
+          [foo.identifier]: {
             details: foo.devdoc,
           },
         },

@@ -46,11 +46,11 @@ export function getFunctions(contract) {
       const args = _(parameters).map('typeDescriptions.typeString').join(',');
       const methodIdentifier = `${name}(${args})`;
 
-      const devdoc = _.get(contract.devdoc.methods[methodIdentifier], 'details', '');
+      const devdoc = _.get(contract.devdoc.methods[identifier], 'details', '');
 
       return {
         astNode,
-        methodIdentifier,
+        identifier,
         devdoc,
       };
     })

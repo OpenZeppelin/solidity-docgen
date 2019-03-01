@@ -1,7 +1,7 @@
 import React from 'react';
 
 export function FunctionDocs(props) {
-  const { methodIdentifier, devdoc } = props;
+  const { identifier, devdoc } = props;
 
   return [
     <h3>{ methodIdentifier }</h3>,

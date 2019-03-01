@@ -19,7 +19,7 @@ test('no functions', function () {
 
 test('1 function', function () {
   const foo = {
-    methodIdentifier: 'foo()',
+    identifier: 'foo()',
     astNode: {
       nodeType: 'FunctionDefinition',
       name: 'foo',

@@ -5,6 +5,9 @@
   "bin": {
     "solidity-docgen": "./dist/cli.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "babel --out-dir dist src",
     "test": "jest",

@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { getContractsPerFile, groupByDirectory, getFunctions, getContractDocs, getContractDocsPerDirectory } from './extract';
+import { getContractsPerFile, groupByDirectory, getFunctions, extractDocs, extractDocsPerDirectory } from './extract';
 
 describe('getContractsPerFile', function () {
   test('one contract in one file', function () {
@@ -236,7 +236,7 @@ describe('getFunctions', function () {
   });
 });
 
-describe('getContractDocs', function () {
+describe('extractDocs', function () {
   test('no functions', function () {
     const contractName = Symbol('name');
     const devdoc = Symbol('devdoc');
@@ -255,7 +255,7 @@ describe('getContractDocs', function () {
       functions: [],
     };
 
-    assert.deepEqual(getContractDocs(contract), documentation);
+    assert.deepEqual(extractDocs(contract), documentation);
   });
 
   test('1 function', function () {
@@ -297,11 +297,11 @@ describe('getContractDocs', function () {
       functions: [ foo ],
     };
 
-    assert.deepEqual(getContractDocs(contract), documentation);
+    assert.deepEqual(extractDocs(contract), documentation);
   });
 });
 
-describe('getContractDocsPerDirectory', function () {
+describe('extractDocsPerDirectory', function () {
   test('1 contract in 1 subdirectory', function () {
     const astNode = {
       nodeType: 'ContractDefinition',
@@ -339,6 +339,6 @@ describe('getContractDocsPerDirectory', function () {
       ],
     };
 
-    assert.deepEqual(getContractDocsPerDirectory(solcOutput), docsData);
+    assert.deepEqual(extractDocsPerDirectory(solcOutput), docsData);
   });
 });

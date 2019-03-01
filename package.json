@@ -7,8 +7,10 @@
     "solidity-docgen": "./bin/solidity-docgen"
   },
   "scripts": {
+    "build": "babel --out-dir dist src",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "commander": "^2.14.1",

@@ -42,9 +42,10 @@ export function getFunctions(contract) {
     .filter(['nodeType', 'FunctionDefinition'])
     .reject(['visibility', 'internal'])
     .map(function (astNode) {
-      const { name, parameters: { parameters } } = astNode;
+      const { name, kind, parameters: { parameters } } = astNode;
       const args = _(parameters).map('typeDescriptions.typeString').join(',');
-      const methodIdentifier = `${name}(${args})`;
+      const isConstructor = kind === 'constructor';
+      const identifier = isConstructor ? 'constructor' : `${name}(${args})`;
 
       const devdoc = _.get(contract.devdoc.methods[identifier], 'details', '');
 

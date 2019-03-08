@@ -33,10 +33,11 @@ const COMBINED_JSON_OPTIONS = [
 /**
  * Generate Docusaurus docs for the project's API.
  */
-export default function (projectPath, contractsPath, docusaurusPath, excludePaths) {
+export default function (projectPath, contractsPath, docusaurusPath, repositoryRoot, excludePaths) {
   checkPathExists(projectPath)
   checkPathExists(contractsPath)
   checkPathExists(docusaurusPath)
+  checkPathExists(repositoryRoot)
   excludePaths.forEach(excludePath => checkPathExists(excludePath))
   const solidityCompilerPath = getSolidityCompilerPath(process.env)
   const solidityCompilerExtraArgs = getSolidityCompilerExtraArgs(process.env)
@@ -48,7 +49,7 @@ export default function (projectPath, contractsPath, docusaurusPath, excludePath
     sources
   } = parseProject(solidityCompilerPath, solidityCompilerExtraArgs, contractsPath)
   generateSidebar(contracts, contractsPath, excludePaths, docusaurusPath)
-  generateDocs(sources, contractsPath, version, repoBaseUrl, docusaurusPath)
+  generateDocs(sources, contractsPath, version, repoBaseUrl, docusaurusPath, repositoryRoot)
 }
 
 /**

@@ -10,6 +10,7 @@ import AstWalker from '../ast/ast-walker'
 import get from '../util/safe-get'
 import parseNatspec from '../util/parse-natspec'
 import React from 'react'
+import path from 'path'
 
 /**
  * Render the content of a Docusaurus document for a specific contract.
@@ -92,9 +93,9 @@ function BaseContracts (props) {
  * Render link to contract's source.
  */
 function ContractSource (props) {
-  const { contractsPath, absolutePath, version, repoBaseUrl } = props
-  const relativePath = absolutePath.slice(contractsPath.length + 1)
-  const href = `${repoBaseUrl}/blob/v${version}/contracts/${relativePath}`
+  const { contractsPath, absolutePath, version, repoBaseUrl, repositoryRoot } = props
+  const relativePath = path.relative(repositoryRoot, absolutePath)
+  const href = `${repoBaseUrl.replace(/^git\+/, '')}/blob/v${version}/${relativePath}`
   return (
     <div className='source'>
       Source:&nbsp;<a href={href} target='_blank'>{relativePath}</a>

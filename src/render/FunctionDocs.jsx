@@ -1,11 +1,11 @@
 import React from 'react';
 
 export function FunctionDocs(props) {
-  const { identifier, devdoc } = props;
+  const { identifier, devdoc, contractName } = props;
 
   return (
     <>
-    <h3>{ identifier }</h3>
+    <h3 id={ contractName + '.' + identifier }>{ identifier }</h3>
     { '\n\n' }
     { devdoc }
     { '\n\n' }

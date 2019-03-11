@@ -6,7 +6,15 @@ export function ContractDocs(props) {
   const { name, devdoc, functions } = props;
 
   const functionDocs = functions.map(fn => (
-    <FunctionDocs key={ fn.identifier } {...fn} />
+    <FunctionDocs key={ fn.identifier } {...fn} contractName={ name } />
+  ));
+
+  const functionIndex = functions.map(fn => (
+    <li key={ fn.identifier }>
+      <a href={ '#' + name + '.' + fn.identifier }>
+        { fn.identifier }
+      </a>
+    </li>
   ));
 
   return (
@@ -14,6 +22,10 @@ export function ContractDocs(props) {
     <h2>{ name }</h2>
     { '\n\n' }
     { devdoc }
+    { '\n\n' }
+    <ul>
+      { functionIndex }
+    </ul>
     { '\n\n' }
     { functionDocs }
     { '\n\n' }

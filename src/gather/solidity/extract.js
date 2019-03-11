@@ -43,8 +43,8 @@ export function getFunctions(contract) {
     .map(function (astNode) {
       const { name, kind, parameters: { parameters } } = astNode;
       const args = _(parameters).map('typeDescriptions.typeString').join(',');
-      const isConstructor = kind === 'constructor';
-      const identifier = isConstructor ? 'constructor' : `${name}(${args})`;
+      const isRegularFunction = kind === 'function';
+      const identifier = isRegularFunction ? `${name}(${args})` : kind;
 
       const devdoc = parseDocumentation(astNode.documentation);
 

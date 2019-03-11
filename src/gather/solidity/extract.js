@@ -40,14 +40,13 @@ export function groupByDirectory(contractsPerFile, relativeTo = '') {
 export function getFunctions(contract) {
   return _(contract.astNode.nodes)
     .filter(['nodeType', 'FunctionDefinition'])
-    .reject(['visibility', 'internal'])
     .map(function (astNode) {
       const { name, kind, parameters: { parameters } } = astNode;
       const args = _(parameters).map('typeDescriptions.typeString').join(',');
       const isConstructor = kind === 'constructor';
       const identifier = isConstructor ? 'constructor' : `${name}(${args})`;
 
-      const devdoc = _.get(contract.devdoc.methods[identifier], 'details', '');
+      const devdoc = parseDocumentation(astNode.documentation);
 
       return {
         astNode,
@@ -58,14 +57,28 @@ export function getFunctions(contract) {
     .value();
 }
 
+export function parseDocumentation(documentation) {
+  documentation = documentation || '';
+
+  // compensates for a bug in solidity where double newlines are wrongly parsed
+  documentation = documentation.replace(/\s+\*\s+/g, '\n\n');
+
+  // extracts the first @dev NatSpec tag
+  const matches = documentation.match(/^@dev\s+((?:(?!^@\w+).)*)/ms);
+  documentation = matches ? matches[1] : '';
+
+  return documentation;
+}
+
 export function extractDocs(contract) {
   const { contractName } = contract;
 
   const functions = getFunctions(contract);
+  const devdoc = parseDocumentation(contract.astNode.documentation);
 
   return {
     name: contractName,
-    devdoc: contract.devdoc.details,
+    devdoc,
     functions,
   };
 }

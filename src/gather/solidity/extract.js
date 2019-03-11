@@ -37,6 +37,25 @@ export function groupByDirectory(contractsPerFile, relativeTo = '') {
   return groupedContracts;
 }
 
+export function getEvents(contract) {
+  return _(contract.astNode.nodes)
+    .filter(['nodeType', 'EventDefinition'])
+    .map(function (astNode) {
+      const { name, parameters: { parameters } } = astNode;
+      const args = _(parameters).map('typeDescriptions.typeString').join(',');
+      const identifier = `${name}(${args})`;
+
+      const devdoc = parseDocumentation(astNode.documentation);
+
+      return {
+        astNode,
+        identifier,
+        devdoc,
+      };
+    })
+    .value();
+}
+
 export function getFunctions(contract) {
   return _(contract.astNode.nodes)
     .filter(['nodeType', 'FunctionDefinition'])
@@ -74,11 +93,14 @@ export function extractDocs(contract) {
   const { contractName } = contract;
 
   const functions = getFunctions(contract);
+  const events = getEvents(contract);
+
   const devdoc = parseDocumentation(contract.astNode.documentation);
 
   return {
     name: contractName,
     devdoc,
     functions,
+    events,
   };
 }

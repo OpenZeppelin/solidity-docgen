@@ -1,22 +1,62 @@
 import path from 'path';
 import fs from 'fs';
 import _ from 'lodash';
-import glob from 'glob';
+import yaml from 'js-yaml';
 import { promisify } from 'util';
 
-const globAsync = promisify(glob);
-const readFileAsync = promisify(fs.readFile);
+const exists = promisify(fs.exists);
+const readFile = promisify(fs.readFile);
 
-export async function gatherMarkdownDocs(directory) {
-  const files = await globAsync(path.join(directory, '**/README.md'));
-
+export async function gatherMarkdownDocs(directories) {
   const pairs = await Promise.all(
-    files.map(async function (file) {
-      const content = await readFileAsync(file, 'utf8');
-      const fileDirectory = path.dirname(path.relative(directory, file));
-      return [fileDirectory, content];
+    directories.map(async function (directory) {
+      const readmeFile = path.join(directory, 'README.md');
+
+      const readme = await exists(readmeFile)
+        ? await readFile(readmeFile, 'utf8')
+        : '';
+
+      const docs = parseReadme(readme, directory);
+
+      return [directory, docs];
     })
   );
 
   return _.fromPairs(pairs);
+}
+
+export function parseReadme(content, directory) {
+  const frontMatter = parseFrontMatter(content, directory);
+
+  const metadata = _.defaults(frontMatter, {
+    get title() {
+      const basename = path.basename(directory);
+      return _.startCase(basename);
+    },
+  });
+
+  const head = (frontMatter ? '' : '---\n---\n') + content;
+
+  return {
+    metadata,
+    head,
+  };
+}
+
+export function parseFrontMatter(content, directory) {
+  const regexp = /^---$((?:(?!^---$).)*)^---$/ms;
+  const matches = regexp.exec(content);
+
+  if (!matches) {
+    return undefined;
+  }
+
+  const yamlString = matches[1]
+
+  try {
+    return yaml.safeLoad(yamlString) || {};
+  } catch (e) {
+    const relativeDir = path.relative(process.cwd(), directory);
+    throw new Error(`Front matter is invalid in ${relativeDir}.`);
+  }
 }

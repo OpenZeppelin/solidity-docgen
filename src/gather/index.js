@@ -3,13 +3,11 @@ import { gatherMarkdownDocs } from './markdown';
 import { gatherSolidityDocs } from './solidity';
 
 export async function gatherDocs(directory) {
-  const markdown = await gatherMarkdownDocs(directory);
-  const contracts = await gatherSolidityDocs(directory);
+  const contractDocs = await gatherSolidityDocs(directory);
+  const markdownDocs = await gatherMarkdownDocs(Object.keys(contractDocs));
 
-  const docs = {};
-
-  _.merge(docs, _.mapValues(markdown, doc => ({ head: doc })));
-  _.merge(docs, _.mapValues(contracts, doc => ({ contracts: doc })));
-
-  return docs;
+  return _.merge(
+    markdownDocs,
+    _.mapValues(contractDocs, contracts => ({ contracts })),
+  );
 }

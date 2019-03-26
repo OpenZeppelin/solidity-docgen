@@ -20,4 +20,8 @@ program
   .parse(process.argv);
 
 const { contractsDir, outDir } = program;
-renderAndWriteDirectoryDocs(contractsDir, outDir).catch(console.error);
+
+renderAndWriteDirectoryDocs(contractsDir, outDir).catch(function (error) {
+  console.error(error);
+  process.exitCode = 1;
+});

@@ -7,16 +7,16 @@ import { promisify } from 'util';
 const exists = promisify(fs.exists);
 const readFile = promisify(fs.readFile);
 
-export async function gatherMarkdownDocs(directories) {
+export async function gatherMarkdownDocs(base, directories) {
   const pairs = await Promise.all(
     directories.map(async function (directory) {
-      const readmeFile = path.join(directory, 'README.md');
+      const readmeFile = path.join(base, directory, 'README.md');
 
       const readme = await exists(readmeFile)
         ? await readFile(readmeFile, 'utf8')
         : '';
 
-      const docs = parseReadme(readme, directory);
+      const docs = parseFrontMatter(readme, directory);
 
       return [directory, docs];
     })
@@ -25,36 +25,20 @@ export async function gatherMarkdownDocs(directories) {
   return _.fromPairs(pairs);
 }
 
-export function parseReadme(content, directory) {
-  const frontMatter = parseFrontMatter(content, directory);
-
-  const metadata = _.defaults(frontMatter, {
-    get title() {
-      const basename = path.basename(directory);
-      return _.startCase(basename);
-    },
-  });
-
-  const head = (frontMatter ? '' : '---\n---\n') + content;
-
-  return {
-    metadata,
-    head,
-  };
-}
-
-export function parseFrontMatter(content, directory) {
-  const regexp = /^---$((?:(?!^---$).)*)^---$/ms;
-  const matches = regexp.exec(content);
+export function parseFrontMatter(readme, directory) {
+  const regexp = /^---$((?:(?!^---$)[^])*)^---$([^]*)/m;
+  const matches = regexp.exec(readme);
 
   if (!matches) {
-    return undefined;
+    return { intro: readme, frontMatter: {} };
   }
 
-  const yamlString = matches[1]
+  const yamlString = matches[1];
+  const intro = matches[2];
 
   try {
-    return yaml.safeLoad(yamlString) || {};
+    const frontMatter = yaml.safeLoad(yamlString) || {};
+    return { intro, frontMatter };
   } catch (e) {
     const relativeDir = path.relative(process.cwd(), directory);
     throw new Error(`Front matter is invalid in ${relativeDir}.`);

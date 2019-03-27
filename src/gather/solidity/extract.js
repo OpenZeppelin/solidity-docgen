@@ -4,7 +4,15 @@ import _ from 'lodash';
 export function extractDocsPerDirectory(solcOutput, relativeTo = '') {
   const contractsPerFile = getContractsPerFile(solcOutput);
   const contractsPerDirectory = groupByDirectory(contractsPerFile, relativeTo);
-  return _.mapValues(contractsPerDirectory, contracts => contracts.map(extractDocs));
+
+  return _.mapValues(contractsPerDirectory, function (contracts) {
+    const pairs = contracts.map(function (contract) {
+      const docs = extractDocs(contract);
+      return [docs.name, docs];
+    });
+
+    return _.fromPairs(pairs);
+  });
 }
 
 export function getContractsPerFile(solcOutput) {

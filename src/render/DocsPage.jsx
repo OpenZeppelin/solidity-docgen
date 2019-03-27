@@ -14,9 +14,11 @@ export function DocsPage(props) {
     '\n\n',
     sections.map(section => {
       if (section.type === 'contracts') {
+        const title = !!section.title && <h1>{ section.title }</h1>;
+
         return (
           <section>
-            <h1>{ section.title }</h1>
+            { title }
             {
               section.contracts.map(contract => (
                 <ContractDocs key={ contract.name } { ...contract } />

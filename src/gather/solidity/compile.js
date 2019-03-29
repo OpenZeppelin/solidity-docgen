@@ -24,8 +24,11 @@ const compilerSettings = {
   },
 };
 
-export async function compile(directory) {
-  const files = await globAsync(path.join(directory, '**/*.sol'));
+export async function compile(directory, ignore) {
+  const files = await globAsync(path.join(directory, '**/*.sol'), {
+    ignore: ignore.map(i => path.join(i, '**/*')),
+  });
+
   const sources = _.fromPairs(await Promise.all(files.map(async file => [
     file,
     { content: await readFileAsync(file, 'utf8') },

@@ -17,11 +17,17 @@ program
     'directory where generated docs will be written',
     'docs',
   )
+  .option(
+    '-i, --ignore <pattern>',
+    'ignore directories that match the pattern',
+    (val, arr) => arr.concat(val),
+    [],
+  )
   .parse(process.argv);
 
-const { contractsDir, outDir } = program;
+const { contractsDir, outDir, ignore } = program;
 
-renderAndWriteDirectoryDocs(contractsDir, outDir).catch(function (error) {
+renderAndWriteDirectoryDocs(contractsDir, outDir, ignore).catch(function (error) {
   console.error(error);
   process.exitCode = 1;
 });

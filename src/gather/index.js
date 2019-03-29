@@ -16,6 +16,7 @@ export async function gatherDocs(directory, ignore) {
       const { title, sections } = _.defaults(docs.frontMatter, {
         title: _.startCase(path.basename(directory)),
         sections: [{
+          title: 'Contracts',
           contracts: Object.keys(contractDocs[directory]),
         }],
       });

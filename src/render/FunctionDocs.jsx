@@ -1,11 +1,17 @@
 import React from 'react';
 
+import { FunctionIdentifier } from './FunctionIdentifier';
+
 export function FunctionDocs(props) {
   const { identifier, devdoc, contractName } = props;
 
   return (
     <>
-    <h3 id={ contractName + '.' + identifier }>{ identifier }</h3>
+    { '\n\n' }
+    <h4>
+      <a className="anchor" aria-hidden="true" id={ contractName + '.' + identifier }></a>
+      <FunctionIdentifier>{ identifier }</FunctionIdentifier>
+    </h4>
     { '\n\n' }
     { devdoc }
     { '\n\n' }

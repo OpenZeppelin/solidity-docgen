@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { FunctionDocs } from './FunctionDocs';
+import { FunctionIdentifier } from './FunctionIdentifier';
 
 export function ContractDocs(props) {
   const { name, devdoc, functions, events } = props;
@@ -9,41 +10,51 @@ export function ContractDocs(props) {
     <FunctionDocs key={ fn.identifier } {...fn} contractName={ name } />
   ));
 
-  const functionIndex = functions.map(fn => (
-    <li key={ fn.identifier }>
-      <a href={ '#' + name + '.' + fn.identifier }>
-        { fn.identifier }
-      </a>
-    </li>
-  ));
+  const functionIndex = functions.length > 0 && <>
+    <span className="contract-index-title">Functions</span>
+    <ul>
+      {
+        functions.map(fn => (
+          <li key={ fn.identifier }>
+            <a href={ '#' + name + '.' + fn.identifier }>
+              <FunctionIdentifier>{ fn.identifier }</FunctionIdentifier>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </>;
 
   const eventDocs = events.map(fn => (
     <FunctionDocs key={ fn.identifier } {...fn} contractName={ name } />
   ));
 
-  const eventIndex = events.map(fn => (
-    <li key={ fn.identifier }>
-      <a href={ '#' + name + '.' + fn.identifier }>
-        { fn.identifier }
-      </a>
-    </li>
-  ));
+  const eventIndex = events.length > 0 && <>
+    <span className="contract-index-title">Events</span>
+    <ul>
+      { 
+        events.map(fn => (
+          <li key={ fn.identifier }>
+            <a href={ '#' + name + '.' + fn.identifier }>
+              <FunctionIdentifier>{ fn.identifier }</FunctionIdentifier>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </>;
 
   return (
     <>
-    <h2>{ name }</h2>
+    { '\n\n' }
+    ### `{ name }`
     { '\n\n' }
     { devdoc }
     { '\n\n' }
-    <h3>Functions</h3>
-    <ul>
+    <div className="contract-index">
       { functionIndex }
-    </ul>
-    { '\n\n' }
-    <h3>Events</h3>
-    <ul>
       { eventIndex }
-    </ul>
+    </div>
     { '\n\n' }
     { functionDocs }
     { '\n\n' }

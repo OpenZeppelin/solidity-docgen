@@ -3,7 +3,6 @@ import path from 'path';
 import fs from 'fs';
 import glob from 'glob';
 import solc from 'solc';
-import process from 'process';
 import { promisify } from 'util';
 
 const globAsync = promisify(glob);

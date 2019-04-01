@@ -10,38 +10,49 @@ export async function gatherDocs(directory, ignore) {
   const fullDocs = {};
 
   for (const directory in markdownDocs) {
-    const docs = markdownDocs[directory];
+    (function processDocs(directory) {
+      const docs = markdownDocs[directory];
+      delete markdownDocs[directory];
 
-    (function processDocs(docs, directory) {
-      const { title, sections } = _.defaults(docs.frontMatter, {
+      const defaults = {
         title: _.startCase(path.basename(directory)),
         sections: [{
           title: 'Contracts',
           contracts: Object.keys(contractDocs[directory]),
         }],
-      });
+      };
 
-      delete docs.frontMatter.sections;
+      const title = _.get(docs.frontMatter, 'title', defaults.title);
+      const sections = _.get(docs.frontMatter, 'sections', defaults.sections);
+
+      _.unset(docs, 'frontMatter.sections');
 
       sections.forEach(function (section, i) {
         if (section.subdirectory) {
           const subdirectory = path.join(directory, section.subdirectory);
 
           if (subdirectory in markdownDocs) {
-            const subdocs = markdownDocs[subdirectory];
-            delete markdownDocs[subdirectory];
-            processDocs(subdocs, subdirectory);
+            processDocs(subdirectory);
           } else if (!(subdirectory in fullDocs)) {
             throw new Error(`${subdirectory} (inlined in ${directory}) either does not exist or is already inlined elsewhere.`);
           }
 
-          sections[i] = fullDocs[subdirectory];
+          const subdocs = fullDocs[subdirectory];
           delete fullDocs[subdirectory];
 
-          sections[i].type = 'subdirectory';
-          delete sections[i].frontMatter;
+          if (subdocs.intro.trim().length > 0) {
+            throw new Error(`${subdirectory} is being inlined so its README content will be ignored. Please move the content to the README for ${directory}.`);
+          }
+
+          if (subdocs.sections.length > 1) {
+            throw new Error(`${subdirectory} can only have one section in order to be inlined (in ${directory}).`);
+          }
+
+          sections[i] = {
+            title: subdocs.title,
+            contracts: subdocs.sections[0].contracts,
+          };
         } else if (section.contracts) {
-          section.type = 'contracts';
           section.contracts = _.at(contractDocs[directory], section.contracts);
         }
       });
@@ -51,8 +62,9 @@ export async function gatherDocs(directory, ignore) {
         sections,
         ...docs,
       };
-    })(docs, directory);
+    })(directory);
   }
 
   return fullDocs;
 }
+

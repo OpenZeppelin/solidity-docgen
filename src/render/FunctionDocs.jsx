@@ -10,7 +10,7 @@ export function FunctionDocs(props) {
     { '\n\n' }
     <h4>
       <a className="anchor" aria-hidden="true" id={ contractName + '.' + identifier }></a>
-      <FunctionIdentifier { ...props } />
+      <FunctionIdentifier withReturn { ...props } />
     </h4>
     { '\n\n' }
     { devdoc }

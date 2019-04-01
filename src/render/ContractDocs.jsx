@@ -17,7 +17,7 @@ export function ContractDocs(props) {
         functions.map(fn => (
           <li key={ fn.identifier }>
             <a href={ '#' + name + '.' + fn.identifier }>
-              <FunctionIdentifier>{ fn.identifier }</FunctionIdentifier>
+              <FunctionIdentifier { ...fn } />
             </a>
           </li>
         ))
@@ -36,7 +36,7 @@ export function ContractDocs(props) {
         events.map(fn => (
           <li key={ fn.identifier }>
             <a href={ '#' + name + '.' + fn.identifier }>
-              <FunctionIdentifier>{ fn.identifier }</FunctionIdentifier>
+              <FunctionIdentifier { ...fn } />
             </a>
           </li>
         ))

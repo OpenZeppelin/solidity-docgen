@@ -68,8 +68,16 @@ export function getFunctions(contract) {
   return _(contract.astNode.nodes)
     .filter(['nodeType', 'FunctionDefinition'])
     .map(function (astNode) {
-      const { name, kind, parameters: { parameters } } = astNode;
+      const { name, kind } = astNode;
+
+      const parameters = astNode.parameters.parameters;
+      const returnParameters = astNode.returnParameters.parameters;
+
       const args = _(parameters).map('typeDescriptions.typeString').join(',');
+      const returnType = returnParameters.length == 0 
+        ? undefined
+        : _(returnParameters).map('typeDescriptions.typeString').join(',');
+
       const isRegularFunction = kind === 'function';
       const identifier = isRegularFunction ? `${name}(${args})` : kind;
 
@@ -78,6 +86,7 @@ export function getFunctions(contract) {
       return {
         astNode,
         identifier,
+        returnType,
         devdoc,
       };
     })

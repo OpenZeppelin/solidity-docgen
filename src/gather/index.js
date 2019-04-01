@@ -14,16 +14,13 @@ export async function gatherDocs(directory, ignore) {
       const docs = markdownDocs[directory];
       delete markdownDocs[directory];
 
-      const defaults = {
+      const { title, sections } = _.defaults(docs.frontMatter, {
         title: _.startCase(path.basename(directory)),
         sections: [{
           title: 'Contracts',
           contracts: Object.keys(contractDocs[directory]),
         }],
-      };
-
-      const title = _.get(docs.frontMatter, 'title', defaults.title);
-      const sections = _.get(docs.frontMatter, 'sections', defaults.sections);
+      });
 
       _.unset(docs, 'frontMatter.sections');
 

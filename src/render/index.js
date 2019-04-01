@@ -37,9 +37,7 @@ export function renderContract(contract) {
 }
 
 export function renderFrontMatter(data) {
-  if (data === undefined) {
-    return undefined;
-  } else if (_.isEmpty(data)) {
+  if (_.isEmpty(data)) {
     return '---\n---\n';
   } else {
     const frontMatter = yaml.safeDump(data);

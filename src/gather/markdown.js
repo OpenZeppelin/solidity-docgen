@@ -30,7 +30,7 @@ export function parseFrontMatter(readme, directory) {
   const matches = regexp.exec(readme);
 
   if (!matches) {
-    return { intro: readme, frontMatter: undefined };
+    return { intro: readme, frontMatter: {} };
   }
 
   const yamlString = matches[1];

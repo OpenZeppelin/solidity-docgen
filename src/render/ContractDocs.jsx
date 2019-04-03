@@ -15,8 +15,11 @@ export function ContractDocs(props) {
     <ul>
       {
         functions.map(fn => (
-          <li key={ fn.identifier }>
-            <a href={ '#' + name + '.' + fn.identifier }>
+          <li
+            key={ fn.identifier }
+            className={ name !== fn.definedIn ? 'inherited' : undefined }
+          >
+            <a href={ '#' + fn.definedIn + '.' + fn.identifier }>
               <FunctionIdentifier { ...fn } />
             </a>
           </li>
@@ -34,7 +37,10 @@ export function ContractDocs(props) {
     <ul>
       { 
         events.map(fn => (
-          <li key={ fn.identifier }>
+          <li
+            key={ fn.identifier }
+            className={ name !== fn.definedIn ? 'inherited' : undefined }
+          >
             <a href={ '#' + name + '.' + fn.identifier }>
               <FunctionIdentifier { ...fn } />
             </a>

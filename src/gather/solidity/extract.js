@@ -16,15 +16,26 @@ export function extractDocsPerDirectory(solcOutput, relativeTo = '') {
 }
 
 export function getContractsPerFile(solcOutput) {
+  const contractsByAstNodeId = {};
+
   return _.mapValues(solcOutput.contracts, function (contracts, file) {
-    return _.map(contracts, function (contract, contractName) {
+    return _.map(contracts, function (contract, name) {
       const { ast } = solcOutput.sources[file];
 
       const astNode = _(ast.nodes)
         .filter(['nodeType', 'ContractDefinition'])
-        .find(['name', contractName]);
+        .find(['name', name]);
 
-      return _.assign({ astNode, contractName }, contract);
+      return contractsByAstNodeId[astNode.id] = {
+        astNode,
+        name,
+        get baseContracts() {
+          return astNode.baseContracts.map(c =>
+            contractsByAstNodeId[c.baseName.referencedDeclaration]
+          );
+        },
+        ...contract,
+      };
     });
   });
 }
@@ -46,6 +57,12 @@ export function groupByDirectory(contractsPerFile, relativeTo = '') {
 }
 
 export function getEvents(contract) {
+  const ownEvents = getOwnEvents(contract);
+  const inheritedEvents = getInheritedEvents(contract);
+  return _.uniqBy(ownEvents.concat(inheritedEvents), 'identifier');
+}
+
+export function getOwnEvents(contract) {
   return _(contract.astNode.nodes)
     .filter(['nodeType', 'EventDefinition'])
     .map(function (astNode) {
@@ -55,16 +72,32 @@ export function getEvents(contract) {
 
       const devdoc = parseDocumentation(astNode.documentation);
 
+      const definedIn = contract.name;
+
       return {
         astNode,
         identifier,
         devdoc,
+        definedIn,
       };
     })
     .value();
 }
 
-export function getFunctions(contract) {
+export function getInheritedEvents(contract) {
+  return _(contract.baseContracts)
+    .map(function (baseContract) {
+      return getOwnEvents(baseContract).map(function (fn) {
+        fn.inherited = true;
+        return fn;
+      })
+    })
+    .flatten()
+    .uniqBy('identifier')
+    .value();
+}
+
+export function getOwnFunctions(contract) {
   return _(contract.astNode.nodes)
     .filter(['nodeType', 'FunctionDefinition'])
     .map(function (astNode) {
@@ -83,14 +116,36 @@ export function getFunctions(contract) {
 
       const devdoc = parseDocumentation(astNode.documentation);
 
+      const definedIn = contract.name;
+
       return {
         astNode,
         identifier,
         returnType,
         devdoc,
+        definedIn,
       };
     })
     .value();
+}
+
+export function getInheritedFunctions(contract) {
+  return _(contract.baseContracts)
+    .map(function (baseContract) {
+      return getOwnFunctions(baseContract).map(function (fn) {
+        fn.inherited = true;
+        return fn;
+      })
+    })
+    .flatten()
+    .uniqBy('identifier')
+    .value();
+}
+
+export function getFunctions(contract) {
+  const ownFunctions = getOwnFunctions(contract);
+  const inheritedFunctions = getInheritedFunctions(contract);
+  return _.uniqBy(ownFunctions.concat(inheritedFunctions), 'identifier');
 }
 
 export function parseDocumentation(documentation) {
@@ -107,7 +162,7 @@ export function parseDocumentation(documentation) {
 }
 
 export function extractDocs(contract) {
-  const { contractName } = contract;
+  const { name } = contract;
 
   const functions = getFunctions(contract);
   const events = getEvents(contract);
@@ -115,7 +170,7 @@ export function extractDocs(contract) {
   const devdoc = parseDocumentation(contract.astNode.documentation);
 
   return {
-    name: contractName,
+    name,
     devdoc,
     functions,
     events,

@@ -11,7 +11,7 @@ export function ContractDocs(props) {
   const relativeURL = (url) => path.relative(path.dirname(docsPage), url) || '.';
 
   const functionDocs = functions.filter(fn => !fn.inherited).map(fn => (
-    <FunctionDocs key={ fn.identifier } {...fn} contractName={ name } />
+    <FunctionDocs key={ fn.signature } {...fn} contractName={ name } />
   ));
 
   const functionIndex = functions.length > 0 && <>
@@ -24,10 +24,10 @@ export function ContractDocs(props) {
 
           return (
             <li
-              key={ fn.identifier }
+              key={ fn.signature }
               className={ fn.inherited && 'inherited' }
             >
-              <a href={ location + '#' + definedIn + '.' + fn.identifier }>
+              <a href={ location + '#' + definedIn + '.' + fn.signature }>
                 <FunctionIdentifier { ...fn } />
               </a>
             </li>
@@ -38,7 +38,7 @@ export function ContractDocs(props) {
   </>;
 
   const eventDocs = events.filter(fn => !fn.inherited).map(fn => (
-    <FunctionDocs key={ fn.identifier } {...fn} contractName={ name } />
+    <FunctionDocs key={ fn.signature } {...fn} contractName={ name } />
   ));
 
   const eventIndex = events.length > 0 && <>
@@ -47,10 +47,10 @@ export function ContractDocs(props) {
       { 
         events.map(fn => (
           <li
-            key={ fn.identifier }
+            key={ fn.signature }
             className={ name !== fn.definedIn ? 'inherited' : undefined }
           >
-            <a href={ '#' + name + '.' + fn.identifier }>
+            <a href={ '#' + name + '.' + fn.signature }>
               <FunctionIdentifier { ...fn } />
             </a>
           </li>

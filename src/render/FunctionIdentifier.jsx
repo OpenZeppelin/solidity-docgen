@@ -1,7 +1,7 @@
 import React from 'react';
 
 export function FunctionIdentifier(props) {
-  const { identifier, returnType, withReturn = false } = props;
+  const { signatureWithNames, returnType, withReturn = false } = props;
 
   const returnArrowAndType = returnType !== undefined && withReturn && <>
     {' '}
@@ -12,7 +12,7 @@ export function FunctionIdentifier(props) {
 
   return (
     <code className="function-signature">
-      { identifier }{ returnArrowAndType }
+      { signatureWithNames }{ returnArrowAndType }
     </code>
   );
 }

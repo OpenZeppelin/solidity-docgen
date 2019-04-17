@@ -59,7 +59,7 @@ export function groupByDirectory(contractsPerFile, relativeTo = '') {
 export function getEvents(contract) {
   const ownEvents = getOwnEvents(contract);
   const inheritedEvents = getInheritedEvents(contract);
-  return _.uniqBy(ownEvents.concat(inheritedEvents), 'identifier');
+  return _.uniqBy(ownEvents.concat(inheritedEvents), 'signature');
 }
 
 export function getOwnEvents(contract) {
@@ -67,14 +67,27 @@ export function getOwnEvents(contract) {
     .filter(['nodeType', 'EventDefinition'])
     .map(function (astNode) {
       const { name, parameters: { parameters } } = astNode;
-      const args = _(parameters).map('typeDescriptions.typeString').join(',');
-      const identifier = `${name}(${args})`;
+      const argTypes = _(parameters).map('typeDescriptions.typeString').join(',');
+
+      const actualName = name;
+      const signature = `${actualName}(${argTypes})`;
 
       const devdoc = parseDocumentation(astNode.documentation);
 
+      const args = _(parameters).map(function (param) {
+        if (param.name) {
+          return `${param.typeDescriptions.typeString} ${param.name}`;
+        } else {
+          return param.typeDescriptions.typeString;
+        }
+      }).join(', ');
+
+      const signatureWithNames = `${actualName}(${args})`;
+
       return {
         astNode,
-        identifier,
+        signature,
+        signatureWithNames,
         devdoc,
       };
     })
@@ -95,7 +108,7 @@ export function getInheritedEvents(contract) {
       })
     })
     .flatten()
-    .uniqBy('identifier')
+    .uniqBy('signature')
     .value();
 }
 
@@ -108,19 +121,31 @@ export function getOwnFunctions(contract) {
       const parameters = astNode.parameters.parameters;
       const returnParameters = astNode.returnParameters.parameters;
 
-      const args = _(parameters).map('typeDescriptions.typeString').join(',');
+      const argTypes = _(parameters).map('typeDescriptions.typeString').join(',');
       const returnType = returnParameters.length == 0 
         ? undefined
         : _(returnParameters).map('typeDescriptions.typeString').join(',');
 
       const isRegularFunction = kind === 'function';
-      const identifier = isRegularFunction ? `${name}(${args})` : kind;
+      const actualName = isRegularFunction ? name : kind;
+      const signature = `${actualName}(${argTypes})`;
 
       const devdoc = parseDocumentation(astNode.documentation);
 
+      const args = _(parameters).map(function (param) {
+        if (param.name) {
+          return `${param.typeDescriptions.typeString} ${param.name}`;
+        } else {
+          return param.typeDescriptions.typeString;
+        }
+      }).join(', ');
+
+      const signatureWithNames = `${actualName}(${args})`;
+
       return {
         astNode,
-        identifier,
+        signature,
+        signatureWithNames,
         returnType,
         devdoc,
       };
@@ -142,14 +167,14 @@ export function getInheritedFunctions(contract) {
       })
     })
     .flatten()
-    .uniqBy('identifier')
+    .uniqBy('signature')
     .value();
 }
 
 export function getFunctions(contract) {
   const ownFunctions = getOwnFunctions(contract);
   const inheritedFunctions = getInheritedFunctions(contract);
-  return _.uniqBy(ownFunctions.concat(inheritedFunctions), 'identifier');
+  return _.uniqBy(ownFunctions.concat(inheritedFunctions), 'signature');
 }
 
 export function parseDocumentation(documentation) {

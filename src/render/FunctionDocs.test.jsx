@@ -6,7 +6,7 @@ import { FunctionDocs } from './FunctionDocs';
 describe('FunctionDocs', function () {
   test('basic function', function () {
     const foo = {
-      identifier: 'foo()',
+      signature: 'foo()',
       astNode: {
         nodeType: 'FunctionDefinition',
         name: 'foo',

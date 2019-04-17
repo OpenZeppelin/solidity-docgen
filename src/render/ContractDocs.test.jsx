@@ -19,7 +19,7 @@ test('no functions', function () {
 
 test('1 function', function () {
   const foo = {
-    identifier: 'foo()',
+    signature: 'foo()',
     astNode: {
       nodeType: 'FunctionDefinition',
       name: 'foo',

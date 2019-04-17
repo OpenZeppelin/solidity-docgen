@@ -1,10 +1,14 @@
 import React from 'react';
 
+import path from 'path';
+
 import { FunctionDocs } from './FunctionDocs';
 import { FunctionIdentifier } from './FunctionIdentifier';
 
 export function ContractDocs(props) {
   const { name, devdoc, functions, events, docsPage } = props;
+
+  const relativeURL = (url) => path.relative(path.dirname(docsPage), url) || '.';
 
   const functionDocs = functions.map(fn => (
     <FunctionDocs key={ fn.identifier } {...fn} contractName={ name } />
@@ -15,7 +19,7 @@ export function ContractDocs(props) {
     <ul>
       {
         functions.map(fn => {
-          const location = fn.inherited ? `/${fn.definedIn.docsPage}` : '';
+          const location = fn.inherited ? relativeURL(fn.definedIn.docsPage) : '';
           const definedIn = fn.inherited ? fn.definedIn.name : name;
 
           return (

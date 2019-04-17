@@ -10,7 +10,7 @@ export function ContractDocs(props) {
 
   const relativeURL = (url) => path.relative(path.dirname(docsPage), url) || '.';
 
-  const functionDocs = functions.map(fn => (
+  const functionDocs = functions.filter(fn => !fn.inherited).map(fn => (
     <FunctionDocs key={ fn.identifier } {...fn} contractName={ name } />
   ));
 
@@ -37,7 +37,7 @@ export function ContractDocs(props) {
     </ul>
   </>;
 
-  const eventDocs = events.map(fn => (
+  const eventDocs = events.filter(fn => !fn.inherited).map(fn => (
     <FunctionDocs key={ fn.identifier } {...fn} contractName={ name } />
   ));
 

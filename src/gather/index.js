@@ -51,6 +51,10 @@ export async function gatherDocs(directory, ignore) {
           };
         } else if (section.contracts) {
           section.contracts = _.at(contractDocs[directory], section.contracts);
+
+          for (const contract of section.contracts) {
+            contract.docsPage = directory;
+          }
         }
       });
 

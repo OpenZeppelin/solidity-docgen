@@ -72,13 +72,10 @@ export function getOwnEvents(contract) {
 
       const devdoc = parseDocumentation(astNode.documentation);
 
-      const definedIn = contract.name;
-
       return {
         astNode,
         identifier,
         devdoc,
-        definedIn,
       };
     })
     .value();
@@ -88,8 +85,13 @@ export function getInheritedEvents(contract) {
   return _(contract.baseContracts)
     .map(function (baseContract) {
       return getOwnEvents(baseContract).map(function (fn) {
-        fn.inherited = true;
-        return fn;
+        return {
+          inherited: true,
+          get definedIn() {
+            return baseContract.docs;
+          },
+          ...fn,
+        };
       })
     })
     .flatten()
@@ -116,14 +118,11 @@ export function getOwnFunctions(contract) {
 
       const devdoc = parseDocumentation(astNode.documentation);
 
-      const definedIn = contract.name;
-
       return {
         astNode,
         identifier,
         returnType,
         devdoc,
-        definedIn,
       };
     })
     .value();
@@ -133,8 +132,13 @@ export function getInheritedFunctions(contract) {
   return _(contract.baseContracts)
     .map(function (baseContract) {
       return getOwnFunctions(baseContract).map(function (fn) {
-        fn.inherited = true;
-        return fn;
+        return {
+          inherited: true,
+          get definedIn() {
+            return baseContract.docs;
+          },
+          ...fn,
+        };
       })
     })
     .flatten()
@@ -169,7 +173,7 @@ export function extractDocs(contract) {
 
   const devdoc = parseDocumentation(contract.astNode.documentation);
 
-  return {
+  return contract.docs = {
     name,
     devdoc,
     functions,

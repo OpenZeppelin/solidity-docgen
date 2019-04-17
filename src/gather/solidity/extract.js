@@ -30,8 +30,8 @@ export function getContractsPerFile(solcOutput) {
         astNode,
         name,
         get baseContracts() {
-          return astNode.baseContracts.map(c =>
-            contractsByAstNodeId[c.baseName.referencedDeclaration]
+          return astNode.linearizedBaseContracts.slice(1).map(c =>
+            contractsByAstNodeId[c]
           );
         },
         ...contract,

@@ -11,11 +11,13 @@ export async function gatherDocs(directory, ignore) {
 
   for (const directory in markdownDocs) {
     (function processDocs(directory) {
+      const location = getLocation(directory);
+
       const docs = markdownDocs[directory];
       delete markdownDocs[directory];
 
       const { title, sections } = _.defaults(docs.frontMatter, {
-        title: _.startCase(path.basename(directory)),
+        title: getTitle(directory),
         sections: [{
           title: 'Contracts',
           contracts: Object.keys(contractDocs[directory]),
@@ -58,7 +60,7 @@ export async function gatherDocs(directory, ignore) {
         }
       });
 
-      fullDocs[directory] = {
+      fullDocs[location] = {
         title,
         sections,
         ...docs,
@@ -69,3 +71,22 @@ export async function gatherDocs(directory, ignore) {
   return fullDocs;
 }
 
+function getLocation(directory) {
+  if (directory === '') {
+    return 'index';
+  } else {
+    return directory;
+  }
+}
+
+function getTitle(directory) {
+  if (directory === '') {
+    return getRootTitle();
+  } else {
+    return _.startCase(path.basename(directory));
+  }
+}
+
+function getRootTitle() {
+  return 'Contracts';
+}

@@ -68,7 +68,51 @@ export async function gatherDocs(directory, ignore) {
     })(directory);
   }
 
+  const allContractDocs = Object.assign({}, ...Object.values(contractDocs).flat());
+
+  for (const location in fullDocs) {
+    const { intro, sections } = fullDocs[location];
+
+    fullDocs[location].intro = addCrosslinks(intro, allContractDocs);
+
+    for (const section of sections) {
+      for (const contract of section.contracts) {
+        contract.devdoc = addCrosslinks(contract.devdoc, allContractDocs, contract.name);
+
+        for (const fn of contract.functions) {
+          fn.devdoc = addCrosslinks(fn.devdoc, allContractDocs, contract.name);
+        }
+
+        for (const fn of contract.events) {
+          fn.devdoc = addCrosslinks(fn.devdoc, allContractDocs, contract.name);
+        }
+      }
+    }
+  }
+
   return fullDocs;
+}
+
+function addCrosslinks(text, contracts, defaultContract) {
+  return text.replace(/`([\w]+)(?:\.([\w]+))?`/g, function (match, m1, m2) {
+    const link = (c, id) => `[${match}](/api/${c.docsPage}#${id})`;
+
+    if (!m2 && m1 in contracts) {
+      const c = contracts[m1];
+      return link(c, c.name.toLowerCase());
+    } else {
+      const c = contracts[m2 ? m1 : defaultContract];
+
+      const isFn = ({name}) => name === (m2 || m1);
+      const f = c.functions.find(isFn) || c.events.find(isFn);
+
+      if (f) {
+        return link(c, `${c.name}.${f.signature}`);
+      } else {
+        return match;
+      }
+    }
+  });
 }
 
 function getLocation(directory) {

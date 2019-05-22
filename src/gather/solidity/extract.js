@@ -86,6 +86,7 @@ export function getOwnEvents(contract) {
 
       return {
         astNode,
+        name,
         signature,
         signatureWithNames,
         devdoc,
@@ -144,6 +145,7 @@ export function getOwnFunctions(contract) {
 
       return {
         astNode,
+        name,
         signature,
         signatureWithNames,
         returnType,

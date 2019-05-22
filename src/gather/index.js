@@ -73,18 +73,18 @@ export async function gatherDocs(directory, ignore) {
   for (const location in fullDocs) {
     const { intro, sections } = fullDocs[location];
 
-    fullDocs[location].intro = addCrosslinks(intro, allContractDocs);
+    fullDocs[location].intro = addCrosslinks(intro, allContractDocs, location);
 
     for (const section of sections) {
       for (const contract of section.contracts) {
-        contract.devdoc = addCrosslinks(contract.devdoc, allContractDocs, contract.name);
+        contract.devdoc = addCrosslinks(contract.devdoc, allContractDocs, location, contract.name);
 
         for (const fn of contract.functions) {
-          fn.devdoc = addCrosslinks(fn.devdoc, allContractDocs, contract.name);
+          fn.devdoc = addCrosslinks(fn.devdoc, allContractDocs, location, contract.name);
         }
 
         for (const fn of contract.events) {
-          fn.devdoc = addCrosslinks(fn.devdoc, allContractDocs, contract.name);
+          fn.devdoc = addCrosslinks(fn.devdoc, allContractDocs, location, contract.name);
         }
       }
     }
@@ -93,9 +93,10 @@ export async function gatherDocs(directory, ignore) {
   return fullDocs;
 }
 
-function addCrosslinks(text, contracts, defaultContract) {
+function addCrosslinks(text, contracts, currentPage, defaultContract) {
   return text.replace(/`([\w]+)(?:\.([\w]+))?`/g, function (match, m1, m2) {
-    const link = (c, id) => `[${match}](/api/${c.docsPage}#${id})`;
+    const relative = (url) => (url === currentPage) ? '' : (path.relative(path.dirname(currentPage), url) || '.');
+    const link = (c, id) => `[${match}](${relative(c.docsPage)}#${id})`;
 
     if (!m2 && m1 in contracts) {
       const c = contracts[m1];

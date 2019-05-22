@@ -68,7 +68,7 @@ export async function gatherDocs(directory, ignore) {
     })(directory);
   }
 
-  const allContractDocs = Object.assign({}, ...Object.values(contractDocs).flat());
+  const allContractDocs = _.assign({}, ..._.flatten(_.values(contractDocs)));
 
   for (const location in fullDocs) {
     const { intro, sections } = fullDocs[location];

@@ -45,16 +45,21 @@ export function ContractDocs(props) {
     <span className="contract-index-title">Events</span>
     <ul>
       { 
-        events.map(fn => (
-          <li
-            key={ fn.signature }
-            className={ name !== fn.definedIn ? 'inherited' : undefined }
-          >
-            <a href={ '#' + name + '.' + fn.signature }>
-              <FunctionIdentifier { ...fn } />
-            </a>
-          </li>
-        ))
+        events.map(fn => {
+          const location = fn.inherited ? relativeURL(fn.definedIn.docsPage) : '';
+          const definedIn = fn.inherited ? fn.definedIn.name : name;
+
+          return (
+            <li
+              key={ fn.signature }
+              className={ fn.inherited && 'inherited' }
+            >
+              <a href={ location + '#' + definedIn + '.' + fn.signature }>
+                <FunctionIdentifier { ...fn } />
+              </a>
+            </li>
+          );
+        })
       }
     </ul>
   </>;

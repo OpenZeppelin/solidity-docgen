@@ -96,7 +96,7 @@ export async function gatherDocs(directory, ignore) {
 function addCrosslinks(text, contracts, currentPage, defaultContract) {
   return text.replace(/`([\w]+)(?:\.([\w]+))?`/g, function (match, m1, m2) {
     const relative = (url) => (url === currentPage) ? '' : (path.relative(path.dirname(currentPage), url) || '.');
-    const link = (c, id) => `[${match}](${relative(c.docsPage)}#${id})`;
+    const link = (c, id) => `[${match}](${encodeURIComponent(relative(c.docsPage))}#${encodeURIComponent(id)})`;
 
     if (!m2 && m1 in contracts) {
       const c = contracts[m1];

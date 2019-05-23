@@ -116,6 +116,7 @@ export function getInheritedEvents(contract) {
 export function getOwnFunctions(contract) {
   return _(contract.astNode.nodes)
     .filter(['nodeType', 'FunctionDefinition'])
+    .reject(['visibility', 'private'])
     .map(function (astNode) {
       const { name, kind } = astNode;
 

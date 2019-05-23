@@ -93,10 +93,14 @@ export async function gatherDocs(directory, ignore) {
   return fullDocs;
 }
 
+function encodeURISpace(string) {
+  return string.replace(/ /g, '%20');
+}
+
 function addCrosslinks(text, contracts, currentPage, defaultContract) {
   return text.replace(/`([\w]+)(?:\.([\w]+))?`/g, function (match, m1, m2) {
     const relative = (url) => (url === currentPage) ? '' : (path.relative(path.dirname(currentPage), url) || '.');
-    const link = (c, id) => `[${match}](${encodeURIComponent(relative(c.docsPage))}#${encodeURIComponent(id)})`;
+    const link = (c, id) => `[${match}](${encodeURISpace(relative(c.docsPage))}#${encodeURISpace(id)})`;
 
     if (!m2 && m1 in contracts) {
       const c = contracts[m1];

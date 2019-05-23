@@ -118,7 +118,7 @@ export function getOwnFunctions(contract) {
     .filter(['nodeType', 'FunctionDefinition'])
     .reject(['visibility', 'private'])
     .map(function (astNode) {
-      const { name, kind } = astNode;
+      const { name, visibility, kind } = astNode;
 
       const parameters = astNode.parameters.parameters;
       const returnParameters = astNode.returnParameters.parameters;
@@ -146,6 +146,7 @@ export function getOwnFunctions(contract) {
 
       return {
         astNode,
+        visibility,
         name,
         signature,
         signatureWithNames,

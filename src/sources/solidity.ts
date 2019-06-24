@@ -41,7 +41,7 @@ class SolidityFile {
     private readonly source: SoliditySource,
     private readonly fileData: solc.FileData,
     private readonly ast: solc.ast.SourceUnit,
-    readonly name: string,
+    readonly path: string,
   ) { }
 
   get contracts(): SolidityContract[] {
@@ -58,14 +58,14 @@ class SolidityFile {
     );
 
     if (astNode === undefined || contractData === undefined) {
-      throw new Error(`Contract ${contractName} not found in ${this.name}`);
+      throw new Error(`Contract ${contractName} not found in ${this.path}`);
     }
 
     return new SolidityContract(this.source, contractData, astNode, contractName);
   }
 }
 
-class SolidityContract {
+export class SolidityContract {
   constructor(
     private readonly source: SoliditySource,
     private readonly contractData: solc.ContractData,

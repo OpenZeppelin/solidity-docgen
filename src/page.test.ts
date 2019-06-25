@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import { Page } from './pages';
+import { Page } from './page';
 import { SoliditySource } from './sources/solidity';
 import { SolcOutputBuilder } from './sources/solc';
 

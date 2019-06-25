@@ -5,8 +5,6 @@ import yaml from 'js-yaml';
 
 import { SoliditySource, SolidityContract } from './sources/solidity';
 
-type Template<T> = (data: Page) => T;
-
 export class Page {
   constructor(
     private readonly pagePath: string,
@@ -14,10 +12,6 @@ export class Page {
     readonly intro: string,
     private readonly source: SoliditySource
   ) { }
-
-  render<T>(template: Template<T>): T {
-    return template(this);
-  }
 
   get contracts(): SolidityContract[] {
     const sourceFiles = this.source.files.filter(f => isContainedIn(this.pagePath, f.path));

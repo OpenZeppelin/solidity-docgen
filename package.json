@@ -11,8 +11,8 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "test": "npm run build && jest",
-    "test:watch": "concurrently -kr -s first 'jest --watch' 'tsc --watch > /dev/null'",
+    "test": "npm run build && ava",
+    "test:watch": "concurrently -krs first -n ava,tsc 'ava --watch' 'tsc --watch --preserveWatchOutput'",
     "prepare": "npm run build"
   },
   "dependencies": {
@@ -31,8 +31,8 @@
     "@types/lodash": "^4.14.134",
     "@types/minimatch": "^3.0.3",
     "@types/node": "^12.0.10",
-    "concurrently": "^4.1.0",
-    "jest": "^24.8.0"
+    "ava": "^2.1.0",
+    "concurrently": "^4.1.0"
   },
   "keywords": [
     "solidity",

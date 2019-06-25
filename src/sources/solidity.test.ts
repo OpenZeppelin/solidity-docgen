@@ -1,35 +1,37 @@
+import test from 'ava';
+
 import { SolcOutputBuilder } from './solc';
 import { SoliditySource } from './solidity';
 
-test('no files', function () {
+test('no files', t => {
   const solcOutput = new SolcOutputBuilder();
 
   const source = new SoliditySource(solcOutput);
 
-  expect(source.files).toHaveLength(0);
-  expect(source.contracts).toHaveLength(0);
+  t.is(source.files.length, 0);
+  t.is(source.contracts.length, 0);
 });
 
-test('one empty file', function () {
+test('one empty file', t => {
   const solcOutput = new SolcOutputBuilder()
     .file('Foo.sol');
 
   const source = new SoliditySource(solcOutput);
 
-  expect(source.files).toHaveLength(1);
+  t.is(source.files.length, 1);
 });
 
-test('one contract', function () {
+test('one contract', t => {
   const solcOutput = new SolcOutputBuilder()
     .file('Foo.sol')
     .contract('Foo');
 
   const source = new SoliditySource(solcOutput);
 
-  expect(source.contracts).toHaveLength(1);
+  t.is(source.contracts.length, 1);
 });
 
-test('one own function', function () {
+test('one own function', t => {
   const solcOutput = new SolcOutputBuilder()
     .file('Foo.sol')
     .contract('Foo')
@@ -39,10 +41,10 @@ test('one own function', function () {
 
   const foo = source.contracts[0];
 
-  expect(foo.functions).toHaveLength(1);
+  t.is(foo.functions.length, 1);
 });
 
-test('one inherited function', function () {
+test('one inherited function', t => {
   const solcOutput = new SolcOutputBuilder()
     .file('Foo.sol')
     .contract('Foo')
@@ -53,10 +55,10 @@ test('one inherited function', function () {
 
   const bar = source.contracts[1];
 
-  expect(bar.functions).toHaveLength(1);
+  t.is(bar.functions.length, 1);
 });
 
-test('one multiply inherited function', function () {
+test('one multiply inherited function', t => {
   const solcOutput = new SolcOutputBuilder()
     .file('Foo.sol')
     .contract('Foo')
@@ -68,11 +70,11 @@ test('one multiply inherited function', function () {
   const source = new SoliditySource(solcOutput);
 
   const bar = source.contracts[2];
-  expect(bar.name).toBe('Bar');
-  expect(bar.functions).toHaveLength(1);
+  t.is(bar.name, 'Bar');
+  t.is(bar.functions.length, 1);
 });
 
-test('two inherited functions with name overloading', function () {
+test('two inherited functions with name overloading', t => {
   const solcOutput = new SolcOutputBuilder()
     .file('Foo.sol')
     .contract('Foo')
@@ -82,5 +84,5 @@ test('two inherited functions with name overloading', function () {
 
   const source = new SoliditySource(solcOutput);
   const foof = source.contracts[1];
-  expect(foof.functions).toHaveLength(2);
+  t.is(foof.functions.length, 2);
 });

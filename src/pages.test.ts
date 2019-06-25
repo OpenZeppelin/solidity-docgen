@@ -1,50 +1,50 @@
+import test from 'ava';
+
 import Handlebars from 'handlebars';
 
 import { Page } from './pages';
 import { SoliditySource } from './sources/solidity';
 import { SolcOutputBuilder } from './sources/solc';
 
-test('constant template', function () {
-  const source = buildSoliditySource();
-  const pageContent = 'constant';
-  const template = () => pageContent;
+test('single file no contracts', t => {
+  const source = buildSoliditySource(b => b
+    .file('Foo.sol')
+  );
 
-  const rendered = new Page('', {}, '', source).render(template);
+  const page = new Page('', {}, '', source)
 
-  expect(rendered).toBe(pageContent);
+  t.is(page.contracts.length, 0);
 });
 
-test('simple contract name list', function () {
+test('single file multiple contracts ', t => {
   const source = buildSoliditySource(b => b
     .file('Foo.sol')
       .contract('Foo')
       .contract('Bar')
   );
-  const template = ({ contracts }) => contracts.map(({ name }) => name);
 
-  const rendered = new Page('', {}, '', source).render(template);
+  const page = new Page('', {}, '', source);
 
-  expect(rendered).toHaveLength(2);
-  expect(rendered).toContain('Foo');
-  expect(rendered).toContain('Bar');
+  t.is(page.contracts.length, 2);
+  t.assert(page.contracts.some(c => c.name === 'Foo'));
+  t.assert(page.contracts.some(c => c.name === 'Bar'));
 });
 
-test('render only subdirectory', function () {
+test('filter subdirectory ', t => {
   const source = buildSoliditySource(b => b
     .file('Foo.sol')
       .contract('Foo')
     .file('sub/Bar.sol')
       .contract('Bar')
   );
-  const template = ({ contracts }) => contracts.map(({ name }) => name);
 
-  const rendered = new Page('sub', {}, '', source).render(template);
+  const page = new Page('sub', {}, '', source);
 
-  expect(rendered).toHaveLength(1);
-  expect(rendered).toContain('Bar');
+  t.is(page.contracts.length, 1);
+  t.is(page.contracts[0].name, 'Bar');
 });
 
-test('render nested subdirectories', function () {
+test('render nested subdirectories', t => {
   const source = buildSoliditySource(b => b
     .file('sub/Bar.sol')
       .contract('Bar')
@@ -53,14 +53,15 @@ test('render nested subdirectories', function () {
   );
   const template = ({ contracts }) => contracts.map(({ name }) => name);
 
-  const rendered = new Page('sub', {}, '', source).render(template);
+  const page = new Page('sub', {}, '', source);
+  const rendered = template(page);
 
-  expect(rendered).toHaveLength(2);
-  expect(rendered).toContain('Bar');
-  expect(rendered).toContain('Foo');
+  t.is(rendered.length, 2);
+  t.assert(rendered.includes('Bar'));
+  t.assert(rendered.includes('Foo'));
 });
 
-test('handlebars', function () {
+test('handlebars', t => {
   const source = buildSoliditySource(b => b
     .file('Foo.sol')
       .contract('Foo')
@@ -71,12 +72,13 @@ test('handlebars', function () {
 {{name}}
 {{/contracts}}`);
 
-  const rendered = new Page('', {}, '', source).render(template);
+  const page = new Page('', {}, '', source);
+  const rendered = template(page);
 
-  expect(rendered).toBe(`Foo\nBar\n`);
+  t.is(rendered, `Foo\nBar\n`);
 });
 
-test('handlebars with functions', function () {
+test('handlebars with functions', t => {
   const source = buildSoliditySource(b => b
     .file('Foo.sol')
       .contract('Foo')
@@ -91,26 +93,28 @@ test('handlebars with functions', function () {
 {{/functions}}
 {{/contracts}}`);
 
-  const rendered = new Page('', {}, '', source).render(template);
+  const page = new Page('', {}, '', source);
+  const rendered = template(page);
 
-  expect(rendered).toBe(`Foo\ntest1\ntest2\n`);
+  t.is(rendered, `Foo\ntest1\ntest2\n`);
 });
 
-test('page with intro', function () {
+test('page with intro', t => {
   const source = buildSoliditySource(b => b);
   const template = ({ intro }) => intro;
 
-  const rendered = new Page('', {}, 'intro', source).render(template);
+  const page = new Page('', {}, 'intro', source);
+  const rendered = template(page);
 
-  expect(rendered).toBe(`intro`);
+  t.is(rendered, `intro`);
 });
 
-test('frontmatter', function () {
+test('frontmatter', t => {
   const source = buildSoliditySource(b => b);
   const frontmatterData = { a: 1 };
   const page = new Page('', frontmatterData, '', source);
 
-  expect(page.frontmatter).toBe('a: 1\n');
+  t.is(page.frontmatter, 'a: 1\n');
 });
 
 function buildSoliditySource(builder?: (b: SolcOutputBuilder) => void): SoliditySource {

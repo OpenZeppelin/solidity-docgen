@@ -3,6 +3,7 @@
     "outDir": "dist",
     "target": "es2015",
     "module": "commonjs",
+    "sourceMap": true,
     "allowJs": true,
     "incremental": true,
     "esModuleInterop": true,

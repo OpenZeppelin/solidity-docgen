@@ -2,7 +2,7 @@
 
 import program from 'commander';
 import { version } from '../package.json';
-import { renderAndWriteDirectoryDocs } from '.';
+import { docgen } from './docgen';
 
 program
   .version(version, '-v, --version')
@@ -24,9 +24,7 @@ program
   )
   .parse(process.argv);
 
-const { contractsDir, outDir, ignore } = program;
-
-renderAndWriteDirectoryDocs(contractsDir, outDir, ignore).catch(function (error) {
+docgen(program).catch(function (error) {
   console.error(error);
   process.exitCode = 1;
 });

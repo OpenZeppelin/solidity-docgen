@@ -19,7 +19,7 @@ export class Page {
   }
 
   get frontmatter(): string {
-    return yaml.safeDump(this.frontmatterData);
+    return '---\n' + yaml.safeDump(this.frontmatterData) + '---';
   }
 }
 

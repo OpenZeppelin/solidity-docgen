@@ -5,6 +5,9 @@ export interface Output {
   sources: {
     [file: string]: ast.SourceUnit;
   };
+  errors: {
+    severity: 'error';
+  }[];
 }
 
 export interface FileData {
@@ -51,6 +54,8 @@ export namespace ast {
 export class SolcOutputBuilder implements Output {
   contracts: { [file: string]: FileData };
   sources: { [file: string]: ast.SourceUnit };
+
+  errors: [] = [];
 
   _currentFile: string;
   _currentContract: {

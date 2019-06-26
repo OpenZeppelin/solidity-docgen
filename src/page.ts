@@ -7,14 +7,14 @@ import { SoliditySource, SolidityContract } from './solidity';
 
 export class Page {
   constructor(
-    private readonly pagePath: string,
+    readonly path: string,
     private readonly frontmatterData: {},
     readonly intro: string,
     private readonly source: SoliditySource
   ) { }
 
   get contracts(): SolidityContract[] {
-    const sourceFiles = this.source.files.filter(f => isContainedIn(this.pagePath, f.path));
+    const sourceFiles = this.source.files.filter(f => isContainedIn(this.path, f.path));
     return flatten(sourceFiles.map(f => f.contracts));
   }
 

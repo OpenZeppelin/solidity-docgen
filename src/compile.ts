@@ -2,8 +2,12 @@ import _ from 'lodash';
 import path from 'path';
 import fs from 'fs';
 import glob from 'glob';
-import solc from 'solc';
 import { promisify } from 'util';
+
+// @ts-ignore
+import solc from 'solc';
+
+import { Output as SolcOutput } from './solc';
 
 const globAsync = promisify(glob);
 const readFileAsync = promisify(fs.readFile);
@@ -23,7 +27,11 @@ const compilerSettings = {
   },
 };
 
-export async function compile(directory, ignore) {
+export async function compile(
+  directory: string,
+  ignore: string[],
+): Promise<SolcOutput> {
+
   const files = await globAsync(path.join(directory, '**/*.sol'), {
     ignore: ignore.map(i => path.join(i, '**/*')),
   });
@@ -40,11 +48,11 @@ export async function compile(directory, ignore) {
   };
 
   const solcOutputString = solc.compile(JSON.stringify(inputJSON));
-  const solcOutput = JSON.parse(solcOutputString);
+  const solcOutput: SolcOutput = JSON.parse(solcOutputString);
 
-  if (_.some(solcOutput.errors, ['severity', 'error'])) {
-    console.error(solcOutput.errors);
-    throw new Error();
+  const { errors } = solcOutput;
+  if (errors && errors.some(e => e.severity === 'error')) {
+    throw new Error(`solc failed to compile\n\n${errors}`);
   }
 
   return solcOutput;

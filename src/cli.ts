@@ -1,8 +1,14 @@
 #!/usr/bin/env node
 
+import fs from 'fs';
+import path from 'path';
 import program from 'commander';
-import { version } from '../package.json';
 import { docgen } from './docgen';
+
+const { version } = JSON.parse(fs.readFileSync(
+  path.join(__dirname, '../package.json'),
+  'utf8',
+));
 
 program
   .version(version, '-v, --version')
@@ -24,7 +30,8 @@ program
   )
   .parse(process.argv);
 
-docgen(program).catch(function (error) {
+// @ts-ignore
+docgen(program).catch(function (error: Error) {
   console.error(error);
-  process.exitCode = 1;
+  process.exit(1);
 });

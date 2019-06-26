@@ -8,7 +8,7 @@
     "incremental": true,
     "esModuleInterop": true,
     "strictNullChecks": true,
-    "experimentalDecorators": true
+    "noImplicitAny": true
   },
   "include": [
     "src/**/*"

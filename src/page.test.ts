@@ -1,8 +1,8 @@
 import test from 'ava';
 
 import { Page } from './page';
-import { SoliditySource } from './sources/solidity';
-import { SolcOutputBuilder } from './sources/solc';
+import { SoliditySource } from './solidity';
+import { SolcOutputBuilder } from './solc';
 
 test('single file no contracts', t => {
   const source = buildSoliditySource(b => b

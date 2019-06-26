@@ -3,7 +3,7 @@ import minimatch from 'minimatch';
 import path from 'path';
 import yaml from 'js-yaml';
 
-import { SoliditySource, SolidityContract } from './sources/solidity';
+import { SoliditySource, SolidityContract } from './solidity';
 
 export class Page {
   constructor(

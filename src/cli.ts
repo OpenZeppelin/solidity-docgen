@@ -1,37 +1,38 @@
 #!/usr/bin/env node
 
-import fs from 'fs';
-import path from 'path';
-import program from 'commander';
+import { Command, flags } from '@oclif/command'
+
 import { docgen } from './docgen';
 
-const { version } = JSON.parse(fs.readFileSync(
-  path.join(__dirname, '../package.json'),
-  'utf8',
-));
+class Docgen extends Command {
+  static flags = {
+    version: flags.version(),
+    help: flags.help(),
+    contractsDir: flags.string({
+      char: 'c',
+      default: 'contracts',
+      description: 'directory where contracts will be taken from',
+    }),
+    outDir: flags.string({
+      char: 'o',
+      default: 'docs',
+      description: 'directory where generated docs will be written',
+    }),
+    ignore: flags.build({
+      parse: s => s.split(','),
+    })({
+      char: 'i',
+      default: [],
+      description: 'ignore directories that match the pattern (separated by commas)',
+    }),
+  }
 
-program
-  .version(version, '-v, --version')
-  .option(
-    '-c, --contractsDir <directory>',
-    'directory where contracts will be taken from',
-    'contracts',
-  )
-  .option(
-    '-o, --outDir <directory>',
-    'directory where generated docs will be written',
-    'docs',
-  )
-  .option(
-    '-i, --ignore <pattern>',
-    'ignore directories that match the pattern',
-    (val, arr) => arr.concat(val),
-    [],
-  )
-  .parse(process.argv);
+  async run() {
+    const { flags } = this.parse(Docgen)
 
-// @ts-ignore
-docgen(program).catch(function (error: Error) {
-  console.error(error);
-  process.exit(1);
-});
+    // @ts-ignore see https://github.com/oclif/parser/pull/53
+    await docgen(flags);
+  }
+}
+
+Docgen.run().then(undefined, require('@oclif/errors/handle'));

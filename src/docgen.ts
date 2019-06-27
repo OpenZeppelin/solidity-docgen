@@ -11,7 +11,7 @@ import { Page } from './page';
 
 type FSVinyl = Vinyl & { contents: Buffer };
 
-export interface Options {
+interface Options {
   contractsDir: string;
   outDir: string;
   ignore: string[];

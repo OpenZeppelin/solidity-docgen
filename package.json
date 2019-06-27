@@ -6,7 +6,8 @@
     "solidity-docgen": "./dist/cli.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "page.hbs"
   ],
   "scripts": {
     "build": "tsc",

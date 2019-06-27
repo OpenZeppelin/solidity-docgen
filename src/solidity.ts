@@ -22,7 +22,7 @@ export class SoliditySource {
     return new SolidityFile(
       this,
       this.solcOutput.contracts[fileName],
-      this.solcOutput.sources[fileName],
+      this.solcOutput.sources[fileName].ast,
       path.relative(this.contractsDir, fileName),
     );
   }

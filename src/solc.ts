@@ -3,7 +3,9 @@ export interface Output {
     [file: string]: FileData;
   };
   sources: {
-    [file: string]: ast.SourceUnit;
+    [file: string]: {
+      ast: ast.SourceUnit;
+    };
   };
   errors: {
     severity: 'error';
@@ -53,7 +55,7 @@ export namespace ast {
 
 export class SolcOutputBuilder implements Output {
   contracts: { [file: string]: FileData };
-  sources: { [file: string]: ast.SourceUnit };
+  sources: { [file: string]: { ast: ast.SourceUnit } };
 
   errors: [] = [];
 
@@ -75,8 +77,10 @@ export class SolcOutputBuilder implements Output {
   file(fileName: string) {
     this._currentFile = fileName;
     this.sources[fileName] = {
-      nodeType: 'SourceUnit',
-      nodes: [],
+      ast: {
+        nodeType: 'SourceUnit',
+        nodes: [],
+      },
     };
     this.contracts[fileName] = {};
     return this;
@@ -99,7 +103,7 @@ export class SolcOutputBuilder implements Output {
     };
     const data = {};
     this._currentContract = { astNode, data };
-    this.sources[fileName].nodes.push(astNode);
+    this.sources[fileName].ast.nodes.push(astNode);
     this.contracts[fileName][contractName] = data;
     return this;
   }

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { Command, flags } from '@oclif/command'
+import path from 'path';
 
 import { docgen } from './docgen';
 
@@ -24,6 +25,11 @@ class Docgen extends Command {
       char: 'i',
       default: [],
       description: 'ignore directories that match the pattern (separated by commas)',
+    }),
+    template: flags.string({
+      char: 't',
+      default: path.resolve(__dirname, '../page.hbs'),
+      description: 'path to a handlebars template to render each page',
     }),
   }
 

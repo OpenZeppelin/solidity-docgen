@@ -16,6 +16,7 @@ type FSVinyl = Vinyl & { contents: Buffer };
 interface Options {
   contractsDir: string;
   outDir: string;
+  template: string;
   ignore: string[];
 }
 
@@ -35,7 +36,7 @@ export async function docgen(options: Options) {
     );
   });
 
-  const template = await getTemplate();
+  const template = await getTemplate(options.template);
 
   const renderedPages = pages.map((p, i) => {
     const f = readmes[i].clone();
@@ -63,11 +64,8 @@ function parsePage(contents: string): { frontmatterData: {}, intro: string } {
   return { frontmatterData, intro };
 }
 
-async function getTemplate(): Promise<HandlebarsTemplateDelegate> {
-  const template = await fs.readFile(
-    path.join(__dirname, '../page.hbs'),
-    'utf8',
-  );
+async function getTemplate(templatePath: string): Promise<HandlebarsTemplateDelegate> {
+  const template = await fs.readFile(templatePath, 'utf8');
   return Handlebars.compile(template);
 }
 

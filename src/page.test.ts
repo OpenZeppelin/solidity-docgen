@@ -76,5 +76,5 @@ test('frontmatter', t => {
 function buildSoliditySource(builder?: (b: SolcOutputBuilder) => void): SoliditySource {
   const solcOutput = new SolcOutputBuilder();
   if (builder) builder(solcOutput);
-  return new SoliditySource(solcOutput);
+  return new SoliditySource('', solcOutput);
 }

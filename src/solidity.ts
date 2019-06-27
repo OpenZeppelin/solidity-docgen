@@ -1,10 +1,12 @@
 import { flatten, uniqBy } from 'lodash';
+import path from 'path';
 
 import * as solc from './solc';
 
 export class SoliditySource {
   constructor(
-    private readonly solcOutput: solc.Output
+    private readonly contractsDir: string,
+    private readonly solcOutput: solc.Output,
   ) { }
 
   get contracts(): SolidityContract[] {
@@ -21,7 +23,7 @@ export class SoliditySource {
       this,
       this.solcOutput.contracts[fileName],
       this.solcOutput.sources[fileName],
-      fileName,
+      path.relative(this.contractsDir, fileName),
     );
   }
 

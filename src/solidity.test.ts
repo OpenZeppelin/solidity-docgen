@@ -6,7 +6,7 @@ import { SoliditySource } from './solidity';
 test('no files', t => {
   const solcOutput = new SolcOutputBuilder();
 
-  const source = new SoliditySource(solcOutput);
+  const source = new SoliditySource('', solcOutput);
 
   t.is(source.files.length, 0);
   t.is(source.contracts.length, 0);
@@ -16,7 +16,7 @@ test('one empty file', t => {
   const solcOutput = new SolcOutputBuilder()
     .file('Foo.sol');
 
-  const source = new SoliditySource(solcOutput);
+  const source = new SoliditySource('', solcOutput);
 
   t.is(source.files.length, 1);
 });
@@ -26,7 +26,7 @@ test('one contract', t => {
     .file('Foo.sol')
     .contract('Foo');
 
-  const source = new SoliditySource(solcOutput);
+  const source = new SoliditySource('', solcOutput);
 
   t.is(source.contracts.length, 1);
 });
@@ -37,7 +37,7 @@ test('one own function', t => {
     .contract('Foo')
       .function('test');
 
-  const source = new SoliditySource(solcOutput);
+  const source = new SoliditySource('', solcOutput);
 
   const foo = source.contracts[0];
 
@@ -51,7 +51,7 @@ test('one inherited function', t => {
       .function('test')
     .contract('Bar', 'Foo');
     
-  const source = new SoliditySource(solcOutput);
+  const source = new SoliditySource('', solcOutput);
 
   const bar = source.contracts[1];
 
@@ -67,7 +67,7 @@ test('one multiply inherited function', t => {
       .function('test')
     .contract('Bar', 'Foo', 'FooFlavor');
     
-  const source = new SoliditySource(solcOutput);
+  const source = new SoliditySource('', solcOutput);
 
   const bar = source.contracts[2];
   t.is(bar.name, 'Bar');
@@ -82,7 +82,7 @@ test('two inherited functions with name overloading', t => {
       .function('test', 'string')
     .contract('FooFlavor', 'Foo');
 
-  const source = new SoliditySource(solcOutput);
+  const source = new SoliditySource('', solcOutput);
   const foof = source.contracts[1];
   t.is(foof.functions.length, 2);
 });

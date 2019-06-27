@@ -19,7 +19,7 @@ interface Options {
 
 export async function docgen(options: Options) {
   const solcOutput = await compile(options.contractsDir, options.ignore);
-  const source = new SoliditySource(solcOutput);
+  const source = new SoliditySource(options.contractsDir, solcOutput);
 
   const glob = path.join(options.contractsDir, '**/README.*');
   const readmes = (await destream<FSVinyl>(vfs.src(glob)));

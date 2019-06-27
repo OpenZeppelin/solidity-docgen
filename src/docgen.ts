@@ -4,6 +4,8 @@ import pEvent from 'p-event';
 import { object as intoStream } from 'into-stream';
 import Vinyl from 'vinyl';
 import vfs from 'vinyl-fs';
+import Handlebars from 'handlebars';
+import fs from 'fs-extra';
 
 import { compile } from './compile';
 import { SoliditySource } from './solidity';
@@ -24,14 +26,16 @@ export async function docgen(options: Options) {
   const glob = path.join(options.contractsDir, '**/README.*');
   const readmes = (await destream<FSVinyl>(vfs.src(glob)));
   const pages = readmes.map((file) => {
-      const { frontmatterData, intro } = parsePage(file.contents.toString());
-      return new Page(
-        file.relative,
-        frontmatterData,
-        intro,
-        source,
-      );
-    });
+    const { frontmatterData, intro } = parsePage(file.contents.toString());
+    return new Page(
+      path.dirname(file.relative),
+      frontmatterData,
+      intro,
+      source,
+    );
+  });
+
+  const template = await getTemplate();
 
   const renderedPages = pages.map((p, i) => {
     const f = readmes[i].clone();
@@ -57,8 +61,12 @@ function parsePage(contents: string): { frontmatterData: {}, intro: string } {
   return { frontmatterData, intro };
 }
 
-function template(page: Page): string {
-  return page.path;
+async function getTemplate(): Promise<HandlebarsTemplateDelegate> {
+  const template = await fs.readFile(
+    path.join(__dirname, '../page.hbs'),
+    'utf8',
+  );
+  return Handlebars.compile(template);
 }
 
 function destream<T>(stream: NodeJS.ReadableStream): Promise<T[]> {

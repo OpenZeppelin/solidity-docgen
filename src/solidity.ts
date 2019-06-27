@@ -155,8 +155,9 @@ interface NatSpec {
   devdoc?: string;
   userdoc?: string;
   params?: {
-    [param: string]: string;
-  };
+    param: string;
+    description: string;
+  }[];
 }
 
 function parseNatSpec(doc: string): NatSpec {
@@ -177,6 +178,16 @@ function parseNatSpec(doc: string): NatSpec {
     }
     if (tag === 'notice') {
       setOrAppend(res, 'userdoc', content);
+    }
+    if (tag === 'param') {
+      const paramMatches = content.match(/(\w+) ([^]*)/);
+      if (paramMatches) {
+        const [, param, description] = paramMatches;
+        if (res.params === undefined) {
+          res.params = [];
+        }
+        res.params.push({ param, description });
+      }
     }
   }
 

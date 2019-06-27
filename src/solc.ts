@@ -41,6 +41,7 @@ export namespace ast {
   export interface FunctionDefinition {
     nodeType: 'FunctionDefinition';
     kind: 'function' | 'constructor' | 'fallback';
+    visibility: 'internal' | 'external' | 'public';
     name: string;
     documentation: string | null;
     parameters: {
@@ -130,6 +131,7 @@ export class SolcOutputBuilder implements Output {
     const astNode: ast.FunctionDefinition = {
       nodeType: 'FunctionDefinition',
       kind,
+      visibility: 'public',
       name: functionName,
       documentation: null,
       parameters: {

@@ -134,6 +134,10 @@ class SolidityFunction {
     return `${this.name}(${this.args.map(a => a.typeName).join(',')})`;
   }
 
+  get visibility(): 'internal' | 'external' | 'public' {
+    return this.astNode.visibility;
+  }
+
   get natspec(): NatSpec {
     if (this.astNode.documentation === null) {
       return {};

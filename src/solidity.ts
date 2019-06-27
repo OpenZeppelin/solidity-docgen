@@ -1,5 +1,6 @@
 import { flatten, uniqBy } from 'lodash';
 import path from 'path';
+import execall from 'execall';
 
 import * as solc from './solc';
 
@@ -98,6 +99,14 @@ export class SolidityContract {
     );
   }
 
+  get natspec(): NatSpec {
+    if (this.astNode.documentation === null) {
+      return {};
+    }
+
+    return parseNatSpec(this.astNode.documentation);
+  }
+
   get astId(): number {
     return this.astNode.id;
   }
@@ -124,8 +133,60 @@ class SolidityFunction {
   get signature(): string {
     return `${this.name}(${this.args.map(a => a.typeName).join(',')})`;
   }
+
+  get natspec(): NatSpec {
+    if (this.astNode.documentation === null) {
+      return {};
+    }
+
+    return parseNatSpec(this.astNode.documentation);
+  }
 }
 
 interface SolidityTypedVariable {
   typeName: string;
+}
+
+interface NatSpec {
+  devdoc?: string;
+  userdoc?: string;
+  params?: {
+    [param: string]: string;
+  };
+}
+
+function parseNatSpec(doc: string): NatSpec {
+  const res: NatSpec = {};
+
+  const raw = doc.replace(/^\s*\*\s*/mg, '');
+
+  const untagged = raw.match(/^([^]*?)^@\w+ /m);
+  if (untagged) {
+    setOrAppend(res, 'userdoc', untagged[1]);
+  }
+
+  const tagMatches = execall(/^@(\w+) ((?:(?!^@\w+ )[^])*)/gm, raw);
+  for (const m of tagMatches) {
+    const [tag, content] = m.subMatches;
+    if (tag === 'dev') {
+      setOrAppend(res, 'devdoc', content); 
+    }
+    if (tag === 'notice') {
+      setOrAppend(res, 'userdoc', content);
+    }
+  }
+
+  return res;
+}
+
+function setOrAppend<K extends string>(
+  obj: { [key in K]?: string },
+  key: K,
+  value: string,
+) {
+  if (obj[key] === undefined) {
+    obj[key] = value;
+  } else {
+    obj[key] += value;
+  }
 }

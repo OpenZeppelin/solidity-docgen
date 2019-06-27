@@ -29,6 +29,7 @@ export namespace ast {
     nodeType: 'ContractDefinition';
     id: number;
     name: string;
+    documentation: string | null;
     nodes: FunctionDefinition[];
     baseContracts: { 
       baseName: {
@@ -41,6 +42,7 @@ export namespace ast {
     nodeType: 'FunctionDefinition';
     kind: 'function' | 'constructor' | 'fallback';
     name: string;
+    documentation: string | null;
     parameters: {
       parameters: {
         typeName: {
@@ -92,6 +94,7 @@ export class SolcOutputBuilder implements Output {
     const astNode: ast.ContractDefinition = {
       nodeType: 'ContractDefinition',
       name: contractName,
+      documentation: null,
       id: this._getContractId(contractName),
       baseContracts: baseContracts.map(baseName => ({
         baseName: {
@@ -128,6 +131,7 @@ export class SolcOutputBuilder implements Output {
       nodeType: 'FunctionDefinition',
       kind,
       name: functionName,
+      documentation: null,
       parameters: {
         parameters: argTypes.map(t => ({
           typeName: {

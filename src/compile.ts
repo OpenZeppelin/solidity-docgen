@@ -50,9 +50,12 @@ export async function compile(
   const solcOutputString = solc.compile(JSON.stringify(inputJSON));
   const solcOutput: SolcOutput = JSON.parse(solcOutputString);
 
-  const { errors } = solcOutput;
-  if (errors && errors.some(e => e.severity === 'error')) {
-    throw new Error(`solc failed to compile\n\n${errors}`);
+  const { errors: allErrors } = solcOutput;
+  if (allErrors && allErrors.some(e => e.severity === 'error')) {
+    const errors = allErrors.filter(e => e.severity === 'error');
+    const firstError = errors[0].formattedMessage;
+    const moreErrors = errors.length === 1 ? '' : ` (And ${errors.length - 1} other errors...)`;
+    throw new Error(`Solidity was unable to compile. ${firstError}${moreErrors}`);
   }
 
   return solcOutput;

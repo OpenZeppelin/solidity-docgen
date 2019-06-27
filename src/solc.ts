@@ -9,6 +9,7 @@ export interface Output {
   };
   errors: {
     severity: 'error';
+    formattedMessage: string;
   }[];
 }
 

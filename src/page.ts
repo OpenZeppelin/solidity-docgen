@@ -1,4 +1,4 @@
-import { flatten } from 'lodash';
+import { flatten, isEmpty } from 'lodash';
 import minimatch from 'minimatch';
 import path from 'path';
 import yaml from 'js-yaml';
@@ -19,7 +19,8 @@ export class Page {
   }
 
   get frontmatter(): string {
-    return '---\n' + yaml.safeDump(this.frontmatterData) + '---';
+    const str = isEmpty(this.frontmatterData) ? '' : yaml.safeDump(this.frontmatterData);
+    return '---\n' + str + '---';
   }
 }
 

@@ -52,7 +52,7 @@ export async function docgen(options: Options) {
 function parsePage(contents: string): { frontmatterData: {}, intro: string } {
   const match = <RegExpMatchArray> // this regexp will always match
     contents.match(/^(?:---\n([^]*?\n)---\n)?([^]*)/);
-  const frontmatterData = match ? yaml.safeLoad(match[1]) : {};
+  const frontmatterData = match[1] ? yaml.safeLoad(match[1]) : {};
   const intro = match[2];
   return { frontmatterData, intro };
 }

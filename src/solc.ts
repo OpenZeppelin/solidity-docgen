@@ -57,6 +57,7 @@ export namespace ast {
   }
 }
 
+// fake solc output builder for tests
 export class SolcOutputBuilder implements Output {
   contracts: { [file: string]: FileData };
   sources: { [file: string]: { ast: ast.SourceUnit } };

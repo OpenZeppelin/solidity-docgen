@@ -1,14 +1,10 @@
 import { fromPairs } from 'lodash';
 import path from 'path';
-import fs from 'fs';
-import glob from 'glob';
-import { promisify } from 'util';
+import fs from 'fs-extra';
+import globby from 'globby';
 import semver from 'semver';
 
 import { Output as SolcOutput } from './solc';
-
-const globAsync = promisify(glob);
-const readFileAsync = promisify(fs.readFile);
 
 const compilerSettings = {
   outputSelection: {
@@ -32,13 +28,13 @@ export async function compile(
 ): Promise<SolcOutput> {
   const solc = await SolcAdapter.require(solcModule);
 
-  const files = await globAsync(path.join(directory, '**/*.sol'), {
+  const files = await globby(path.join(directory, '**/*.sol'), {
     ignore: ignore.map(i => path.join(i, '**/*')),
   });
 
   const sources = fromPairs(await Promise.all(files.map(async file => [
     file,
-    { content: await readFileAsync(file, 'utf8') },
+    { content: await fs.readFile(file, 'utf8') },
   ])));
 
   const solcInput = {

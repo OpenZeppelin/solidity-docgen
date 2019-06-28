@@ -23,7 +23,6 @@
     "@oclif/plugin-help": "^2.2.0",
     "execall": "^2.0.0",
     "fs-extra": "^8.0.1",
-    "glob": "^7.1.4",
     "globby": "^9.2.0",
     "handlebars": "^4.1.2",
     "js-yaml": "^3.12.2",

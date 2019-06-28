@@ -23,17 +23,13 @@ export async function docgen(options: Options) {
   const readmes = await globby(path.join(options.contractsDir, '**/README.*'));
 
   const pages = await Promise.all(
-    readmes.map(async readmePath => {
-      const contents = await fs.readFile(readmePath, 'utf8');
-      const { frontmatterData, intro } = parsePage(contents);
-
-      return new Page(
+    readmes.map(async readmePath =>
+      Page.parse(
         path.relative(options.contractsDir, readmePath),
-        frontmatterData,
-        intro,
+        await fs.readFile(readmePath, 'utf8'),
         source,
-      );
-    })
+      )
+    )
   );
 
   const template = await getTemplate(options.templateFile);
@@ -42,14 +38,6 @@ export async function docgen(options: Options) {
     const dest = path.join(options.outputDir, page.outputFile);
     await fs.outputFile(dest, template(page));
   }
-}
-
-function parsePage(contents: string): { frontmatterData: {}, intro: string } {
-  const match = // non-null assertion because this regexp always matches
-    contents.match(/^(?:---\n([^]*?\n)?---\n)?([^]*)$/)!;
-  const frontmatterData = match[1] ? yaml.safeLoad(match[1]) : {};
-  const intro = match[2];
-  return { frontmatterData, intro };
 }
 
 async function getTemplate(templatePath?: string): Promise<Handlebars.TemplateDelegate> {

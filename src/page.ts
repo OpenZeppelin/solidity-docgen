@@ -10,8 +10,20 @@ export class Page {
     private readonly inputFile: string,
     private readonly frontmatterData: {},
     readonly intro: string,
-    private readonly source: SoliditySource
+    private readonly source: SoliditySource,
   ) { }
+
+  static parse(
+    inputFile: string,
+    contents: string,
+    source: SoliditySource,
+  ): Page {
+    const match = // non-null assertion because this regexp always matches
+      contents.match(/^(?:---\n([^]*?\n)?---\n)?([^]*)$/)!;
+    const frontmatterData = match[1] ? yaml.safeLoad(match[1]) : {};
+    const intro = match[2];
+    return new Page(inputFile, frontmatterData, intro, source);
+  }
 
   get contracts(): SolidityContract[] {
     const sourceFiles = this.source.files.filter(f => isContainedIn(this.location, f.path));

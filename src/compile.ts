@@ -1,11 +1,9 @@
-import _ from 'lodash';
+import { fromPairs } from 'lodash';
 import path from 'path';
 import fs from 'fs';
 import glob from 'glob';
 import { promisify } from 'util';
-
-// @ts-ignore
-import solc from 'solc';
+import semver from 'semver';
 
 import { Output as SolcOutput } from './solc';
 
@@ -30,25 +28,26 @@ const compilerSettings = {
 export async function compile(
   directory: string,
   ignore: string[],
+  solcModule: string = 'solc',
 ): Promise<SolcOutput> {
+  const solc = await SolcAdapter.require(solcModule);
 
   const files = await globAsync(path.join(directory, '**/*.sol'), {
     ignore: ignore.map(i => path.join(i, '**/*')),
   });
 
-  const sources = _.fromPairs(await Promise.all(files.map(async file => [
+  const sources = fromPairs(await Promise.all(files.map(async file => [
     file,
     { content: await readFileAsync(file, 'utf8') },
   ])));
 
-  const inputJSON = {
+  const solcInput = {
     language: "Solidity",
     sources: sources,
     settings: compilerSettings,
   };
 
-  const solcOutputString = solc.compile(JSON.stringify(inputJSON));
-  const solcOutput: SolcOutput = JSON.parse(solcOutputString);
+  const solcOutput = solc.compile(solcInput);
 
   const { errors: allErrors } = solcOutput;
   if (allErrors && allErrors.some(e => e.severity === 'error')) {
@@ -59,4 +58,42 @@ export async function compile(
   }
 
   return solcOutput;
+}
+
+class SolcAdapter {
+  static async require(solcModule: string): Promise<SolcAdapter> {
+    const solc = await import(solcModule);
+    return new SolcAdapter(solc);
+  }
+
+  constructor(private readonly solc: any) { }
+
+  compile(input: object): SolcOutput {
+    const inputJSON = JSON.stringify(input);
+
+    const solcOutputString = this.solc.compileStandardWrapper(inputJSON);
+    const solcOutput = JSON.parse(solcOutputString);
+
+    if (semver.satisfies(this.solc.version(), '^0.4')) {
+      for (const source of Object.values(solcOutput.sources) as any[]) {
+        for (const fileNode of source.ast.nodes) {
+          if (fileNode.nodeType === 'ContractDefinition') {
+            for (const contractNode of fileNode.nodes) {
+              if (contractNode.nodeType === 'FunctionDefinition') {
+                if (contractNode.isConstructor) {
+                  contractNode.kind = 'constructor';
+                } else if (contractNode.name === '') {
+                  contractNode.kind = 'fallback';
+                } else {
+                  contractNode.kind = 'function';
+                }
+              }
+            }
+          }
+        }
+      };
+    }
+
+    return solcOutput;
+  }
 }

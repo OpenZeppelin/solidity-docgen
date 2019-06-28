@@ -35,6 +35,12 @@ class Docgen extends Command {
       default: path.resolve(__dirname, '../page.hbs'),
       description: 'path to a handlebars template to render each page',
     }),
+
+    solcModule: flags.build({
+      parse: s => path.resolve(s),
+    })({
+      description: 'path to an alternative solc module',
+    }),
   }
 
   async run() {

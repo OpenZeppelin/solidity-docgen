@@ -18,10 +18,11 @@ interface Options {
   outDir: string;
   template: string;
   ignore: string[];
+  solcModule?: string;
 }
 
 export async function docgen(options: Options) {
-  const solcOutput = await compile(options.contractsDir, options.ignore);
+  const solcOutput = await compile(options.contractsDir, options.ignore, options.solcModule);
   const source = new SoliditySource(options.contractsDir, solcOutput);
 
   const glob = path.join(options.contractsDir, '**/README.*');

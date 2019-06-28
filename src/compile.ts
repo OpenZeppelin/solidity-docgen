@@ -23,7 +23,7 @@ const compilerSettings = {
 
 export async function compile(
   directory: string,
-  ignore: string[],
+  ignore: string[] = [],
   solcModule: string = 'solc',
 ): Promise<SolcOutput> {
   const solc = await SolcAdapter.require(solcModule);

@@ -11,8 +11,8 @@ import { Page } from './page';
 interface Options {
   contractsDir: string;
   outputDir: string;
-  template: string;
-  ignore: string[];
+  templateFile?: string;
+  ignore?: string[];
   solcModule?: string;
 }
 
@@ -36,7 +36,7 @@ export async function docgen(options: Options) {
     })
   );
 
-  const template = await getTemplate(options.template);
+  const template = await getTemplate(options.templateFile);
 
   for (const page of pages) {
     const dest = path.join(options.outputDir, page.outputFile);
@@ -52,7 +52,11 @@ function parsePage(contents: string): { frontmatterData: {}, intro: string } {
   return { frontmatterData, intro };
 }
 
-async function getTemplate(templatePath: string): Promise<Handlebars.TemplateDelegate> {
+async function getTemplate(templatePath?: string): Promise<Handlebars.TemplateDelegate> {
+  if (templatePath === undefined) {
+    templatePath = path.resolve(__dirname, '../page.hbs');
+  }
+
   const template = await fs.readFile(templatePath, 'utf8');
   return Handlebars.compile(template);
 }

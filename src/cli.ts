@@ -26,18 +26,17 @@ class Docgen extends Command {
       parse: s => s.split(','),
     })({
       char: 'i',
-      default: [],
       description: 'ignore directories that match the pattern (separated by commas)',
     }),
 
-    template: flags.string({
+    templateFile: flags.string({
       char: 't',
-      default: path.resolve(__dirname, '../page.hbs'),
+      parse: path.resolve,
       description: 'path to a handlebars template to render each page',
     }),
 
     solcModule: flags.string({
-      parse: s => path.resolve(s),
+      parse: path.resolve,
       description: 'path to an alternative solc module',
     }),
   }

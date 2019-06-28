@@ -48,8 +48,6 @@ export async function docgen(options: Options) {
 
   // renderedPages.map(rp => crosslink(rp, pages));
 
-  await fs.emptyDir(options.outDir);
-
   await finished(
     intoStream(renderedPages)
     .pipe(vfs.dest(options.outDir))

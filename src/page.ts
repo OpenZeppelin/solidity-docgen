@@ -7,20 +7,33 @@ import { SoliditySource, SolidityContract } from './solidity';
 
 export class Page {
   constructor(
-    readonly path: string,
+    private readonly inputFile: string,
     private readonly frontmatterData: {},
     readonly intro: string,
     private readonly source: SoliditySource
   ) { }
 
   get contracts(): SolidityContract[] {
-    const sourceFiles = this.source.files.filter(f => isContainedIn(this.path, f.path));
+    const sourceFiles = this.source.files.filter(f => isContainedIn(this.location, f.path));
     return flatten(sourceFiles.map(f => f.contracts));
   }
 
   get frontmatter(): string {
     const str = isEmpty(this.frontmatterData) ? '' : yaml.safeDump(this.frontmatterData);
     return '---\n' + str + '---';
+  }
+
+  get location(): string {
+    return path.dirname(this.inputFile);
+  }
+
+  get outputFile(): string {
+    const { dir, ext } = path.parse(this.inputFile);
+    return path.format({
+      dir: path.dirname(dir),
+      name: path.basename(dir),
+      ext,
+    });
   }
 }
 

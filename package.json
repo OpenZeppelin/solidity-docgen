@@ -24,17 +24,14 @@
     "execall": "^2.0.0",
     "fs-extra": "^8.0.1",
     "glob": "^7.1.4",
+    "globby": "^9.2.0",
     "handlebars": "^4.1.2",
-    "into-stream": "^5.1.0",
     "js-yaml": "^3.12.2",
     "lodash": "^4.17.11",
     "minimatch": "^3.0.4",
-    "p-event": "^4.1.0",
     "semver": "^6.1.2",
     "solc": "^0.5.10",
-    "typescript": "^3.5.2",
-    "vinyl": "^2.2.0",
-    "vinyl-fs": "^3.0.3"
+    "typescript": "^3.5.2"
   },
   "devDependencies": {
     "@types/fs-extra": "^8.0.0",

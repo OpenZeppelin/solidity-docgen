@@ -36,9 +36,8 @@ class Docgen extends Command {
       description: 'path to a handlebars template to render each page',
     }),
 
-    solcModule: flags.build({
+    solcModule: flags.string({
       parse: s => path.resolve(s),
-    })({
       description: 'path to an alternative solc module',
     }),
   }

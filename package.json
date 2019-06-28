@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "test": "npm run build && ava",
+    "test": "ava",
     "test:watch": "concurrently -krs first -n ava,tsc 'ava --watch' 'tsc --watch --preserveWatchOutput'",
     "prepare": "npm run build"
   },

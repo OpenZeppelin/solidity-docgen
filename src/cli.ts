@@ -16,7 +16,7 @@ class Docgen extends Command {
       description: 'directory where contracts will be taken from',
     }),
 
-    outDir: flags.string({
+    outputDir: flags.string({
       char: 'o',
       default: 'docs',
       description: 'directory where generated docs will be written',

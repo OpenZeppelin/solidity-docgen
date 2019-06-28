@@ -10,7 +10,7 @@ import { Page } from './page';
 
 interface Options {
   contractsDir: string;
-  outDir: string;
+  outputDir: string;
   template: string;
   ignore: string[];
   solcModule?: string;
@@ -39,7 +39,7 @@ export async function docgen(options: Options) {
   const template = await getTemplate(options.template);
 
   for (const page of pages) {
-    const dest = path.join(options.outDir, page.outputFile);
+    const dest = path.join(options.outputDir, page.outputFile);
     await fs.outputFile(dest, template(page));
   }
 }

@@ -52,7 +52,7 @@ function parsePage(contents: string): { frontmatterData: {}, intro: string } {
   return { frontmatterData, intro };
 }
 
-async function getTemplate(templatePath: string): Promise<HandlebarsTemplateDelegate> {
+async function getTemplate(templatePath: string): Promise<Handlebars.TemplateDelegate> {
   const template = await fs.readFile(templatePath, 'utf8');
   return Handlebars.compile(template);
 }

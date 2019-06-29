@@ -163,7 +163,8 @@ interface NatSpec {
 function parseNatSpec(doc: string): NatSpec {
   const res: NatSpec = {};
 
-  const raw = doc.replace(/^\s*\*\s*/mg, '');
+  // fix solc buggy parsing of doc comments
+  const raw = doc.replace(/\n\n?^[ \t]*\*[ \t]*/mg, '\n\n');
 
   const untagged = raw.match(/^([^]*?)^@\w+ /m);
   if (untagged) {

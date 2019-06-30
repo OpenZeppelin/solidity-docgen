@@ -31,12 +31,12 @@ class Docgen extends Command {
 
     templateFile: flags.string({
       char: 't',
-      parse: path.resolve,
+      parse: s => path.resolve(s),
       description: 'path to a handlebars template to render each page',
     }),
 
     solcModule: flags.string({
-      parse: path.resolve,
+      parse: s => path.resolve(s),
       description: 'path to an alternative solc module',
     }),
   }

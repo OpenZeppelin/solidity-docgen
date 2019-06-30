@@ -43,7 +43,7 @@ export class Page {
     const { dir, ext } = path.parse(this.inputFile);
     return path.format({
       dir: path.dirname(dir),
-      name: path.basename(dir),
+      name: path.basename(dir) || 'index',
       ext,
     });
   }

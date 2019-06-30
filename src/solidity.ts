@@ -164,11 +164,12 @@ function parseNatSpec(doc: string): NatSpec {
   const res: NatSpec = {};
 
   // fix solc buggy parsing of doc comments
+  // reverse engineered from solc behavior...
   const raw = doc.replace(/\n\n?^[ \t]*\*[ \t]*/mg, '\n\n');
 
-  const untagged = raw.match(/^([^]*?)^@\w+ /m);
+  const untagged = raw.match(/^(?:(?!^@\w+ )[^])+/m);
   if (untagged) {
-    setOrAppend(res, 'userdoc', untagged[1]);
+    setOrAppend(res, 'userdoc', untagged[0]);
   }
 
   const tagMatches = execall(/^@(\w+) ((?:(?!^@\w+ )[^])*)/gm, raw);

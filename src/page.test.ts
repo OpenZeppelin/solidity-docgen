@@ -9,7 +9,7 @@ test('single file no contracts', t => {
     .file('Foo.sol')
   );
 
-  const page = new Page('', {}, '', source)
+  const page = new Page('README.md', {}, '', source)
 
   t.is(page.contracts.length, 0);
 });
@@ -21,7 +21,7 @@ test('single file multiple contracts', t => {
       .contract('Bar')
   );
 
-  const page = new Page('', {}, '', source);
+  const page = new Page('README.md', {}, '', source);
 
   t.is(page.contracts.length, 2);
   t.assert(page.contracts.some(c => c.name === 'Foo'));
@@ -36,7 +36,7 @@ test('filter subdirectory ', t => {
       .contract('Bar')
   );
 
-  const page = new Page('sub', {}, '', source);
+  const page = new Page('sub/README.md', {}, '', source);
 
   t.is(page.contracts.length, 1);
   t.is(page.contracts[0].name, 'Bar');
@@ -50,7 +50,7 @@ test('filter nested subdirectories', t => {
       .contract('Foo')
   );
 
-  const page = new Page('sub', {}, '', source);
+  const page = new Page('sub/README.md', {}, '', source);
 
   t.is(page.contracts.length, 2);
   t.assert(page.contracts.some(c => c.name === 'Bar'));
@@ -60,7 +60,7 @@ test('filter nested subdirectories', t => {
 test('intro', t => {
   const source = buildSoliditySource();
 
-  const page = new Page('', {}, 'intro', source);
+  const page = new Page('README.md', {}, 'intro', source);
 
   t.is(page.intro, `intro`);
 });
@@ -68,7 +68,7 @@ test('intro', t => {
 test('frontmatter', t => {
   const source = buildSoliditySource();
   const frontmatterData = { a: 1 };
-  const page = new Page('', frontmatterData, '', source);
+  const page = new Page('README.md', frontmatterData, '', source);
 
   t.is(page.frontmatter, '---\na: 1\n---');
 });

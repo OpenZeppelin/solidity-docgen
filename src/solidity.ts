@@ -208,10 +208,9 @@ class SolidityTypedVariable {
   }
 }
 
-class PrettyArray<T> extends Array<T> {
+class PrettyArray<T extends ToString> extends Array<T> {
   toString() {
-    // e.toString() is not available for arbitrary T
-    return this.map(e => `${e}`).join(', ');
+    return this.map(e => e.toString()).join(', ');
   }
 }
 
@@ -291,6 +290,10 @@ function setOrAppend<K extends string>(
   } else {
     obj[key] += value;
   }
+}
+
+interface ToString {
+  toString(): string;
 }
 
 function isFunctionDefinition(

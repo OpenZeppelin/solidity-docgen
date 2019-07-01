@@ -18,24 +18,30 @@ interface Options {
 export async function docgen(options: Options) {
   const solcOutput = await compile(options.contractsDir, options.ignore, options.solcModule);
   const source = new SoliditySource(options.contractsDir, solcOutput);
-
-  const readmes = await globby(path.join(options.contractsDir, '**/README.*'));
-
-  const pages = await Promise.all(
-    readmes.map(async readmePath =>
-      Page.parse(
-        path.relative(options.contractsDir, readmePath),
-        await fs.readFile(readmePath, 'utf8'),
-        source,
-      )
-    )
-  );
-
+  const pages = await getPages(options.contractsDir, source);
   const template = await getTemplate(options.templateFile);
 
   for (const page of pages) {
     const dest = path.join(options.outputDir, page.outputFile);
     await fs.outputFile(dest, template(page));
+  }
+}
+
+async function getPages(contractsDir: string, source: SoliditySource): Promise<Page[]> {
+  const readmes = await globby(path.join(contractsDir, '**/README.*'));
+
+  if (readmes.length === 0) {
+    return [new Page('README.md', {}, '', source)];
+  } else {
+    return await Promise.all(
+      readmes.map(async readmePath =>
+        Page.parse(
+          path.relative(contractsDir, readmePath),
+          await fs.readFile(readmePath, 'utf8'),
+          source,
+        )
+      )
+    );
   }
 }
 

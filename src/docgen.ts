@@ -1,4 +1,3 @@
-import yaml from 'js-yaml';
 import path from 'path';
 import Handlebars from 'handlebars';
 import fs from 'fs-extra';

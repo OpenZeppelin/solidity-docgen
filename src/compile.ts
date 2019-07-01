@@ -12,11 +12,6 @@ const compilerSettings = {
       '': [
         'ast',
       ],
-      '*': [
-        'abi',
-        'devdoc',
-        'evm.methodIdentifiers',
-      ],
     },
   },
 };

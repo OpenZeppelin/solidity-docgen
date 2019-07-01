@@ -22,7 +22,6 @@ export class SoliditySource {
   file(fileName: string): SolidityFile {
     return new SolidityFile(
       this,
-      this.solcOutput.contracts[fileName],
       this.solcOutput.sources[fileName].ast,
       path.relative(this.contractsDir, fileName),
     );
@@ -42,39 +41,30 @@ export class SoliditySource {
 class SolidityFile {
   constructor(
     private readonly source: SoliditySource,
-    private readonly fileData: solc.FileData,
     private readonly ast: solc.ast.SourceUnit,
     readonly path: string,
   ) { }
 
   get contracts(): SolidityContract[] {
-    return Object.keys(this.fileData).map(contractName =>
-      this.contract(contractName)
-    );
-  }
-
-  contract(contractName: string): SolidityContract {
-    const contractData = this.fileData[contractName];
-
-    const astNode = this.ast.nodes.find(n =>
-      n.nodeType === 'ContractDefinition' && n.name === contractName
+    const astNodes = this.ast.nodes.filter(n =>
+      n.nodeType === 'ContractDefinition'
     );
 
-    if (astNode === undefined || contractData === undefined) {
-      throw new Error(`Contract ${contractName} not found in ${this.path}`);
-    }
-
-    return new SolidityContract(this.source, contractData, astNode, contractName);
+    return astNodes.map(node => 
+      new SolidityContract(this.source, node)
+    );
   }
 }
 
 export class SolidityContract {
   constructor(
     private readonly source: SoliditySource,
-    private readonly contractData: solc.ContractData,
     private readonly astNode: solc.ast.ContractDefinition,
-    readonly name: string,
   ) { }
+
+  get name() {
+    return this.astNode.name;
+  }
 
   get functions(): SolidityFunction[] {
     return [...this.ownFunctions, ...this.inheritedFunctions];

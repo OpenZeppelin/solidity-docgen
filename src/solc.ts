@@ -35,12 +35,14 @@ export namespace ast {
     visibility: 'internal' | 'external' | 'public';
     name: string;
     documentation: string | null;
+    parameters: ParameterList;
+  }
+
+  export interface ParameterList {
     parameters: {
-      parameters: {
-        name: string;
-        typeName: TypeName;
-      }[];
-    };
+      name: string;
+      typeName: TypeName;
+    }[];
   }
 
   export interface TypeName {

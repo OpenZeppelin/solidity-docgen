@@ -115,13 +115,8 @@ class SolidityFunction {
   }
 
   get args(): SolidityTypedVariable[] {
-    return SolidityTypedVariableArray.from(
-      this.astNode.parameters.parameters.map(p =>
-        new SolidityTypedVariable(
-          p.typeName,
-          p.name || undefined,
-        )
-      )
+    return SolidityTypedVariableArray.fromParameterList(
+      this.astNode.parameters
     );
   }
 
@@ -169,6 +164,17 @@ class PrettyArray<T> extends Array<T> {
 }
 
 class SolidityTypedVariableArray extends PrettyArray<SolidityTypedVariable> {
+  static fromParameterList(parameters: solc.ast.ParameterList): SolidityTypedVariable[] {
+    return SolidityTypedVariableArray.from(
+      parameters.parameters.map(p =>
+        new SolidityTypedVariable(
+          p.typeName,
+          p.name || undefined,
+        )
+      )
+    );
+  }
+
   get types(): string[] {
     return this.map(v => v.typeName);
   }

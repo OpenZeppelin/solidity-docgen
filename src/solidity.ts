@@ -120,6 +120,12 @@ class SolidityFunction {
     );
   }
 
+  get outputs(): SolidityTypedVariable[] {
+    return SolidityTypedVariableArray.fromParameterList(
+      this.astNode.returnParameters
+    );
+  }
+
   get signature(): string {
     return `${this.name}(${this.args.map(a => a.typeName).join(',')})`;
   }

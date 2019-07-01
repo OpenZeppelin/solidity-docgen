@@ -36,6 +36,7 @@ export namespace ast {
     name: string;
     documentation: string | null;
     parameters: ParameterList;
+    returnParameters: ParameterList;
   }
 
   export interface ParameterList {
@@ -136,6 +137,9 @@ export class SolcOutputBuilder implements Output {
             },
           },
         })),
+      },
+      returnParameters: {
+        parameters: [],
       },
     };
     this._currentContract.astNode.nodes.push(astNode);

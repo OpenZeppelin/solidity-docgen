@@ -45,11 +45,9 @@ async function getPages(contractsDir: string, source: SoliditySource): Promise<P
   }
 }
 
-async function getTemplate(templatePath?: string): Promise<Handlebars.TemplateDelegate> {
-  if (templatePath === undefined) {
-    templatePath = path.resolve(__dirname, '../page.hbs');
-  }
+const defaultTemplatePath = path.resolve(__dirname, '../page.hbs');
 
+async function getTemplate(templatePath: string = defaultTemplatePath): Promise<Handlebars.TemplateDelegate> {
   const template = await fs.readFile(templatePath, 'utf8');
   return Handlebars.compile(template);
 }

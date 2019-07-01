@@ -32,7 +32,7 @@ export namespace ast {
   export interface FunctionDefinition {
     nodeType: 'FunctionDefinition';
     kind: 'function' | 'constructor' | 'fallback';
-    visibility: 'internal' | 'external' | 'public';
+    visibility: 'internal' | 'external' | 'public' | 'private';
     name: string;
     documentation: string | null;
     parameters: ParameterList;

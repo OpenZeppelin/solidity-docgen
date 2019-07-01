@@ -73,6 +73,7 @@ export class SolidityContract {
   get ownFunctions(): SolidityFunction[] {
     return this.astNode.nodes
       .filter(isFunctionDefinition)
+      .filter(n => n.visibility !== 'private')
       .map(n => new SolidityFunction(this, n));
   }
 
@@ -147,7 +148,7 @@ class SolidityFunction {
     return `${this.name}(${this.args.map(a => a.typeName).join(',')})`;
   }
 
-  get visibility(): 'internal' | 'external' | 'public' {
+  get visibility(): 'internal' | 'external' | 'public' | 'private' {
     return this.astNode.visibility;
   }
 

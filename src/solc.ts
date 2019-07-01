@@ -21,7 +21,7 @@ export namespace ast {
     id: number;
     name: string;
     documentation: string | null;
-    nodes: FunctionDefinition[];
+    nodes: (FunctionDefinition | EventDefinition)[];
     baseContracts: { 
       baseName: {
         referencedDeclaration: number;
@@ -37,6 +37,13 @@ export namespace ast {
     documentation: string | null;
     parameters: ParameterList;
     returnParameters: ParameterList;
+  }
+
+  export interface EventDefinition {
+    nodeType: 'EventDefinition';
+    name: string;
+    documentation: string | null;
+    parameters: ParameterList;
   }
 
   export interface ParameterList {

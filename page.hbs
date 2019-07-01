@@ -9,11 +9,15 @@
 {{{natspec.devdoc}}}
 
 {{#functions}}
-- `{{signature}}`
+- `{{name}}({{args}})`
 {{/functions}}
 
+{{#events}}
+- `{{name}}({{args}})`
+{{/events}}
+
 {{#ownFunctions}}
-### `{{signature}}{{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}})
+### `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}})
 
 {{{natspec.devdoc}}}
 

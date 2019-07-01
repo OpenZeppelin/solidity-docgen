@@ -72,13 +72,30 @@ export class SolidityContract {
 
   get ownFunctions(): SolidityFunction[] {
     return this.astNode.nodes
-      .filter(n => n.nodeType === 'FunctionDefinition')
+      .filter(isFunctionDefinition)
       .map(n => new SolidityFunction(this, n));
   }
 
   get inheritedFunctions(): SolidityFunction[] {
     return uniqBy(
       flatten(this.baseContracts.map(c => c.functions)),
+      f => f.signature,
+    );
+  }
+
+  get events(): SolidityEvent[] {
+    return [...this.ownEvents, ...this.inheritedEvents];
+  }
+
+  get ownEvents(): SolidityEvent[] {
+    return this.astNode.nodes
+      .filter(isEventDefinition)
+      .map(n => new SolidityEvent(this, n));
+  }
+
+  get inheritedEvents(): SolidityEvent[] {
+    return uniqBy(
+      flatten(this.baseContracts.map(c => c.events)),
       f => f.signature,
     );
   }
@@ -132,6 +149,35 @@ class SolidityFunction {
 
   get visibility(): 'internal' | 'external' | 'public' {
     return this.astNode.visibility;
+  }
+
+  get natspec(): NatSpec {
+    if (this.astNode.documentation === null) {
+      return {};
+    }
+
+    return parseNatSpec(this.astNode.documentation);
+  }
+}
+
+class SolidityEvent {
+  constructor(
+    readonly contract: SolidityContract,
+    private readonly astNode: solc.ast.FunctionDefinition,
+  ) { }
+
+  get name(): string {
+    return this.astNode.name;
+  }
+
+  get args(): SolidityTypedVariable[] {
+    return SolidityTypedVariableArray.fromParameterList(
+      this.astNode.parameters
+    );
+  }
+
+  get signature(): string {
+    return `${this.name}(${this.args.map(a => a.typeName).join(',')})`;
   }
 
   get natspec(): NatSpec {
@@ -245,4 +291,16 @@ function setOrAppend<K extends string>(
   } else {
     obj[key] += value;
   }
+}
+
+function isFunctionDefinition(
+  node: solc.ast.FunctionDefinition | solc.ast.EventDefinition,
+): node is solc.ast.FunctionDefinition {
+  return node.nodeType === 'FunctionDefinition';
+}
+
+function isEventDefinition(
+  node: solc.ast.FunctionDefinition | solc.ast.EventDefinition,
+): node is solc.ast.FunctionDefinition {
+  return node.nodeType === 'EventDefinition';
 }

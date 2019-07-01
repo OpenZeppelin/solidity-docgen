@@ -125,9 +125,14 @@ class SolidityFunction {
   }
 
   get args(): SolidityTypedVariable[] {
-    return this.astNode.parameters.parameters.map(p => ({
-      typeName: p.typeName.typeDescriptions.typeString,
-    }));
+    return SolidityTypedVariableArray.from(
+      this.astNode.parameters.parameters.map(p =>
+        new SolidityTypedVariable(
+          p.typeName,
+          p.name || undefined,
+        )
+      )
+    );
   }
 
   get signature(): string {
@@ -147,8 +152,40 @@ class SolidityFunction {
   }
 }
 
-interface SolidityTypedVariable {
-  typeName: string;
+class SolidityTypedVariable {
+  constructor(
+    readonly type: solc.ast.TypeName,
+    readonly name?: string,
+  ) { }
+
+  get typeName() {
+    return this.type.typeDescriptions.typeString;
+  }
+
+  toString(): string {
+    if (this.name) {
+      return [this.typeName, this.name].join(' ');
+    } else {
+      return this.typeName;
+    }
+  }
+}
+
+class PrettyArray<T> extends Array<T> {
+  toString() {
+    // e.toString() is not available for arbitrary T
+    return this.map(e => `${e}`).join(', ');
+  }
+}
+
+class SolidityTypedVariableArray extends PrettyArray<SolidityTypedVariable> {
+  get types(): string[] {
+    return this.map(v => v.typeName);
+  }
+
+  get names(): (string | undefined)[] {
+    return this.map(v => v.name);
+  }
 }
 
 interface NatSpec {

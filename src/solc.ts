@@ -47,12 +47,16 @@ export namespace ast {
     documentation: string | null;
     parameters: {
       parameters: {
-        typeName: {
-          typeDescriptions: {
-            typeString: string;
-          };
-        };
+        name: string;
+        typeName: TypeName;
       }[];
+    };
+  }
+
+  export interface TypeName {
+    nodeType: 'ElementaryTypeName' | 'UserDefinedTypeName';
+    typeDescriptions: {
+      typeString: string;
     };
   }
 }
@@ -138,7 +142,9 @@ export class SolcOutputBuilder implements Output {
       documentation: null,
       parameters: {
         parameters: argTypes.map(t => ({
+          name: '',
           typeName: {
+            nodeType: 'ElementaryTypeName',
             typeDescriptions: {
               typeString: t,
             },

@@ -104,7 +104,7 @@ export class SolidityContract {
 
 class SolidityFunction {
   constructor(
-    private readonly contract: SolidityContract,
+    readonly contract: SolidityContract,
     private readonly astNode: solc.ast.FunctionDefinition,
   ) { }
 

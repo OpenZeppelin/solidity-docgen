@@ -1,6 +1,7 @@
 import { flatten, uniqBy } from 'lodash';
 import path from 'path';
 import execall from 'execall';
+import handlebars from 'handlebars';
 
 import * as solc from './solc';
 
@@ -62,8 +63,16 @@ export class SolidityContract {
     private readonly astNode: solc.ast.ContractDefinition,
   ) { }
 
-  get name() {
+  get name(): string {
     return this.astNode.name;
+  }
+
+  get slug(): string {
+    return this.name;
+  }
+
+  get anchor(): handlebars.SafeString {
+    return new handlebars.SafeString(`<span id="${this.slug}"></span>`);
   }
 
   get functions(): SolidityFunction[] {
@@ -132,6 +141,14 @@ class SolidityFunction {
     return isRegularFunction ? name : kind;
   }
 
+  get slug(): string {
+    return `${this.contract.name}.${this.signature}`
+  }
+
+  get anchor(): handlebars.SafeString {
+    return new handlebars.SafeString(`<span id="${this.slug}"></span>`);
+  }
+
   get args(): SolidityTypedVariable[] {
     return SolidityTypedVariableArray.fromParameterList(
       this.astNode.parameters
@@ -169,6 +186,14 @@ class SolidityEvent {
 
   get name(): string {
     return this.astNode.name;
+  }
+
+  get slug(): string {
+    return `${this.contract.name}.${this.signature}`
+  }
+
+  get anchor(): handlebars.SafeString {
+    return new handlebars.SafeString(`<span id="${this.slug}"></span>`);
   }
 
   get args(): SolidityTypedVariable[] {

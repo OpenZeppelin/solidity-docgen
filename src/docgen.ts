@@ -6,6 +6,7 @@ import globby from 'globby';
 import { compile } from './compile';
 import { SoliditySource } from './solidity';
 import { Page } from './page';
+import { crossreferencer } from './crossreferences';
 
 interface Options {
   contractsDir: string;
@@ -20,10 +21,11 @@ export async function docgen(options: Options) {
   const source = new SoliditySource(options.contractsDir, solcOutput);
   const pages = await getPages(options.contractsDir, source);
   const template = await getTemplate(options.templateFile);
+  const crossreference = crossreferencer(pages);
 
   for (const page of pages) {
     const dest = path.join(options.outputDir, page.outputFile);
-    await fs.outputFile(dest, template(page));
+    await fs.outputFile(dest, crossreference(page.outputFile, template(page)));
   }
 }
 

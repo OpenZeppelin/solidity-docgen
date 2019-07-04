@@ -4,22 +4,27 @@
 # Contracts
 {{#contracts}}
 
-## `{{name}}`
+## {{anchor}} `{{name}}`
 
 {{{natspec.devdoc}}}
 
 {{#functions}}
-- `{{name}}({{args}})`
+- [`{{name}}({{args}})`][`{{slug}}`]
 {{/functions}}
 
 {{#events}}
-- `{{name}}({{args}})`
+- [`{{name}}({{args}})`][`{{slug}}`]
 {{/events}}
-
 {{#ownFunctions}}
-### `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}})
+
+### {{anchor}} `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}})
 
 {{{natspec.devdoc}}}
-
 {{/ownFunctions}}
+{{#ownEvents}}
+
+### {{anchor}} `{{name}}({{args}})`
+
+{{{natspec.devdoc}}}
+{{/ownEvents}}
 {{/contracts}}

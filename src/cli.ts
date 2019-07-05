@@ -29,10 +29,16 @@ class Docgen extends Command {
       description: 'ignore directories that match the pattern (separated by commas)',
     }),
 
-    templateFile: flags.string({
+    contractTemplate: flags.string({
       char: 't',
       parse: s => path.resolve(s),
-      description: 'path to a handlebars template to render each page',
+      description: 'path to a handlebars template to render each contract',
+    }),
+
+    preludeTemplate: flags.string({
+      char: 'p',
+      parse: s => path.resolve(s),
+      description: 'path to a handlebars template to render the page prelude',
     }),
 
     solcModule: flags.string({

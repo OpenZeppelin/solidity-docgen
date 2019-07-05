@@ -1,34 +1,49 @@
 import test from 'ava';
+import path from 'path';
 
-import { Page } from './page';
+import { ReadmeSitemap } from './sitemap';
 import { SoliditySource } from './solidity';
 import { SolcOutputBuilder } from './solc';
 
-test('single file no contracts', t => {
+const emptyReadme = (dir: string = '') => ({
+  path: path.join(dir, 'README.md'),
+  contents: '',
+});
+
+test('single readme', t => {
+  const source = buildSoliditySource();
+  const sitemap = new ReadmeSitemap(source, [emptyReadme()])
+
+  t.is(sitemap.pages.length, 1);
+});
+
+test('single readme no contracts', t => {
   const source = buildSoliditySource(b => b
     .file('Foo.sol')
   );
 
-  const page = new Page('README.md', {}, '', source)
+  const sitemap = new ReadmeSitemap(source, [emptyReadme()])
+  const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 0);
 });
 
-test('single file multiple contracts', t => {
+test('single readme multiple contracts', t => {
   const source = buildSoliditySource(b => b
     .file('Foo.sol')
       .contract('Foo')
       .contract('Bar')
   );
 
-  const page = new Page('README.md', {}, '', source);
+  const sitemap = new ReadmeSitemap(source, [emptyReadme()])
+  const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 2);
   t.assert(page.contracts.some(c => c.name === 'Foo'));
   t.assert(page.contracts.some(c => c.name === 'Bar'));
 });
 
-test('filter subdirectory ', t => {
+test('filter subdirectory', t => {
   const source = buildSoliditySource(b => b
     .file('Foo.sol')
       .contract('Foo')
@@ -36,7 +51,8 @@ test('filter subdirectory ', t => {
       .contract('Bar')
   );
 
-  const page = new Page('sub/README.md', {}, '', source);
+  const sitemap = new ReadmeSitemap(source, [emptyReadme('sub')])
+  const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 1);
   t.is(page.contracts[0].name, 'Bar');
@@ -50,31 +66,16 @@ test('filter nested subdirectories', t => {
       .contract('Foo')
   );
 
-  const page = new Page('sub/README.md', {}, '', source);
+  const sitemap = new ReadmeSitemap(source, [emptyReadme('sub')])
+  const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 2);
   t.assert(page.contracts.some(c => c.name === 'Bar'));
   t.assert(page.contracts.some(c => c.name === 'Foo'));
 });
 
-test('intro', t => {
-  const source = buildSoliditySource();
-
-  const page = new Page('README.md', {}, 'intro', source);
-
-  t.is(page.intro, `intro`);
-});
-
-test('frontmatter', t => {
-  const source = buildSoliditySource();
-  const frontmatterData = { a: 1 };
-  const page = new Page('README.md', frontmatterData, '', source);
-
-  t.is(page.frontmatter, '---\na: 1\n---');
-});
-
 function buildSoliditySource(builder?: (b: SolcOutputBuilder) => void): SoliditySource {
   const solcOutput = new SolcOutputBuilder();
   if (builder) builder(solcOutput);
-  return new SoliditySource('', solcOutput);
+  return new SoliditySource('', solcOutput, c => c.name);
 }

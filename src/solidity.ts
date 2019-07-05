@@ -3,12 +3,15 @@ import path from 'path';
 import execall from 'execall';
 import handlebars from 'handlebars';
 
+type ContractTemplate = (contract: SolidityContract) => string;
+
 import * as solc from './solc';
 
 export class SoliditySource {
   constructor(
     private readonly contractsDir: string,
     private readonly solcOutput: solc.Output,
+    readonly contractTemplate: ContractTemplate,
   ) { }
 
   get contracts(): SolidityContract[] {
@@ -52,7 +55,7 @@ class SolidityFile {
     );
 
     return astNodes.map(node => 
-      new SolidityContract(this.source, node)
+      new SolidityContract(this.source, this, node)
     );
   }
 }
@@ -60,8 +63,13 @@ class SolidityFile {
 export class SolidityContract {
   constructor(
     private readonly source: SoliditySource,
+    readonly file: SolidityFile,
     private readonly astNode: solc.ast.ContractDefinition,
   ) { }
+
+  toHTML(): string {
+    return this.source.contractTemplate(this);
+  }
 
   get name(): string {
     return this.astNode.name;

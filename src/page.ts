@@ -1,54 +1,44 @@
-import { flatten, isEmpty } from 'lodash';
-import minimatch from 'minimatch';
 import path from 'path';
-import yaml from 'js-yaml';
+import handlebars from 'handlebars';
 
-import { SoliditySource, SolidityContract } from './solidity';
+import { VFile } from './vfile';
+import { Sitemap, RelativeSitemap } from './sitemap';
+import { SolidityContract } from './solidity';
 
-export class Page {
+type Template<T> = (data: T) => string;
+type PreludeTemplate = Template<RelativeSitemap>;
+
+export interface Page {
+  path: string;
+  contracts: SolidityContract[];
+}
+
+export class ReadmePage {
   constructor(
-    private readonly inputFile: string,
-    private readonly frontmatterData: {},
-    readonly intro: string,
-    private readonly source: SoliditySource,
+    private readonly sitemap: Sitemap,
+    private readonly readme: VFile,
+    readonly contracts: SolidityContract[],
   ) { }
 
-  static parse(
-    inputFile: string,
-    contents: string,
-    source: SoliditySource,
-  ): Page {
-    const match = // non-null assertion because this regexp always matches
-      contents.match(/^(?:---\n([^]*?\n)?---\n)?([^]*)$/)!;
-    const frontmatterData = match[1] ? yaml.safeLoad(match[1]) : {};
-    const intro = match[2];
-    return new Page(inputFile, frontmatterData, intro, source);
+  render(prelude: PreludeTemplate): string {
+    const contents = this.template(this);
+    return prelude(this.sitemap.relative(this)) + contents;
   }
 
-  get contracts(): SolidityContract[] {
-    const sourceFiles = this.source.files.filter(f => isContainedIn(this.location, f.path));
-    return flatten(sourceFiles.map(f => f.contracts));
-  }
-
-  get frontmatter(): string {
-    const str = isEmpty(this.frontmatterData) ? '' : yaml.safeDump(this.frontmatterData);
-    return '---\n' + str + '---';
+  get template(): (page: Page) => string {
+    return handlebars.compile(this.readme.contents);
   }
 
   get location(): string {
-    return path.dirname(this.inputFile);
+    return path.dirname(this.readme.path);
   }
 
-  get outputFile(): string {
-    const { dir, ext } = path.parse(this.inputFile);
+  get path(): string {
+    const { dir, ext } = path.parse(this.readme.path);
     return path.format({
       dir: path.dirname(dir),
       name: path.basename(dir) || 'index',
       ext,
     });
   }
-}
-
-function isContainedIn(pagePath: string, filePath: string): boolean {
-  return minimatch(filePath, path.join(pagePath, '**/*'));
 }

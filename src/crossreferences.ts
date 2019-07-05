@@ -12,12 +12,8 @@ interface Reference {
 }
 
 export function crossreferencer(pages: Page[]): (location: string, input: string) => string {
-  const references = [...generateReferencePairs(pages)];
   return function (location: string, input: string) {
-    const definitions = unified().use(stringify).stringify(
-      getDefinitions(location, references)
-    );
-    return input + '\n' + definitions;
+    return input;
   };
 }
 

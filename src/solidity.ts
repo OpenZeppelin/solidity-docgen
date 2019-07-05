@@ -264,7 +264,12 @@ class SolidityTypedVariableArray extends PrettyArray<SolidityTypedVariable> {
 interface NatSpec {
   devdoc?: string;
   userdoc?: string;
+  title?: string;
   params?: {
+    param: string;
+    description: string;
+  }[];
+  returns?: {
     param: string;
     description: string;
   }[];
@@ -291,6 +296,9 @@ function parseNatSpec(doc: string): NatSpec {
     if (tag === 'notice') {
       setOrAppend(res, 'userdoc', content);
     }
+    if (tag === 'title') {
+      res.title = content;
+    }
     if (tag === 'param') {
       const paramMatches = content.match(/(\w+) ([^]*)/);
       if (paramMatches) {
@@ -299,6 +307,16 @@ function parseNatSpec(doc: string): NatSpec {
           res.params = [];
         }
         res.params.push({ param, description });
+      }
+    }
+    if (tag === 'return') {
+      const paramMatches = content.match(/(\w+) ([^]*)/);
+      if (paramMatches) {
+        const [, param, description] = paramMatches;
+        if (res.returns === undefined) {
+          res.returns = [];
+        }
+        res.returns.push({ param, description });
       }
     }
   }

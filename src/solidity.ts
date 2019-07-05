@@ -151,7 +151,7 @@ class SolidityFunction {
   }
 
   get slug(): string {
-    return `${this.contract.name}.${this.signature}`
+    return `${this.contract.name}-${slugSignature(this.signature)}`
   }
 
   get anchor(): handlebars.SafeString {
@@ -198,7 +198,7 @@ class SolidityEvent {
   }
 
   get slug(): string {
-    return `${this.contract.name}.${this.signature}`
+    return `${this.contract.name}-${slugSignature(this.signature)}`
   }
 
   get anchor(): handlebars.SafeString {
@@ -359,4 +359,8 @@ function isEventDefinition(
   node: solc.ast.FunctionDefinition | solc.ast.EventDefinition,
 ): node is solc.ast.FunctionDefinition {
   return node.nodeType === 'EventDefinition';
+}
+
+function slugSignature(signature: string): string {
+  return signature.replace(/\(?\)$/, '').replace(/[(, ]/g, '-');
 }

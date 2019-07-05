@@ -80,7 +80,7 @@ export class SolidityContract {
   }
 
   get anchor(): handlebars.SafeString {
-    return new handlebars.SafeString(`<span id="${this.slug}"></span>`);
+    return anchor(this.slug);
   }
 
   get functions(): SolidityFunction[] {
@@ -155,7 +155,7 @@ class SolidityFunction {
   }
 
   get anchor(): handlebars.SafeString {
-    return new handlebars.SafeString(`<span id="${this.slug}"></span>`);
+    return anchor(this.slug);
   }
 
   get args(): SolidityTypedVariable[] {
@@ -202,7 +202,7 @@ class SolidityEvent {
   }
 
   get anchor(): handlebars.SafeString {
-    return new handlebars.SafeString(`<span id="${this.slug}"></span>`);
+    return anchor(this.slug);
   }
 
   get args(): SolidityTypedVariable[] {
@@ -363,4 +363,8 @@ function isEventDefinition(
 
 function slugSignature(signature: string): string {
   return signature.replace(/\(?\)$/, '').replace(/[(, ]/g, '-');
+}
+
+function anchor(slug: string): handlebars.SafeString {
+  return new handlebars.SafeString(`<span id="${slug}"></span>`);
 }

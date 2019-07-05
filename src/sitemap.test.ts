@@ -74,15 +74,28 @@ test('filter nested subdirectories', t => {
   t.assert(page.contracts.some(c => c.name === 'Foo'));
 });
 
-test('relative sitemap', t => {
-  const source = buildSoliditySource();
+test('references', t => {
+  const source = buildSoliditySource(b => b
+    .file('sub1/Bar.sol')
+      .contract('Bar')
+    .file('sub2/Foo.sol')
+      .contract('Foo')
+  );
 
-  const sitemap = new ReadmeSitemap(source, [emptyReadme('sub1'), emptyReadme('sub2'), emptyReadme('sub1/sub2')])
-  const relative = sitemap.relative(sitemap.pages[0]);
+  const sitemap = new ReadmeSitemap(source, [emptyReadme('sub1'), emptyReadme('sub2')])
+  const references = sitemap.references(sitemap.pages[0]);
 
-  t.is(relative.pages.length, sitemap.pages.length);
-  t.is(relative.pages[1].path, 'sub2.md');
-  t.is(relative.pages[2].path, 'sub1/sub2.md');
+  t.is(references.length, 2);
+
+  const bar = references[0];
+  t.is(bar.target.label, 'Bar');
+  t.is(bar.path, 'sub1.md');
+  t.is(bar.relativePath, '');
+
+  const foo = references[1];
+  t.is(foo.target.label, 'Foo');
+  t.is(foo.path, 'sub2.md');
+  t.is(foo.relativePath, 'sub2.md');
 });
 
 function buildSoliditySource(builder?: (b: SolcOutputBuilder) => void): SoliditySource {

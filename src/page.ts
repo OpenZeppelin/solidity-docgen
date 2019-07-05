@@ -2,11 +2,11 @@ import path from 'path';
 import handlebars from 'handlebars';
 
 import { VFile } from './vfile';
-import { Sitemap, RelativeSitemap } from './sitemap';
+import { Sitemap, Reference } from './sitemap';
 import { SolidityContract } from './solidity';
 
 type Template<T> = (data: T) => string;
-type PreludeTemplate = Template<RelativeSitemap>;
+type PreludeTemplate = Template<{ references: Reference[] }>;
 
 export interface Page {
   path: string;
@@ -22,7 +22,8 @@ export class ReadmePage {
 
   render(preludeTemplate: PreludeTemplate): string {
     const contents = this.template(this);
-    const prelude = preludeTemplate(this.sitemap.relative(this));
+    const references = this.sitemap.references(this);
+    const prelude = preludeTemplate({ references });
     return addPrelude(contents, prelude);
   }
 
@@ -36,11 +37,11 @@ export class ReadmePage {
 
   get path(): string {
     const { dir, ext } = path.parse(this.readme.path);
-    return path.format({
+    return path.normalize(path.format({
       dir: path.dirname(dir),
       name: path.basename(dir) || 'index',
       ext,
-    });
+    }));
   }
 }
 

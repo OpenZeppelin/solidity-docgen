@@ -3,14 +3,38 @@ import minimatch from 'minimatch';
 import { maxBy } from 'lodash';
 
 import { VFile } from './vfile';
-import { SoliditySource, SolidityContract } from './solidity';
+import { SoliditySource, SolidityContract, Referenceable } from './solidity';
 import { Page, ReadmePage } from './page';
+
+export interface Reference {
+  target: Referenceable;
+  path: string;
+  relativePath: string;
+}
 
 export abstract class Sitemap {
   abstract pages: Page[];
 
-  relative(origin: Page): RelativeSitemap {
-    return new RelativeSitemap(this, origin);
+  references(origin: Page): Reference[] {
+    function* generate(sitemap: Sitemap): IterableIterator<Reference> {
+      for (const { path, contracts } of sitemap.pages) {
+        const relativePath = relative(origin.path, path);
+
+        for (const c of contracts) {
+          yield { target: c, path, relativePath };
+
+          for (const f of c.ownFunctions) {
+            yield { target: f, path, relativePath };
+          }
+
+          for (const e of c.ownEvents) {
+            yield { target: e, path, relativePath };
+          }
+        }
+      }
+    }
+
+    return Array.from(generate(this));
   }
 }
 
@@ -29,7 +53,7 @@ export class ReadmeSitemap extends Sitemap {
     );
   }
 
-  locate(contract: SolidityContract): string | undefined {
+  private locate(contract: SolidityContract): string | undefined {
     const matches = this.locations.filter(l =>
       isContainedIn(l, contract.file.path));
     return maxBy(matches, l => l.length);
@@ -42,20 +66,6 @@ export class ReadmeSitemap extends Sitemap {
 
 function isContainedIn(location: string, file: string): boolean {
   return minimatch(file, path.join(location, '**/*'));
-}
-
-export class RelativeSitemap {
-  constructor(
-    private readonly base: Sitemap,
-    private readonly current: Page,
-  ) { }
-
-  get pages(): Page[] {
-    return this.base.pages.map(p => ({
-      contracts: p.contracts,
-      path: relative(this.current.path, p.path),
-    }));
-  }
 }
 
 function relative(origin: string, target: string): string {

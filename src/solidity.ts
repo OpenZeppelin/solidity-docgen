@@ -60,12 +60,23 @@ class SolidityFile {
   }
 }
 
-export class SolidityContract {
+export abstract class Referenceable {
+  abstract label: string;
+  abstract slug: string;
+
+  get anchor(): handlebars.SafeString {
+    return new handlebars.SafeString(`<span id="${this.slug}"></span>`);
+  }
+}
+
+export class SolidityContract extends Referenceable {
   constructor(
     private readonly source: SoliditySource,
     readonly file: SolidityFile,
     private readonly astNode: solc.ast.ContractDefinition,
-  ) { }
+  ) {
+    super();
+  }
 
   toHTML(): string {
     return this.source.contractTemplate(this);
@@ -79,8 +90,8 @@ export class SolidityContract {
     return this.name;
   }
 
-  get anchor(): handlebars.SafeString {
-    return anchor(this.slug);
+  get label(): string {
+    return this.name;
   }
 
   get functions(): SolidityFunction[] {
@@ -138,11 +149,13 @@ export class SolidityContract {
   }
 }
 
-class SolidityFunction {
+class SolidityFunction extends Referenceable {
   constructor(
     readonly contract: SolidityContract,
     private readonly astNode: solc.ast.FunctionDefinition,
-  ) { }
+  ) {
+    super();
+  }
 
   get name(): string {
     const { name, kind } = this.astNode;
@@ -154,8 +167,8 @@ class SolidityFunction {
     return `${this.contract.name}-${slugSignature(this.signature)}`
   }
 
-  get anchor(): handlebars.SafeString {
-    return anchor(this.slug);
+  get label(): string {
+    return `${this.contract.name}.${this.name}`
   }
 
   get args(): SolidityTypedVariable[] {
@@ -187,11 +200,13 @@ class SolidityFunction {
   }
 }
 
-class SolidityEvent {
+class SolidityEvent extends Referenceable {
   constructor(
     readonly contract: SolidityContract,
     private readonly astNode: solc.ast.FunctionDefinition,
-  ) { }
+  ) {
+    super();
+  }
 
   get name(): string {
     return this.astNode.name;
@@ -201,8 +216,8 @@ class SolidityEvent {
     return `${this.contract.name}-${slugSignature(this.signature)}`
   }
 
-  get anchor(): handlebars.SafeString {
-    return anchor(this.slug);
+  get label(): string {
+    return `${this.contract.name}.${this.name}`
   }
 
   get args(): SolidityTypedVariable[] {
@@ -363,8 +378,4 @@ function isEventDefinition(
 
 function slugSignature(signature: string): string {
   return signature.replace(/\(?\)$/, '').replace(/[(, ]/g, '-');
-}
-
-function anchor(slug: string): handlebars.SafeString {
-  return new handlebars.SafeString(`<span id="${slug}"></span>`);
 }

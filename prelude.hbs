@@ -1,11 +1,3 @@
-{{#pages}}
-{{#contracts}}
-[{{slug}}]: {{../path}}#{{slug}}
-{{#ownFunctions}}
-[{{slug}}]: {{../../path}}#{{slug}}
-{{/ownFunctions}}
-{{#ownEvents}}
-[{{slug}}]: {{../../path}}#{{slug}}
-{{/ownEvents}}
-{{/contracts}}
-{{/pages}}
+{{#references}}
+[{{target.slug}}]: {{relativePath}}#{{target.slug}}
+{{/references}}

@@ -7,7 +7,8 @@
   },
   "files": [
     "dist",
-    "page.hbs"
+    "contract.hbs",
+    "prelude.hbs"
   ],
   "scripts": {
     "build": "tsc",

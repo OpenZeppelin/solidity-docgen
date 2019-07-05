@@ -1,17 +1,24 @@
-# `solidity-docgen` (WIP)
+# `solidity-docgen`
 
-**Documentation generator for libraries of smart contracts.**
+**Documentation generator for smart contract libraries.**
 
-`solidity-docgen` combines inline documentation with long form documents to
-generate documentation pages that can be easily made into a static site.
+`solidity-docgen` allows you to document your code inline using [NatSpec]
+comments (a format similar to Javadoc and JSDoc) and then produce a website
+to publish the documentation.
 
-Used to generate the documentation for OpenZeppelin.
+Built with :heart: by OpenZeppelin.
 
-## Install
+## Usage
 
 ```sh
 npm install solidity-docgen
 ```
+
+```
+solidity-docgen [ -c <contractsDir> ] [ -o <outputDir> ]
+```
+
+
 
 ## Usage
 

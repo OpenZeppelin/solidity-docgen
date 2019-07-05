@@ -96,6 +96,7 @@ export class SolidityContract {
 
   get inheritedFunctions(): SolidityFunction[] {
     return uniqBy(
+      // [TODO] fix use linearization
       flatten(this.baseContracts.map(c => c.functions)),
       f => f.signature,
     );

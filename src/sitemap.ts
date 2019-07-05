@@ -1,6 +1,6 @@
 import path from 'path';
 import minimatch from 'minimatch';
-import { groupBy, maxBy } from 'lodash';
+import { maxBy } from 'lodash';
 
 import { VFile } from './vfile';
 import { SoliditySource, SolidityContract } from './solidity';
@@ -23,10 +23,9 @@ export class ReadmeSitemap extends Sitemap {
   }
 
   get pages(): ReadmePage[] {
-    const locate = (c: SolidityContract) => this.locate(c);
-    const contracts = groupBy(this.source.contracts.filter(locate), locate);
+    const contracts = groupBy(this.source.contracts, c => this.locate(c));
     return this.readmes.map(r =>
-      new ReadmePage(this, r, contracts[path.dirname(r.path)])
+      new ReadmePage(this, r, contracts[path.dirname(r.path)] || [])
     );
   }
 
@@ -65,4 +64,19 @@ function relative(origin: string, target: string): string {
   } else {
     return path.relative(path.dirname(origin), target);
   }
+}
+
+type Dictionary<T> = { [key: string]: T | undefined };
+
+function groupBy<T>(collection: T[], key: (elem: T) => string | undefined): Dictionary<T[]> {
+  const res: Dictionary<T[]> = {};
+
+  for (const elem of collection) {
+    const k = key(elem);
+    if (k !== undefined) {
+      (res[k] || (res[k] = [])).push(elem);
+    }
+  }
+
+  return res;
 }

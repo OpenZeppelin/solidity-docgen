@@ -11,7 +11,8 @@ import { ReadmeSitemap, RelativeSitemap } from './sitemap';
 interface Options {
   contractsDir: string;
   outputDir: string;
-  templateFile?: string;
+  contractTemplate?: string;
+  preludeTemplate?: string;
   ignore?: string[];
   solcModule?: string;
 }
@@ -23,7 +24,7 @@ interface Templates {
 
 export async function docgen(options: Options) {
   const solcOutput = await compile(options.contractsDir, options.ignore, options.solcModule);
-  const templates = await getTemplates(options.templateFile);
+  const templates = await getTemplates(options.contractTemplate, options.preludeTemplate);
   const readmes = await getReadmes(options.contractsDir);
   const source = new SoliditySource(options.contractsDir, solcOutput, templates.contract);
   const sitemap = new ReadmeSitemap(source, readmes);

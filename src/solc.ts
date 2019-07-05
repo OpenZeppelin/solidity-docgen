@@ -67,8 +67,8 @@ export class SolcOutputBuilder implements Output {
 
   errors: [] = [];
 
-  _currentFile: string;
-  _currentContract: {
+  _currentFile?: string;
+  _currentContract?: {
     astNode: ast.ContractDefinition;
   };
   _nextId: number;
@@ -93,7 +93,7 @@ export class SolcOutputBuilder implements Output {
 
   contract(contractName: string, ...baseContracts: string[]) {
     const fileName = this._currentFile;
-    if (!fileName) throw new Error('No file defined');
+    if (fileName === undefined) throw new Error('No file defined');
     const astNode: ast.ContractDefinition = {
       nodeType: 'ContractDefinition',
       name: contractName,
@@ -124,6 +124,8 @@ export class SolcOutputBuilder implements Output {
   }
 
   function(functionName: string, ...argTypes: string[]) {
+    const contract = this._currentContract;
+    if (contract === undefined) throw new Error('No contract defined');
     const kind =
       functionName === 'fallback' || functionName === 'constructor'
       ? functionName
@@ -149,7 +151,7 @@ export class SolcOutputBuilder implements Output {
         parameters: [],
       },
     };
-    this._currentContract.astNode.nodes.push(astNode);
+    contract.astNode.nodes.push(astNode);
     return this;
   }
 }

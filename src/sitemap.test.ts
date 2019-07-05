@@ -74,6 +74,17 @@ test('filter nested subdirectories', t => {
   t.assert(page.contracts.some(c => c.name === 'Foo'));
 });
 
+test('relative sitemap', t => {
+  const source = buildSoliditySource();
+
+  const sitemap = new ReadmeSitemap(source, [emptyReadme('sub1'), emptyReadme('sub2'), emptyReadme('sub1/sub2')])
+  const relative = sitemap.relative(sitemap.pages[0]);
+
+  t.is(relative.pages.length, sitemap.pages.length);
+  t.is(relative.pages[1].path, 'sub2.md');
+  t.is(relative.pages[2].path, 'sub1/sub2.md');
+});
+
 function buildSoliditySource(builder?: (b: SolcOutputBuilder) => void): SoliditySource {
   const solcOutput = new SolcOutputBuilder();
   if (builder) builder(solcOutput);

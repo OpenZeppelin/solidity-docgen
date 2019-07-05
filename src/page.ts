@@ -20,9 +20,10 @@ export class ReadmePage {
     readonly contracts: SolidityContract[],
   ) { }
 
-  render(prelude: PreludeTemplate): string {
+  render(preludeTemplate: PreludeTemplate): string {
     const contents = this.template(this);
-    return prelude(this.sitemap.relative(this)) + contents;
+    const prelude = preludeTemplate(this.sitemap.relative(this));
+    return addPrelude(contents, prelude);
   }
 
   get template(): (page: Page) => string {
@@ -41,4 +42,11 @@ export class ReadmePage {
       ext,
     });
   }
+}
+
+function addPrelude(contents: string, prelude: string): string {
+  const preludeRegex = /^(---\n([^]*?\n)?---\n)?/;
+  return contents.replace(preludeRegex, (_: unknown, frontmatter?: string) =>
+    frontmatter ? frontmatter + prelude : prelude
+  );
 }

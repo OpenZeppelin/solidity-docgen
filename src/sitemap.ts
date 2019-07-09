@@ -21,14 +21,8 @@ export abstract class Sitemap {
         const relativePath = relative(origin.path, path);
 
         for (const c of contracts) {
-          yield { target: c, path, relativePath };
-
-          for (const f of c.ownFunctions) {
-            yield { target: f, path, relativePath };
-          }
-
-          for (const e of c.ownEvents) {
-            yield { target: e, path, relativePath };
+          for (const target of c.linkable) {
+            yield { target, path, relativePath };
           }
         }
       }

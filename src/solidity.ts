@@ -105,7 +105,10 @@ export class SolidityContract extends Linkable {
   }
 
   get functions(): SolidityFunction[] {
-    return [...this.ownFunctions, ...this.inheritedFunctions];
+    return uniqBy(
+      flatten(this.inheritance.map(c => c.ownFunctions)),
+      f => f.signature,
+    );
   }
 
   get ownFunctions(): SolidityFunction[] {
@@ -115,28 +118,18 @@ export class SolidityContract extends Linkable {
       .map(n => new SolidityFunction(this, n));
   }
 
-  get inheritedFunctions(): SolidityFunction[] {
+  get events(): SolidityEvent[] {
     return uniqBy(
-      flatten(this.inheritance.slice(1).map(c => c.functions)),
+      flatten(this.inheritance.map(c => c.ownEvents)),
       f => f.signature,
     );
-  }
-
-  get events(): SolidityEvent[] {
-    return [...this.ownEvents, ...this.inheritedEvents];
   }
 
   get ownEvents(): SolidityEvent[] {
     return this.astNode.nodes
       .filter(isEventDefinition)
+      .filter(n => n.visibility !== 'private')
       .map(n => new SolidityEvent(this, n));
-  }
-
-  get inheritedEvents(): SolidityEvent[] {
-    return uniqBy(
-      flatten(this.inheritance.slice(1).map(c => c.events)),
-      f => f.signature,
-    );
   }
 
   get natspec(): NatSpec {

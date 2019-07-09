@@ -11,8 +11,7 @@ import { ReadmeSitemap, Reference } from './sitemap';
 interface Options {
   contractsDir: string;
   outputDir: string;
-  contractTemplate?: string;
-  preludeTemplate?: string;
+  templates?: string;
   ignore?: string[];
   solcModule?: string;
 }
@@ -24,7 +23,7 @@ interface Templates {
 
 export async function docgen(options: Options) {
   const solcOutput = await compile(options.contractsDir, options.ignore, options.solcModule);
-  const templates = await getTemplates(options.contractTemplate, options.preludeTemplate);
+  const templates = await getTemplates(options.templates);
   const readmes = await getReadmes(options.contractsDir);
   const source = new SoliditySource(options.contractsDir, solcOutput, templates.contract);
   const sitemap = new ReadmeSitemap(source, readmes);
@@ -45,17 +44,16 @@ async function getReadmes(contractsDir: string): Promise<VFile[]> {
   );
 }
 
-async function getTemplates(contractTemplate?: string, preludeTemplate?: string): Promise<Templates> {
-  const contract = await readTemplate(resolve('../contract.hbs'), contractTemplate);
-  const prelude = await readTemplate(resolve('../prelude.hbs'), preludeTemplate);
+async function getTemplates(directory?: string): Promise<Templates> {
+  if (directory === undefined) {
+    directory = path.join(__dirname, '..');
+  }
+  const contract = await readTemplate(path.join(directory, 'contract.hbs'));
+  const prelude = await readTemplate(path.join(directory, 'prelude.hbs'));
   return { contract, prelude };
 }
 
 async function readTemplate(defaultPath: string, path: string = defaultPath): Promise<(data: any) => string> {
   const template = await fs.readFile(path, 'utf8');
   return Handlebars.compile(template);
-}
-
-function resolve(relativePath: string): string {
-  return path.resolve(__dirname, relativePath);
 }

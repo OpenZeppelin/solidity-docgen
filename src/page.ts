@@ -1,5 +1,6 @@
 import path from 'path';
 import handlebars from 'handlebars';
+import { defaults, keyBy } from 'lodash';
 
 import { VFile } from './vfile';
 import { Sitemap, Link } from './sitemap';
@@ -18,7 +19,9 @@ export class ReadmePage {
     private readonly sitemap: Sitemap,
     private readonly readme: VFile,
     readonly contracts: SolidityContract[],
-  ) { }
+  ) {
+    defaults(this, keyBy(this.contracts, c => c.name));
+  }
 
   render(preludeTemplate: PreludeTemplate): string {
     const contents = this.template(this);

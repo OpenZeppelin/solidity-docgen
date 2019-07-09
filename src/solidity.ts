@@ -60,7 +60,7 @@ class SolidityFile {
   }
 }
 
-export abstract class Referenceable {
+export abstract class Linkable {
   abstract label: string;
   abstract slug: string;
 
@@ -69,7 +69,7 @@ export abstract class Referenceable {
   }
 }
 
-export class SolidityContract extends Referenceable {
+export class SolidityContract extends Linkable {
   constructor(
     private readonly source: SoliditySource,
     readonly file: SolidityFile,
@@ -92,6 +92,10 @@ export class SolidityContract extends Referenceable {
 
   get label(): string {
     return this.name;
+  }
+
+  get linkable(): Linkable[] {
+    return [this, ...this.functions, ...this.events];
   }
 
   get inheritance(): SolidityContract[] {
@@ -148,7 +152,7 @@ export class SolidityContract extends Referenceable {
   }
 }
 
-class SolidityFunction extends Referenceable {
+class SolidityFunction extends Linkable {
   constructor(
     readonly contract: SolidityContract,
     private readonly astNode: solc.ast.FunctionDefinition,
@@ -199,7 +203,7 @@ class SolidityFunction extends Referenceable {
   }
 }
 
-class SolidityEvent extends Referenceable {
+class SolidityEvent extends Linkable {
   constructor(
     readonly contract: SolidityContract,
     private readonly astNode: solc.ast.FunctionDefinition,

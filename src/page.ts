@@ -2,11 +2,11 @@ import path from 'path';
 import handlebars from 'handlebars';
 
 import { VFile } from './vfile';
-import { Sitemap, Reference } from './sitemap';
+import { Sitemap, Link } from './sitemap';
 import { SolidityContract } from './solidity';
 
 type Template<T> = (data: T) => string;
-type PreludeTemplate = Template<{ references: Reference[] }>;
+type PreludeTemplate = Template<{ links: Link[] }>;
 
 export interface Page {
   path: string;
@@ -22,8 +22,8 @@ export class ReadmePage {
 
   render(preludeTemplate: PreludeTemplate): string {
     const contents = this.template(this);
-    const references = this.sitemap.references(this);
-    const prelude = preludeTemplate({ references });
+    const links = this.sitemap.links(this);
+    const prelude = preludeTemplate({ links });
     return addPrelude(contents, prelude);
   }
 

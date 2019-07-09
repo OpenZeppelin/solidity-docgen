@@ -3,11 +3,11 @@ import minimatch from 'minimatch';
 import { maxBy } from 'lodash';
 
 import { VFile } from './vfile';
-import { SoliditySource, SolidityContract, Referenceable } from './solidity';
+import { SoliditySource, SolidityContract, Linkable } from './solidity';
 import { Page, ReadmePage } from './page';
 
-export interface Reference {
-  target: Referenceable;
+export interface Link {
+  target: Linkable;
   path: string;
   relativePath: string;
 }
@@ -15,8 +15,8 @@ export interface Reference {
 export abstract class Sitemap {
   abstract pages: Page[];
 
-  references(origin: Page): Reference[] {
-    function* generate(sitemap: Sitemap): IterableIterator<Reference> {
+  links(origin: Page): Link[] {
+    function* generate(sitemap: Sitemap): IterableIterator<Link> {
       for (const { path, contracts } of sitemap.pages) {
         const relativePath = relative(origin.path, path);
 

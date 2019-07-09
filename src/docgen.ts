@@ -6,7 +6,7 @@ import globby from 'globby';
 import { VFile } from './vfile';
 import { compile } from './compile';
 import { SoliditySource, SolidityContract } from './solidity';
-import { ReadmeSitemap, Reference } from './sitemap';
+import { ReadmeSitemap, Link } from './sitemap';
 
 interface Options {
   input: string;
@@ -18,7 +18,7 @@ interface Options {
 
 interface Templates {
   contract: (c: SolidityContract) => string;
-  prelude: (s: { references: Reference[] }) => string;
+  prelude: (s: { links: Link[] }) => string;
 }
 
 export async function docgen(options: Options) {

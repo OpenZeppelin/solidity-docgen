@@ -74,7 +74,7 @@ test('filter nested subdirectories', t => {
   t.assert(page.contracts.some(c => c.name === 'Foo'));
 });
 
-test('references', t => {
+test('links', t => {
   const source = buildSoliditySource(b => b
     .file('sub1/Bar.sol')
       .contract('Bar')
@@ -83,16 +83,16 @@ test('references', t => {
   );
 
   const sitemap = new ReadmeSitemap(source, [emptyReadme('sub1'), emptyReadme('sub2')])
-  const references = sitemap.references(sitemap.pages[0]);
+  const links = sitemap.links(sitemap.pages[0]);
 
-  t.is(references.length, 2);
+  t.is(links.length, 2);
 
-  const bar = references[0];
+  const bar = links[0];
   t.is(bar.target.label, 'Bar');
   t.is(bar.path, 'sub1.md');
   t.is(bar.relativePath, '');
 
-  const foo = references[1];
+  const foo = links[1];
   t.is(foo.target.label, 'Foo');
   t.is(foo.path, 'sub2.md');
   t.is(foo.relativePath, 'sub2.md');

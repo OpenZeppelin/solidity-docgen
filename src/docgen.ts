@@ -9,10 +9,10 @@ import { SoliditySource, SolidityContract } from './solidity';
 import { ReadmeSitemap, Reference } from './sitemap';
 
 interface Options {
-  contractsDir: string;
-  outputDir: string;
+  input: string;
+  output: string;
   templates?: string;
-  ignore?: string[];
+  exclude?: string[];
   solcModule?: string;
 }
 
@@ -22,23 +22,23 @@ interface Templates {
 }
 
 export async function docgen(options: Options) {
-  const solcOutput = await compile(options.contractsDir, options.ignore, options.solcModule);
+  const solcOutput = await compile(options.input, options.exclude, options.solcModule);
   const templates = await getTemplates(options.templates);
-  const readmes = await getReadmes(options.contractsDir);
-  const source = new SoliditySource(options.contractsDir, solcOutput, templates.contract);
+  const readmes = await getReadmes(options.input);
+  const source = new SoliditySource(options.input, solcOutput, templates.contract);
   const sitemap = new ReadmeSitemap(source, readmes);
 
   for (const page of sitemap.pages) {
-    const dest = path.join(options.outputDir, page.path);
+    const dest = path.join(options.output, page.path);
     await fs.outputFile(dest, page.render(templates.prelude));
   }
 }
 
-async function getReadmes(contractsDir: string): Promise<VFile[]> {
-  const readmes = await globby(path.join(contractsDir, '**/README.*'));
+async function getReadmes(inputDir: string): Promise<VFile[]> {
+  const readmes = await globby(path.join(inputDir, '**/README.*'));
   return await Promise.all(
     readmes.map(async readmePath => ({
-      path: path.relative(contractsDir, readmePath),
+      path: path.relative(inputDir, readmePath),
       contents: await fs.readFile(readmePath, 'utf8'),
     }))
   );

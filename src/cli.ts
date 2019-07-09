@@ -10,23 +10,23 @@ class Docgen extends Command {
     version: flags.version(),
     help: flags.help(),
 
-    contractsDir: flags.string({
-      char: 'c',
+    input: flags.string({
+      char: 'i',
       default: 'contracts',
       description: 'directory where contracts will be taken from',
     }),
 
-    outputDir: flags.string({
+    output: flags.string({
       char: 'o',
       default: 'docs',
       description: 'directory where generated docs will be written',
     }),
 
-    ignore: flags.build({
+    exclude: flags.build({
       parse: s => s.split(','),
     })({
-      char: 'i',
-      description: 'ignore directories that match the pattern (separated by commas)',
+      char: 'e',
+      description: 'exclude directories that match the pattern (separated by commas)',
     }),
 
     templates: flags.string({

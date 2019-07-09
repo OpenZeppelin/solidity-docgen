@@ -42,7 +42,7 @@ class Docgen extends Command {
   }
 
   async run() {
-    const { flags } = this.parse();
+    const { flags } = this.parse(Docgen);
 
     // @ts-ignore see https://github.com/oclif/parser/pull/53
     await docgen(flags);

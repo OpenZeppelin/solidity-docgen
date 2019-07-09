@@ -49,11 +49,20 @@ async function getTemplates(directory?: string): Promise<Templates> {
     directory = path.join(__dirname, '..');
   }
   const contract = await readTemplate(path.join(directory, 'contract.hbs'));
-  const prelude = await readTemplate(path.join(directory, 'prelude.hbs'));
+  const prelude = await readTemplate(path.join(directory, 'prelude.hbs'), true);
   return { contract, prelude };
 }
 
-async function readTemplate(defaultPath: string, path: string = defaultPath): Promise<(data: any) => string> {
-  const template = await fs.readFile(path, 'utf8');
-  return Handlebars.compile(template);
+async function readTemplate(path: string, allowMissing: boolean = false): Promise<(data: any) => string> {
+  try {
+    const template = await fs.readFile(path, 'utf8');
+    return Handlebars.compile(template);
+  } catch (e) {
+    if (e.code === 'ENOENT' && allowMissing) {
+      // default to empty template
+      return () => '';
+    } else {
+      throw e;
+    }
+  }
 }

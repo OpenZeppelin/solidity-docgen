@@ -22,11 +22,7 @@ export namespace ast {
     name: string;
     documentation: string | null;
     nodes: (FunctionDefinition | EventDefinition)[];
-    baseContracts: { 
-      baseName: {
-        referencedDeclaration: number;
-      };
-    }[];
+    linearizedBaseContracts: number[];
   }
 
   export interface FunctionDefinition {
@@ -94,17 +90,16 @@ export class SolcOutputBuilder implements Output {
   contract(contractName: string, ...baseContracts: string[]) {
     const fileName = this._currentFile;
     if (fileName === undefined) throw new Error('No file defined');
+    const id = this._getContractId(contractName);
     const astNode: ast.ContractDefinition = {
       nodeType: 'ContractDefinition',
       name: contractName,
       documentation: null,
-      id: this._getContractId(contractName),
-      baseContracts: baseContracts.map(baseName => ({
-        baseName: {
-          name: baseName,
-          referencedDeclaration: this._getContractId(baseName),
-        },
-      })),
+      id,
+      linearizedBaseContracts: [id].concat(
+        // this isn't really linearizing, but it'll do
+        baseContracts.map(name => this._getContractId(name))
+      ),
       nodes: [],
     };
     this._currentContract = { astNode };

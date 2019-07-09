@@ -94,6 +94,12 @@ export class SolidityContract extends Referenceable {
     return this.name;
   }
 
+  get inheritance(): SolidityContract[] {
+    return this.astNode.linearizedBaseContracts.map(id =>
+      this.source.contractById(id)
+    );
+  }
+
   get functions(): SolidityFunction[] {
     return [...this.ownFunctions, ...this.inheritedFunctions];
   }
@@ -107,8 +113,7 @@ export class SolidityContract extends Referenceable {
 
   get inheritedFunctions(): SolidityFunction[] {
     return uniqBy(
-      // [TODO] fix use linearization
-      flatten(this.baseContracts.map(c => c.functions)),
+      flatten(this.inheritance.slice(1).map(c => c.functions)),
       f => f.signature,
     );
   }
@@ -125,14 +130,8 @@ export class SolidityContract extends Referenceable {
 
   get inheritedEvents(): SolidityEvent[] {
     return uniqBy(
-      flatten(this.baseContracts.map(c => c.events)),
+      flatten(this.inheritance.slice(1).map(c => c.events)),
       f => f.signature,
-    );
-  }
-
-  get baseContracts(): SolidityContract[] {
-    return this.astNode.baseContracts.map(c =>
-      this.source.contractById(c.baseName.referencedDeclaration)
     );
   }
 

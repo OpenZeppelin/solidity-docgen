@@ -1,0 +1,23 @@
+## {{anchor}} `{{name}}`
+
+{{{natspec.devdoc}}}
+
+{{#functions}}
+- [`{{name}}({{args}})`][{{slug}}]
+{{/functions}}
+
+{{#events}}
+- [`{{name}}({{args}})`][{{slug}}]
+{{/events}}
+{{#ownFunctions}}
+
+### {{anchor}} `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}})
+
+{{{natspec.devdoc}}}
+{{/ownFunctions}}
+{{#ownEvents}}
+
+### {{anchor}} `{{name}}({{args}})`
+
+{{{natspec.devdoc}}}
+{{/ownEvents}}

@@ -1,5 +1,5 @@
 import path from 'path';
-import Handlebars from 'handlebars';
+import handlebars from 'handlebars';
 import fs from 'fs-extra';
 import globby from 'globby';
 
@@ -22,6 +22,7 @@ interface Templates {
 }
 
 export async function docgen(options: Options) {
+  registerHandlebarsHelpers();
   const solcOutput = await compile(options.input, options.exclude, options.solcModule);
   const templates = await getTemplates(options.templates);
   const readmes = await getReadmes(options.input);
@@ -56,7 +57,7 @@ async function getTemplates(directory?: string): Promise<Templates> {
 async function readTemplate(path: string, allowMissing: boolean = false): Promise<(data: any) => string> {
   try {
     const template = await fs.readFile(path, 'utf8');
-    return Handlebars.compile(template);
+    return handlebars.compile(template);
   } catch (e) {
     if (e.code === 'ENOENT' && allowMissing) {
       // default to empty template
@@ -65,4 +66,8 @@ async function readTemplate(path: string, allowMissing: boolean = false): Promis
       throw e;
     }
   }
+}
+
+function registerHandlebarsHelpers() {
+  handlebars.registerHelper('slug', str => str.replace(/\W/g, '-'));
 }

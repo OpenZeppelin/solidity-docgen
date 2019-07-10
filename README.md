@@ -10,21 +10,19 @@ Built with :heart: by OpenZeppelin.
 
 ## Usage
 
+> **Note:** Detailed usage information is not available yet. Please be patient!
+
 ```sh
 npm install solidity-docgen
 ```
 
+`solidity-docgen` takes as input a directory of contracts and `README`
+documents. This directory is specified using the `--input`/`-i` flag,
+defaulting to `./contracts`. It produces a set of files that it will place in
+the output directory specified by `--output`/`-o`, defaulting to `./docs`.
+
 ```
-solidity-docgen [ -c <contractsDir> ] [ -o <outputDir> ]
+solidity-docgen [ -i <input-dir> ] [ -o <output-dir> ] [ -t <templates-dir> ]
 ```
-
-
-
-## Usage
-
-1. Document your source code in inline comments using `@dev` tags in the [NatSpec] format.
-2. Write longer form documentation in a README.md file next to your smart contracts. (Optional)
-3. Run `npx solidity-docgen` at the root of your project to generate documentation pages in the `docs/` directory.
-4. Serve the documentation using a static site generator.
 
 [NatSpec]: https://solidity.readthedocs.io/en/develop/natspec-format.html

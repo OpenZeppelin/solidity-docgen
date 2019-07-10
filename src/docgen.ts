@@ -1,8 +1,8 @@
 import path from 'path';
-import handlebars from 'handlebars';
 import fs from 'fs-extra';
 import globby from 'globby';
 
+import * as handlebars from './handlebars';
 import { VFile } from './vfile';
 import { compile } from './compile';
 import { SoliditySource, SolidityContract } from './solidity';
@@ -17,12 +17,11 @@ interface Options {
 }
 
 interface Templates {
-  contract: (c: SolidityContract) => string;
-  prelude: (s: { links: Link[] }) => string;
+  contract: handlebars.Template<SolidityContract>;
+  prelude: handlebars.Template<{ links: Link[] }>;
 }
 
 export async function docgen(options: Options) {
-  registerHandlebarsHelpers();
   const solcOutput = await compile(options.input, options.exclude, options.solcModule);
   const templates = await getTemplates(options.templates);
   const readmes = await getReadmes(options.input);
@@ -66,8 +65,4 @@ async function readTemplate(path: string, allowMissing: boolean = false): Promis
       throw e;
     }
   }
-}
-
-function registerHandlebarsHelpers() {
-  handlebars.registerHelper('slug', str => str.replace(/\W/g, '-'));
 }

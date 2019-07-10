@@ -1,5 +1,5 @@
 import path from 'path';
-import handlebars from 'handlebars';
+import * as handlebars from './handlebars';
 import { defaults, keyBy } from 'lodash';
 
 import { VFile } from './vfile';

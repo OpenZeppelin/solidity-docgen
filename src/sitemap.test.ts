@@ -88,12 +88,12 @@ test('links', t => {
   t.is(links.length, 2);
 
   const bar = links[0];
-  t.is(bar.target.label, 'Bar');
+  t.is(bar.target.name, 'Bar');
   t.is(bar.path, 'sub1.md');
   t.is(bar.relativePath, '');
 
   const foo = links[1];
-  t.is(foo.target.label, 'Foo');
+  t.is(foo.target.name, 'Foo');
   t.is(foo.path, 'sub2.md');
   t.is(foo.relativePath, 'sub2.md');
 });

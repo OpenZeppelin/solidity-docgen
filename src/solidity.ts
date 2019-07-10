@@ -1,7 +1,6 @@
 import { flatten, uniqBy } from 'lodash';
 import path from 'path';
 import execall from 'execall';
-import handlebars from 'handlebars';
 
 type ContractTemplate = (contract: SolidityContract) => string;
 
@@ -60,23 +59,18 @@ class SolidityFile {
   }
 }
 
-export abstract class Linkable {
-  abstract label: string;
-  abstract slug: string;
-
-  get anchor(): handlebars.SafeString {
-    return new handlebars.SafeString(`<span id="${this.slug}"></span>`);
-  }
+export interface Linkable {
+  anchor: string;
+  name: string;
+  fullName: string;
 }
 
-export class SolidityContract extends Linkable {
+export class SolidityContract implements Linkable {
   constructor(
     private readonly source: SoliditySource,
     readonly file: SolidityFile,
     private readonly astNode: solc.ast.ContractDefinition,
-  ) {
-    super();
-  }
+  ) { }
 
   toHTML(): string {
     return this.source.contractTemplate(this);
@@ -86,11 +80,11 @@ export class SolidityContract extends Linkable {
     return this.astNode.name;
   }
 
-  get slug(): string {
+  get fullName(): string {
     return this.name;
   }
 
-  get label(): string {
+  get anchor(): string {
     return this.name;
   }
 
@@ -145,13 +139,11 @@ export class SolidityContract extends Linkable {
   }
 }
 
-class SolidityFunction extends Linkable {
+class SolidityFunction implements Linkable {
   constructor(
     readonly contract: SolidityContract,
     private readonly astNode: solc.ast.FunctionDefinition,
-  ) {
-    super();
-  }
+  ) { }
 
   get name(): string {
     const { name, kind } = this.astNode;
@@ -159,12 +151,12 @@ class SolidityFunction extends Linkable {
     return isRegularFunction ? name : kind;
   }
 
-  get slug(): string {
-    return `${this.contract.name}-${slugSignature(this.signature)}`
+  get fullName(): string {
+    return `${this.contract.name}.${this.name}`
   }
 
-  get label(): string {
-    return `${this.contract.name}.${this.name}`
+  get anchor(): string {
+    return `${this.contract.name}-${slugSignature(this.signature)}`
   }
 
   get args(): SolidityTypedVariable[] {
@@ -196,24 +188,22 @@ class SolidityFunction extends Linkable {
   }
 }
 
-class SolidityEvent extends Linkable {
+class SolidityEvent implements Linkable {
   constructor(
     readonly contract: SolidityContract,
     private readonly astNode: solc.ast.FunctionDefinition,
-  ) {
-    super();
-  }
+  ) { }
 
   get name(): string {
     return this.astNode.name;
   }
 
-  get slug(): string {
-    return `${this.contract.name}-${slugSignature(this.signature)}`
+  get fullName(): string {
+    return `${this.contract.name}.${this.name}`
   }
 
-  get label(): string {
-    return `${this.contract.name}.${this.name}`
+  get anchor(): string {
+    return `${this.contract.name}-${slugSignature(this.signature)}`
   }
 
   get args(): SolidityTypedVariable[] {

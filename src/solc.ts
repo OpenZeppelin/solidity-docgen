@@ -21,9 +21,11 @@ export namespace ast {
     id: number;
     name: string;
     documentation: string | null;
-    nodes: (FunctionDefinition | EventDefinition)[];
+    nodes: ContractItem[];
     linearizedBaseContracts: number[];
   }
+
+  export type ContractItem = FunctionDefinition | EventDefinition | ModifierDefinition;
 
   export interface FunctionDefinition {
     nodeType: 'FunctionDefinition';
@@ -37,6 +39,13 @@ export namespace ast {
 
   export interface EventDefinition {
     nodeType: 'EventDefinition';
+    name: string;
+    documentation: string | null;
+    parameters: ParameterList;
+  }
+
+  export interface ModifierDefinition {
+    nodeType: 'ModifierDefinition';
     name: string;
     documentation: string | null;
     parameters: ParameterList;

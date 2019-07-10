@@ -122,8 +122,20 @@ export class SolidityContract implements Linkable {
   get ownEvents(): SolidityEvent[] {
     return this.astNode.nodes
       .filter(isEventDefinition)
-      .filter(n => n.visibility !== 'private')
       .map(n => new SolidityEvent(this, n));
+  }
+
+  get modifiers(): SolidityModifier[] {
+    return uniqBy(
+      flatten(this.inheritance.map(c => c.ownModifiers)),
+      f => f.signature,
+    );
+  }
+
+  get ownModifiers(): SolidityModifier[] {
+    return this.astNode.nodes
+      .filter(isModifierDefinition)
+      .map(n => new SolidityModifier(this, n));
   }
 
   get natspec(): NatSpec {
@@ -139,60 +151,13 @@ export class SolidityContract implements Linkable {
   }
 }
 
-class SolidityFunction implements Linkable {
+abstract class SolidityContractItem implements Linkable {
   constructor(
     readonly contract: SolidityContract,
-    private readonly astNode: solc.ast.FunctionDefinition,
+    astNode: solc.ast.ContractItem,
   ) { }
 
-  get name(): string {
-    const { name, kind } = this.astNode;
-    const isRegularFunction = kind === 'function';
-    return isRegularFunction ? name : kind;
-  }
-
-  get fullName(): string {
-    return `${this.contract.name}.${this.name}`
-  }
-
-  get anchor(): string {
-    return `${this.contract.name}-${slugSignature(this.signature)}`
-  }
-
-  get args(): SolidityTypedVariable[] {
-    return SolidityTypedVariableArray.fromParameterList(
-      this.astNode.parameters
-    );
-  }
-
-  get outputs(): SolidityTypedVariable[] {
-    return SolidityTypedVariableArray.fromParameterList(
-      this.astNode.returnParameters
-    );
-  }
-
-  get signature(): string {
-    return `${this.name}(${this.args.map(a => a.typeName).join(',')})`;
-  }
-
-  get visibility(): 'internal' | 'external' | 'public' | 'private' {
-    return this.astNode.visibility;
-  }
-
-  get natspec(): NatSpec {
-    if (this.astNode.documentation === null) {
-      return {};
-    }
-
-    return parseNatSpec(this.astNode.documentation);
-  }
-}
-
-class SolidityEvent implements Linkable {
-  constructor(
-    readonly contract: SolidityContract,
-    private readonly astNode: solc.ast.FunctionDefinition,
-  ) { }
+  protected abstract astNode: solc.ast.ContractItem;
 
   get name(): string {
     return this.astNode.name;
@@ -222,6 +187,49 @@ class SolidityEvent implements Linkable {
     }
 
     return parseNatSpec(this.astNode.documentation);
+  }
+}
+
+class SolidityFunction extends SolidityContractItem {
+  constructor(
+    contract: SolidityContract,
+    protected readonly astNode: solc.ast.FunctionDefinition,
+  ) {
+    super(contract, astNode);
+  }
+
+  get name(): string {
+    const { name, kind } = this.astNode;
+    const isRegularFunction = kind === 'function';
+    return isRegularFunction ? name : kind;
+  }
+
+  get outputs(): SolidityTypedVariable[] {
+    return SolidityTypedVariableArray.fromParameterList(
+      this.astNode.returnParameters
+    );
+  }
+
+  get visibility(): 'internal' | 'external' | 'public' | 'private' {
+    return this.astNode.visibility;
+  }
+}
+
+class SolidityEvent extends SolidityContractItem {
+  constructor(
+    contract: SolidityContract,
+    protected readonly astNode: solc.ast.EventDefinition,
+  ) {
+    super(contract, astNode);
+  }
+}
+
+class SolidityModifier extends SolidityContractItem {
+  constructor(
+    contract: SolidityContract,
+    protected readonly astNode: solc.ast.ModifierDefinition,
+  ) {
+    super(contract, astNode);
   }
 }
 
@@ -350,16 +358,16 @@ interface ToString {
   toString(): string;
 }
 
-function isFunctionDefinition(
-  node: solc.ast.FunctionDefinition | solc.ast.EventDefinition,
-): node is solc.ast.FunctionDefinition {
+function isFunctionDefinition(node: solc.ast.ContractItem): node is solc.ast.FunctionDefinition {
   return node.nodeType === 'FunctionDefinition';
 }
 
-function isEventDefinition(
-  node: solc.ast.FunctionDefinition | solc.ast.EventDefinition,
-): node is solc.ast.FunctionDefinition {
+function isEventDefinition(node: solc.ast.ContractItem): node is solc.ast.EventDefinition {
   return node.nodeType === 'EventDefinition';
+}
+
+function isModifierDefinition(node: solc.ast.ContractItem): node is solc.ast.ModifierDefinition {
+  return node.nodeType === 'ModifierDefinition';
 }
 
 function slugSignature(signature: string): string {

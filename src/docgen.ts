@@ -6,7 +6,7 @@ import * as handlebars from './handlebars';
 import { VFile } from './vfile';
 import { compile } from './compile';
 import { SoliditySource, SolidityContract } from './solidity';
-import { ReadmeSitemap, DefaultSitemap, Link } from './sitemap';
+import { Sitemap, Link } from './sitemap';
 
 interface Options {
   input: string;
@@ -25,10 +25,9 @@ export async function docgen(options: Options) {
   const solcOutput = await compile(options.input, options.exclude, options.solcModule);
   const templates = await getTemplates(options.templates);
   const readmes = await getReadmes(options.input);
+
   const source = new SoliditySource(options.input, solcOutput, templates.contract);
-  const sitemap = readmes.length > 0
-    ? new ReadmeSitemap(source, readmes)
-    : new DefaultSitemap(source, 'md');
+  const sitemap = Sitemap.generate(source, readmes, 'md');
 
   for (const page of sitemap.pages) {
     const dest = path.join(options.output, page.path);

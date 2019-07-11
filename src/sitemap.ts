@@ -13,6 +13,14 @@ export interface Link {
 }
 
 export abstract class Sitemap {
+  static generate(source: SoliditySource, readmes: VFile[], ext: string): Sitemap {
+    if (readmes.length > 0) {
+      return new ReadmeSitemap(source, readmes)
+    } else {
+      return new DefaultSitemap(source, ext);
+    }
+  }
+
   abstract pages: Page[];
 
   links(origin: Page): Link[] {
@@ -32,7 +40,7 @@ export abstract class Sitemap {
   }
 }
 
-export class DefaultSitemap extends Sitemap {
+class DefaultSitemap extends Sitemap {
   constructor(
     private readonly source: SoliditySource,
     private readonly ext: string,
@@ -45,7 +53,7 @@ export class DefaultSitemap extends Sitemap {
   }
 }
 
-export class ReadmeSitemap extends Sitemap {
+class ReadmeSitemap extends Sitemap {
   constructor(
     private readonly source: SoliditySource,
     private readonly readmes: VFile[],

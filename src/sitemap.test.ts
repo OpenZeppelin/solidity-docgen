@@ -1,7 +1,7 @@
 import test from 'ava';
 import path from 'path';
 
-import { ReadmeSitemap } from './sitemap';
+import { Sitemap } from './sitemap';
 import { SoliditySource } from './solidity';
 import { SolcOutputBuilder } from './solc';
 
@@ -12,7 +12,7 @@ const emptyReadme = (dir: string = '') => ({
 
 test('single readme', t => {
   const source = buildSoliditySource();
-  const sitemap = new ReadmeSitemap(source, [emptyReadme()])
+  const sitemap = Sitemap.generate(source, [emptyReadme()], 'md');
 
   t.is(sitemap.pages.length, 1);
 });
@@ -22,7 +22,7 @@ test('single readme no contracts', t => {
     .file('Foo.sol')
   );
 
-  const sitemap = new ReadmeSitemap(source, [emptyReadme()])
+  const sitemap = Sitemap.generate(source, [emptyReadme()], 'md');
   const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 0);
@@ -35,7 +35,7 @@ test('single readme multiple contracts', t => {
       .contract('Bar')
   );
 
-  const sitemap = new ReadmeSitemap(source, [emptyReadme()])
+  const sitemap = Sitemap.generate(source, [emptyReadme()], 'md');
   const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 2);
@@ -51,7 +51,7 @@ test('filter subdirectory', t => {
       .contract('Bar')
   );
 
-  const sitemap = new ReadmeSitemap(source, [emptyReadme('sub')])
+  const sitemap = Sitemap.generate(source, [emptyReadme('sub')], 'md');
   const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 1);
@@ -66,7 +66,7 @@ test('filter nested subdirectories', t => {
       .contract('Foo')
   );
 
-  const sitemap = new ReadmeSitemap(source, [emptyReadme('sub')])
+  const sitemap = Sitemap.generate(source, [emptyReadme('sub')], 'md');
   const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 2);
@@ -82,7 +82,7 @@ test('links', t => {
       .contract('Foo')
   );
 
-  const sitemap = new ReadmeSitemap(source, [emptyReadme('sub1'), emptyReadme('sub2')])
+  const sitemap = Sitemap.generate(source, [emptyReadme('sub1'), emptyReadme('sub2')], 'md');
   const links = sitemap.links(sitemap.pages[0]);
 
   t.is(links.length, 2);

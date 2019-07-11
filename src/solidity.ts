@@ -72,7 +72,7 @@ export class SolidityContract implements Linkable {
     private readonly astNode: solc.ast.ContractDefinition,
   ) { }
 
-  toHTML(): string {
+  toString(): string {
     return this.source.contractTemplate(this);
   }
 

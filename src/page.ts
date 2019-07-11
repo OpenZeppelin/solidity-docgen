@@ -23,7 +23,7 @@ export class DefaultPage implements Page {
   ) { }
 
   render(preludeTemplate: PreludeTemplate): string {
-    const contents = this.contracts.map(c => c.toHTML()).join('\n\n');
+    const contents = this.contracts.map(c => c.toString()).join('\n\n');
     const links = this.sitemap.links(this);
     const prelude = preludeTemplate({ links });
     return addPrelude(contents, prelude);

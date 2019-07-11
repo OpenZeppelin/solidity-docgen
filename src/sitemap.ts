@@ -4,7 +4,7 @@ import { maxBy } from 'lodash';
 
 import { VFile } from './vfile';
 import { SoliditySource, SolidityContract, Linkable } from './solidity';
-import { Page, ReadmePage } from './page';
+import { Page, ReadmePage, DefaultPage } from './page';
 
 export interface Link {
   target: Linkable;
@@ -29,6 +29,19 @@ export abstract class Sitemap {
     }
 
     return Array.from(generate(this));
+  }
+}
+
+export class DefaultSitemap extends Sitemap {
+  constructor(
+    private readonly source: SoliditySource,
+    private readonly ext: string,
+  ) {
+    super();
+  }
+
+  get pages(): DefaultPage[] {
+    return [new DefaultPage(this, this.ext, this.source.contracts)];
   }
 }
 

@@ -12,9 +12,32 @@ type PreludeTemplate = Template<{ links: Link[] }>;
 export interface Page {
   path: string;
   contracts: SolidityContract[];
+  render(preludeTemplate: PreludeTemplate): string;
 }
 
-export class ReadmePage {
+export class DefaultPage implements Page {
+  constructor(
+    private readonly sitemap: Sitemap,
+    private readonly ext: string,
+    readonly contracts: SolidityContract[],
+  ) { }
+
+  render(preludeTemplate: PreludeTemplate): string {
+    const contents = this.contracts.map(c => c.toHTML()).join('\n\n');
+    const links = this.sitemap.links(this);
+    const prelude = preludeTemplate({ links });
+    return addPrelude(contents, prelude);
+  }
+
+  get path(): string {
+    return path.format({
+      name: 'index',
+      ext: '.' + this.ext,
+    });
+  }
+}
+
+export class ReadmePage implements Page {
   constructor(
     private readonly sitemap: Sitemap,
     private readonly readme: VFile,

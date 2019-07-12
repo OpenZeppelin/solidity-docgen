@@ -9,24 +9,31 @@ import { SolidityContract } from './solidity';
 type Template<T> = (data: T) => string;
 type PreludeTemplate = Template<{ links: Link[] }>;
 
-export interface Page {
-  path: string;
-  contracts: SolidityContract[];
-  render(preludeTemplate: PreludeTemplate): string;
-}
+export abstract class Page {
+  abstract path: string;
+  abstract contracts: SolidityContract[];
+  abstract contents: string;
 
-export class DefaultPage implements Page {
-  constructor(
-    private readonly sitemap: Sitemap,
-    private readonly ext: string,
-    readonly contracts: SolidityContract[],
-  ) { }
+  constructor(private readonly sitemap: Sitemap) { }
 
   render(preludeTemplate: PreludeTemplate): string {
-    const contents = this.contracts.map(c => c.toString()).join('\n\n');
     const links = this.sitemap.links(this);
     const prelude = preludeTemplate({ links });
-    return addPrelude(contents, prelude);
+    return addPrelude(this.contents, prelude);
+  }
+}
+
+export class DefaultPage extends Page {
+  constructor(
+    sitemap: Sitemap,
+    private readonly ext: string,
+    readonly contracts: SolidityContract[],
+  ) {
+    super(sitemap);
+  }
+
+  get contents(): string {
+    return this.contracts.map(c => c.toString()).join('\n\n');
   }
 
   get path(): string {
@@ -37,20 +44,18 @@ export class DefaultPage implements Page {
   }
 }
 
-export class ReadmePage implements Page {
+export class ReadmePage extends Page {
   constructor(
-    private readonly sitemap: Sitemap,
+    sitemap: Sitemap,
     private readonly readme: VFile,
     readonly contracts: SolidityContract[],
   ) {
+    super(sitemap);
     defaults(this, keyBy(this.contracts, c => c.name));
   }
 
-  render(preludeTemplate: PreludeTemplate): string {
-    const contents = this.template(this);
-    const links = this.sitemap.links(this);
-    const prelude = preludeTemplate({ links });
-    return addPrelude(contents, prelude);
+  get contents(): string {
+    return this.template(this);
   }
 
   get template(): (page: Page) => string {
@@ -68,6 +73,29 @@ export class ReadmePage implements Page {
       name: path.basename(dir) || 'index',
       ext,
     }));
+  }
+}
+
+export class ContractPage extends Page {
+  constructor(
+    sitemap: Sitemap,
+    private readonly contract: SolidityContract,
+    private readonly ext: string,
+  ) {
+    super(sitemap);
+  }
+
+  get contents(): string {
+    return this.contract.toString();
+  }
+
+  get contracts(): SolidityContract[] {
+    return [this.contract];
+  }
+
+  get path(): string {
+    const { dir, name } = path.parse(this.contract.file.path);
+    return path.format({ dir, name, ext: '.' + this.ext });
   }
 }
 

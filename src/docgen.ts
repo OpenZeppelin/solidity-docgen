@@ -13,7 +13,8 @@ interface Options {
   output: string;
   templates?: string;
   exclude?: string[];
-  solcModule?: string;
+  'solc-module'?: string;
+  'contract-pages': boolean;
 }
 
 interface Templates {
@@ -22,12 +23,12 @@ interface Templates {
 }
 
 export async function docgen(options: Options) {
-  const solcOutput = await compile(options.input, options.exclude, options.solcModule);
+  const solcOutput = await compile(options.input, options.exclude, options['solc-module']);
   const templates = await getTemplates(options.templates);
   const readmes = await getReadmes(options.input);
 
   const source = new SoliditySource(options.input, solcOutput, templates.contract);
-  const sitemap = Sitemap.generate(source, readmes, 'md');
+  const sitemap = Sitemap.generate(source, readmes, 'md', options['contract-pages']);
 
   for (const page of sitemap.pages) {
     const dest = path.join(options.output, page.path);

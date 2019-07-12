@@ -12,7 +12,7 @@ const emptyReadme = (dir: string = '') => ({
 
 test('single readme', t => {
   const source = buildSoliditySource();
-  const sitemap = Sitemap.generate(source, [emptyReadme()], 'md');
+  const sitemap = Sitemap.generate(source, [emptyReadme()], 'md', false);
 
   t.is(sitemap.pages.length, 1);
 });
@@ -22,7 +22,7 @@ test('single readme no contracts', t => {
     .file('Foo.sol')
   );
 
-  const sitemap = Sitemap.generate(source, [emptyReadme()], 'md');
+  const sitemap = Sitemap.generate(source, [emptyReadme()], 'md', false);
   const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 0);
@@ -35,7 +35,7 @@ test('single readme multiple contracts', t => {
       .contract('Bar')
   );
 
-  const sitemap = Sitemap.generate(source, [emptyReadme()], 'md');
+  const sitemap = Sitemap.generate(source, [emptyReadme()], 'md', false);
   const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 2);
@@ -51,7 +51,7 @@ test('filter subdirectory', t => {
       .contract('Bar')
   );
 
-  const sitemap = Sitemap.generate(source, [emptyReadme('sub')], 'md');
+  const sitemap = Sitemap.generate(source, [emptyReadme('sub')], 'md', false);
   const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 1);
@@ -66,7 +66,7 @@ test('filter nested subdirectories', t => {
       .contract('Foo')
   );
 
-  const sitemap = Sitemap.generate(source, [emptyReadme('sub')], 'md');
+  const sitemap = Sitemap.generate(source, [emptyReadme('sub')], 'md', false);
   const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 2);
@@ -82,7 +82,7 @@ test('links', t => {
       .contract('Foo')
   );
 
-  const sitemap = Sitemap.generate(source, [emptyReadme('sub1'), emptyReadme('sub2')], 'md');
+  const sitemap = Sitemap.generate(source, [emptyReadme('sub1'), emptyReadme('sub2')], 'md', false);
   const links = sitemap.links(sitemap.pages[0]);
 
   t.is(links.length, 2);

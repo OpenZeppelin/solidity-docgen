@@ -35,9 +35,14 @@ class Docgen extends Command {
       description: 'directory with template files',
     }),
 
-    solcModule: flags.string({
+    'solc-module': flags.string({
       parse: s => path.resolve(s),
       description: 'path to an alternative solc module',
+    }),
+
+    'contract-pages': flags.boolean({
+      default: false,
+      description: 'enable one page per contract',
     }),
   }
 

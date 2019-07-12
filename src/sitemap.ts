@@ -4,7 +4,7 @@ import { maxBy } from 'lodash';
 
 import { VFile } from './vfile';
 import { SoliditySource, SolidityContract, Linkable } from './solidity';
-import { Page, ReadmePage, DefaultPage } from './page';
+import { Page, ReadmePage, DefaultPage, ContractPage } from './page';
 
 export interface Link {
   target: Linkable;
@@ -13,8 +13,10 @@ export interface Link {
 }
 
 export abstract class Sitemap {
-  static generate(source: SoliditySource, readmes: VFile[], ext: string): Sitemap {
-    if (readmes.length > 0) {
+  static generate(source: SoliditySource, readmes: VFile[], ext: string, contractPages: boolean): Sitemap {
+    if (contractPages) {
+      return new ContractSitemap(source, ext);
+    } else if (readmes.length > 0) {
       return new ReadmeSitemap(source, readmes)
     } else {
       return new DefaultSitemap(source, ext);
@@ -76,6 +78,19 @@ class ReadmeSitemap extends Sitemap {
 
   private get locations(): string[] {
     return this.readmes.map(r => path.dirname(r.path));
+  }
+}
+
+class ContractSitemap extends Sitemap {
+  constructor(
+    private readonly source: SoliditySource,
+    private readonly ext: string,
+  ) {
+    super();
+  }
+
+  get pages(): ContractPage[] {
+    return this.source.contracts.map(c => new ContractPage(this, c, this.ext));
   }
 }
 

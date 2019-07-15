@@ -9,6 +9,6 @@ export function compile(template: string): Template<unknown> {
   return H.compile(template, { noEscape: true });
 }
 
-function slug(str: string): string {
+export function slug(str: string): string {
   return str.replace(/\W/g, '-');
 }

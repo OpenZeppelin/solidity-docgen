@@ -4,6 +4,7 @@ import execall from 'execall';
 
 type ContractTemplate = (contract: SolidityContract) => string;
 
+import { slug } from './handlebars';
 import * as solc from './solc';
 
 export class SoliditySource {
@@ -168,7 +169,7 @@ abstract class SolidityContractItem implements Linkable {
   }
 
   get anchor(): string {
-    return `${this.contract.name}-${slugSignature(this.signature)}`
+    return `${this.contract.name}-${slug(this.signature)}`
   }
 
   get args(): SolidityTypedVariable[] {
@@ -368,8 +369,4 @@ function isEventDefinition(node: solc.ast.ContractItem): node is solc.ast.EventD
 
 function isModifierDefinition(node: solc.ast.ContractItem): node is solc.ast.ModifierDefinition {
   return node.nodeType === 'ModifierDefinition';
-}
-
-function slugSignature(signature: string): string {
-  return signature.replace(/\(?\)$/, '').replace(/[(, ]/g, '-');
 }

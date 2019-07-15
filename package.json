@@ -1,6 +1,6 @@
 {
   "name": "solidity-docgen",
-  "version": "0.3.0-beta.1",
+  "version": "0.3.0-beta.2",
   "description": "Solidity API documentation automatic generator.",
   "bin": {
     "solidity-docgen": "./dist/cli.js"

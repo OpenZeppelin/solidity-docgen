@@ -35,6 +35,12 @@ class Docgen extends Command {
       description: 'directory with template files',
     }),
 
+    extension: flags.string({
+      char: 'x',
+      default: 'md',
+      description: 'file extension for generated pages, not necessary when using READMEs',
+    }),
+
     'solc-module': flags.string({
       parse: s => path.resolve(s),
       description: 'path to an alternative solc module',

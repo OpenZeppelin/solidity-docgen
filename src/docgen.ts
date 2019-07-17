@@ -13,6 +13,7 @@ interface Options {
   output: string;
   templates?: string;
   exclude?: string[];
+  extension: string;
   'solc-module'?: string;
   'contract-pages': boolean;
 }
@@ -28,7 +29,7 @@ export async function docgen(options: Options) {
   const readmes = await getReadmes(options.input);
 
   const source = new SoliditySource(options.input, solcOutput, templates.contract);
-  const sitemap = Sitemap.generate(source, readmes, 'md', options['contract-pages']);
+  const sitemap = Sitemap.generate(source, readmes, options.extension, options['contract-pages']);
 
   for (const page of sitemap.pages) {
     const dest = path.join(options.output, page.path);

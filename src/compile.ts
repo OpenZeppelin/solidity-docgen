@@ -14,12 +14,14 @@ const compilerSettings = {
       ],
     },
   },
+  remappings: [] as string[]
 };
 
 export async function compile(
   directory: string,
   ignore: string[] = [],
   solcModule: string = 'solc',
+  remappings: string = '',
 ): Promise<SolcOutput> {
   const solc = await SolcAdapter.require(solcModule);
 
@@ -31,6 +33,10 @@ export async function compile(
     file,
     { content: await fs.readFile(file, 'utf8') },
   ])));
+
+  if (remappings) {
+    compilerSettings.remappings = remappings.split(' ');
+  }
 
   const solcInput = {
     language: "Solidity",
@@ -51,6 +57,10 @@ export async function compile(
   return solcOutput;
 }
 
+function findImports(path: string) {
+  return { contents: fs.readFileSync(path, 'utf8') };
+}
+
 class SolcAdapter {
   static async require(solcModule: string): Promise<SolcAdapter> {
     const solc = await import(solcModule);
@@ -62,7 +72,7 @@ class SolcAdapter {
   compile(input: object): SolcOutput {
     const inputJSON = JSON.stringify(input);
 
-    const solcOutputString = this.solc.compileStandardWrapper(inputJSON);
+    const solcOutputString = this.solc.compileStandardWrapper(inputJSON, findImports);
     const solcOutput = JSON.parse(solcOutputString);
 
     if (semver.satisfies(this.solc.version(), '^0.4')) {

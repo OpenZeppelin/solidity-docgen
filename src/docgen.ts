@@ -16,6 +16,7 @@ interface Options {
   extension: string;
   'solc-module'?: string;
   'contract-pages': boolean;
+  remappings?: string;
 }
 
 interface Templates {
@@ -24,7 +25,7 @@ interface Templates {
 }
 
 export async function docgen(options: Options) {
-  const solcOutput = await compile(options.input, options.exclude, options['solc-module']);
+  const solcOutput = await compile(options.input, options.exclude, options['solc-module'], options['remappings']);
   const templates = await getTemplates(options.templates);
   const readmes = await getReadmes(options.input);
 

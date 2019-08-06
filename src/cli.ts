@@ -41,6 +41,12 @@ class Docgen extends Command {
       description: 'file extension for generated pages, not necessary when using READMEs',
     }),
 
+    remappings: flags.string({
+      char: 'r',
+      default: '',
+      description: 'import remappings as defined in solc documentation (https://solidity.readthedocs.io/en/v0.5.10/using-the-compiler.html#using-the-commandline-compiler)',
+    }),
+
     'solc-module': flags.string({
       parse: s => path.resolve(s),
       description: 'path to an alternative solc module',

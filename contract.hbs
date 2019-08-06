@@ -1,6 +1,6 @@
 ## <span id="{{anchor}}"></span> `{{name}}`
 
-{{{natspec.devdoc}}}
+{{{linebreaks natspec.devdoc}}}
 
 {{#modifiers}}
 - [`{{name}}({{args}})`][{{anchor}}]
@@ -14,18 +14,32 @@
 {{#ownModifiers}}
 ### <span id="{{anchor}}"></span> `{{name}}({{args}})`
 
-{{{natspec.devdoc}}}
+{{{linebreaks natspec.devdoc}}}
 
 {{/ownModifiers}}
 {{#ownFunctions}}
 ### <span id="{{anchor}}"></span> `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}})
 
-{{{natspec.devdoc}}}
+{{{linebreaks natspec.devdoc}}}
+
+{{#if natspec.params.length}}
+#### *Parameters*
+{{/if}}
+{{#natspec.params}}
+- **{{{param}}}**: {{{description}}}
+{{/natspec.params}}
+
+{{#if natspec.returns.length}}
+#### *Returns*
+{{/if}}
+{{#natspec.returns}}
+- **{{{param}}}**: {{{description}}}
+{{/natspec.returns}}
 
 {{/ownFunctions}}
 {{#ownEvents}}
 ### <span id="{{anchor}}"></span> `{{name}}({{args}})`
 
-{{{natspec.devdoc}}}
+{{{linebreaks natspec.devdoc}}}
 
 {{/ownEvents}}

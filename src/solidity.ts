@@ -214,7 +214,7 @@ class SolidityVariable extends SolidityContractItem {
   }
 
   get type(): string {
-    return this.astNode.typeName.name;
+    return this.astNode.typeName.typeDescriptions.typeString;
   }
 
   get signature(): string {

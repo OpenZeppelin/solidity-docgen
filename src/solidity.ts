@@ -99,6 +99,20 @@ export class SolidityContract implements Linkable {
     );
   }
 
+  get variables(): SolidityVariable[] {
+    return uniqBy(
+      flatten(this.inheritance.map(c => c.ownVariables)),
+      v => v.signature,
+    );
+  }
+
+  get ownVariables(): SolidityVariable[] {
+    return this.astNode.nodes
+      .filter(isVariableDeclaration)
+      .filter(n => n.visibility === 'public')
+      .map(n => new SolidityVariable(this, n));
+  }
+
   get functions(): SolidityFunction[] {
     return uniqBy(
       flatten(this.inheritance.map(c => c.ownFunctions)),
@@ -188,6 +202,30 @@ abstract class SolidityContractItem implements Linkable {
     }
 
     return parseNatSpec(this.astNode.documentation);
+  }
+}
+
+class SolidityVariable extends SolidityContractItem {
+  constructor(
+    contract: SolidityContract,
+    protected readonly astNode: solc.ast.VariableDeclaration,
+  ) {
+    super(contract, astNode);
+  }
+
+  get type(): string {
+    return this.astNode.typeName.name;
+  }
+
+  get signature(): string {
+    return `${this.type} ${this.name}`;
+  }
+
+  get natspec(): NatSpec {
+    if (this.astNode.documentation) {
+      return parseNatSpec(this.astNode.documentation);
+    }
+    return {};
   }
 }
 
@@ -357,6 +395,10 @@ function setOrAppend<K extends string>(
 
 interface ToString {
   toString(): string;
+}
+
+function isVariableDeclaration(node: solc.ast.ContractItem): node is solc.ast.VariableDeclaration {
+  return node.nodeType === 'VariableDeclaration';
 }
 
 function isFunctionDefinition(node: solc.ast.ContractItem): node is solc.ast.FunctionDefinition {

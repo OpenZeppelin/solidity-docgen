@@ -222,10 +222,7 @@ class SolidityVariable extends SolidityContractItem {
   }
 
   get natspec(): NatSpec {
-    if (this.astNode.documentation) {
-      return parseNatSpec(this.astNode.documentation);
-    }
-    return {};
+    throw new Error("NatSpec currently does NOT apply to public state variables (see https://github.com/ethereum/solidity/issues/3418)");
   }
 }
 

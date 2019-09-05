@@ -25,7 +25,14 @@ export namespace ast {
     linearizedBaseContracts: number[];
   }
 
-  export type ContractItem = FunctionDefinition | EventDefinition | ModifierDefinition;
+  export type ContractItem = VariableDeclaration | FunctionDefinition | EventDefinition | ModifierDefinition;
+
+  export interface VariableDeclaration {
+    nodeType: 'VariableDeclaration';
+    visibility: 'internal' | 'public' | 'private';
+    name: string;
+    documentation: string | null;
+  }
 
   export interface FunctionDefinition {
     nodeType: 'FunctionDefinition';

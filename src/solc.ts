@@ -31,7 +31,6 @@ export namespace ast {
     nodeType: 'VariableDeclaration';
     visibility: 'internal' | 'public' | 'private';
     name: string;
-    documentation: string | null;
   }
 
   export interface FunctionDefinition {

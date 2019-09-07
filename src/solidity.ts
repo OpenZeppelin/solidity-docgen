@@ -205,12 +205,24 @@ abstract class SolidityContractItem implements Linkable {
   }
 }
 
-class SolidityVariable extends SolidityContractItem {
+class SolidityVariable implements Linkable {
   constructor(
-    contract: SolidityContract,
-    protected readonly astNode: solc.ast.VariableDeclaration,
-  ) {
-    super(contract, astNode);
+    readonly contract: SolidityContract,
+    astNode: solc.ast.ContractItem,
+  ) { }
+
+  protected abstract astNode: solc.ast.ContractItem;
+
+  get name(): string {
+    return this.astNode.name;
+  }
+
+  get fullName(): string {
+    return `${this.contract.name}.${this.name}`
+  }
+
+  get anchor(): string {
+    return `${this.contract.name}-${slug(this.signature)}`
   }
 
   get type(): string {

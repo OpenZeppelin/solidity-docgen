@@ -46,6 +46,11 @@ class Docgen extends Command {
       description: 'path to an alternative solc module',
     }),
 
+    'solc-settings': flags.string({
+      parse: s => JSON.parse(s),
+      description: 'compiler settings for solc module',
+    }),
+
     'contract-pages': flags.boolean({
       default: false,
       description: 'enable one page per contract',

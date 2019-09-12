@@ -24,7 +24,7 @@ interface Templates {
 }
 
 export async function docgen(options: Options) {
-  const solcOutput = await compile(options.input, options.exclude, options['solc-module']);
+  const solcOutput = await compile(options.input, options.exclude, options['solc-module'], options['solc-settings']);
   const templates = await getTemplates(options.templates);
   const readmes = await getReadmes(options.input);
 

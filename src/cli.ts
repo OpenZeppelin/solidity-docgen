@@ -47,7 +47,14 @@ class Docgen extends Command {
     }),
 
     'solc-settings': flags.build({
-      parse: s => JSON.parse(s),
+      parse: s => {
+        const settings = JSON.parse(s) as unknown;
+        if (typeof settings !== 'object' || settings === null) {
+          throw new Error('--solc-settings must be an object');
+        }
+        return settings;
+      },
+    })({
       description: 'compiler settings for solc module',
     }),
 

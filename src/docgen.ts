@@ -15,6 +15,7 @@ interface Options {
   exclude?: string[];
   extension: string;
   'solc-module'?: string;
+  'solc-settings'?: object;
   'contract-pages': boolean;
 }
 

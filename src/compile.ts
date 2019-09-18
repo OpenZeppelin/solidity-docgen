@@ -36,7 +36,7 @@ export async function compile(
   const solcInput = {
     language: "Solidity",
     sources: sources,
-    settings: {...compilerSettings, ...solcSettings},
+    settings: { ...solcSettings, outputSelection },
   };
 
   const solcOutput = solc.compile(solcInput);

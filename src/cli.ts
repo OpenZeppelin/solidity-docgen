@@ -46,7 +46,7 @@ class Docgen extends Command {
       description: 'path to an alternative solc module',
     }),
 
-    'solc-settings': flags.string({
+    'solc-settings': flags.build({
       parse: s => JSON.parse(s),
       description: 'compiler settings for solc module',
     }),

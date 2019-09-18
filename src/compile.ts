@@ -6,13 +6,11 @@ import semver from 'semver';
 
 import { Output as SolcOutput } from './solc';
 
-const compilerSettings = {
-  outputSelection: {
-    '*': {
-      '': [
-        'ast',
-      ],
-    },
+const outputSelection = {
+  '*': {
+    '': [
+      'ast',
+    ],
   },
 };
 

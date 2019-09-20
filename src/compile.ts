@@ -6,13 +6,11 @@ import semver from 'semver';
 
 import { Output as SolcOutput } from './solc';
 
-const compilerSettings = {
-  outputSelection: {
-    '*': {
-      '': [
-        'ast',
-      ],
-    },
+const outputSelection = {
+  '*': {
+    '': [
+      'ast',
+    ],
   },
 };
 
@@ -20,6 +18,7 @@ export async function compile(
   directory: string,
   ignore: string[] = [],
   solcModule: string = 'solc',
+  solcSettings: object = {optimizer: {enabled: true, runs: 200}},
 ): Promise<SolcOutput> {
   const solc = await SolcAdapter.require(solcModule);
 
@@ -35,7 +34,7 @@ export async function compile(
   const solcInput = {
     language: "Solidity",
     sources: sources,
-    settings: compilerSettings,
+    settings: { ...solcSettings, outputSelection },
   };
 
   const solcOutput = solc.compile(solcInput);

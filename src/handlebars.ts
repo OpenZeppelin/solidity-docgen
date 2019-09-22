@@ -22,10 +22,10 @@ H.registerHelper({
         return v1 >= v2;
     },
     and: function () {
-        return [...arguments].every(Boolean);
+        return [...arguments].slice(0, -1).every(Boolean);
     },
     or: function () {
-        return [...arguments].some(Boolean);
+        return [...arguments].slice(0, -1).some(Boolean);
     }
 });
 

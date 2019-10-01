@@ -2,6 +2,7 @@
 
 import { Command, flags } from '@oclif/command'
 import path from 'path';
+import JSON5 from 'json5';
 
 import { docgen } from './docgen';
 
@@ -48,7 +49,7 @@ class Docgen extends Command {
 
     'solc-settings': flags.build({
       parse: s => {
-        const settings = JSON.parse(s) as unknown;
+        const settings = JSON5.parse(s) as unknown;
         if (typeof settings !== 'object' || settings === null) {
           throw new Error('--solc-settings must be an object');
         }

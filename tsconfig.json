@@ -1,13 +1,8 @@
 {
+  "extends": "code-style/tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
-    "target": "es2015",
-    "module": "commonjs",
-    "sourceMap": true,
-    "allowJs": true,
-    "incremental": true,
-    "esModuleInterop": true,
-    "strict": true
+    "allowJs": true
   },
   "include": [
     "src/**/*"

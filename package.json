@@ -24,7 +24,7 @@
     "@oclif/plugin-help": "^2.2.1",
     "execall": "^2.0.0",
     "fs-extra": "^8.1.0",
-    "globby": "^9.2.0",
+    "globby": "^10.0.1",
     "handlebars": "^4.4.0",
     "json5": "^2.1.0",
     "lodash": "^4.17.15",

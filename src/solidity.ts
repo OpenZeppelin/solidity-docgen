@@ -275,8 +275,8 @@ class SolidityTypedVariableArray extends PrettyArray<SolidityTypedVariable> {
     return this.map(v => v.typeName);
   }
 
-  get names(): (string | undefined)[] {
-    return this.map(v => v.name);
+  get names(): string[] {
+    return this.map(v => (v.name === undefined) ? '_' : v.name);
   }
 }
 

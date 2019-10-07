@@ -9,6 +9,8 @@ commands:
           command: |
             if [ ! -d node_modules ]; then
               npm ci
+            else
+              npm run prepare
             fi
       - save_cache:
           paths:

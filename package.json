@@ -13,6 +13,7 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
+    "coverage": "nyc --reporter=lcov npm test",
     "test": "tsc && ava",
     "test:watch": "concurrently -krs first -n ava,tsc 'ava --watch' 'tsc --watch --preserveWatchOutput'",
     "prepare": "npm run build"
@@ -34,6 +35,7 @@
     "typescript": "^3.6.3"
   },
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^0.1.3",
     "@types/fs-extra": "^8.0.0",
     "@types/json5": "0.0.30",
     "@types/lodash": "^4.14.141",
@@ -41,7 +43,9 @@
     "@types/node": "^12.7.9",
     "@types/semver": "^6.0.2",
     "ava": "^2.4.0",
-    "concurrently": "^5.0.0"
+    "codecov": "^3.6.1",
+    "concurrently": "^5.0.0",
+    "nyc": "^14.1.1"
   },
   "keywords": [
     "solidity",

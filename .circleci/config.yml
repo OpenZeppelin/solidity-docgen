@@ -1,23 +1,28 @@
-version: 2
-jobs:
-  build:
-    docker:
-      - image: circleci/node:8
+version: 2.1
 
+commands:
+  npm_install_if_necessary:
     steps:
-      - checkout
-
       - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
-      - run: npm install
-
+          key: v1-node_modules-{{ checksum "package-lock.json" }}
+      - run:
+          command: |
+            if [ ! -d node_modules ]; then
+              npm ci
+            fi
       - save_cache:
           paths:
             - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+          key: v1-node_modules-{{ checksum "package-lock.json" }}
 
-      - run: npm test
+jobs:
+  build:
+    docker:
+      - image: circleci/node:10
+
+    steps:
+      - checkout
+      - npm_install_if_necessary
+      - run: npm run test
+      - run: npm run coverage
+      - run: npx codecov

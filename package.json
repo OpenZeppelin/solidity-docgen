@@ -41,7 +41,7 @@
     "@types/node": "^12.7.9",
     "@types/semver": "^6.0.2",
     "ava": "^2.4.0",
-    "concurrently": "^4.1.2"
+    "concurrently": "^5.0.0"
   },
   "keywords": [
     "solidity",

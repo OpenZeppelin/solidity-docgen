@@ -90,3 +90,22 @@ test('two inherited functions with name overloading', t => {
   const foof = source.contracts[1];
   t.is(foof.functions.length, 2);
 });
+
+test('grouped inherited items', t => {
+  const solcOutput = new SolcOutputBuilder()
+    .file('Foo.sol')
+    .contract('Foo')
+      .function('foo-test')
+    .contract('Bar')
+      .function('bar-test')
+    .contract('Child', 'Foo', 'Bar');
+
+  const source = buildSource(solcOutput);
+  const child = source.contracts[2];
+  t.is(child.name, 'Child');
+
+  const items = child.inheritedItems;
+  t.is(items.length, 3);
+  t.is(items[1].contract.name, 'Foo');
+  t.is(items[1].functions[0].name, 'foo-test');
+});

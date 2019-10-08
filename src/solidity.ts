@@ -1,4 +1,4 @@
-import { flatten, uniqBy } from 'lodash';
+import { flatten, uniqBy, groupBy } from 'lodash';
 import path from 'path';
 import execall from 'execall';
 
@@ -111,6 +111,19 @@ export class SolidityContract implements Linkable {
       .filter(isFunctionDefinition)
       .filter(n => n.visibility !== 'private')
       .map(n => new SolidityFunction(this, n));
+  }
+
+  get inheritedItems(): InheritedItems[] {
+    const functions = groupBy(this.functions, f => f.contract.astId);
+    const events = groupBy(this.events, f => f.contract.astId);
+    const modifiers = groupBy(this.modifiers, f => f.contract.astId);
+
+    return this.inheritance.map(contract => ({
+      contract,
+      functions: functions[contract.astId],
+      events: events[contract.astId],
+      modifiers: modifiers[contract.astId],
+    }));
   }
 
   get events(): SolidityEvent[] {
@@ -251,6 +264,13 @@ class SolidityTypedVariable {
       return this.typeName;
     }
   }
+}
+
+interface InheritedItems {
+  contract: SolidityContract;
+  functions: SolidityFunction[];
+  events: SolidityEvent[];
+  modifiers: SolidityModifier[];
 }
 
 class PrettyArray<T extends ToString> extends Array<T> {

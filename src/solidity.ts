@@ -1,6 +1,7 @@
 import { flatten, uniqBy, groupBy } from 'lodash';
 import path from 'path';
 import execall from 'execall';
+import { memoize } from './memoize';
 
 type ContractTemplate = (contract: SolidityContract) => string;
 
@@ -23,6 +24,7 @@ export class SoliditySource {
       .map(fileName => this.file(fileName));
   }
 
+  @memoize
   file(fileName: string): SolidityFile {
     return new SolidityFile(
       this,
@@ -49,6 +51,7 @@ class SolidityFile {
     readonly path: string,
   ) { }
 
+  @memoize
   get contracts(): SolidityContract[] {
     const astNodes = this.ast.nodes.filter(n =>
       n.nodeType === 'ContractDefinition'
@@ -106,6 +109,7 @@ export class SolidityContract implements Linkable {
     );
   }
 
+  @memoize
   get ownFunctions(): SolidityFunction[] {
     return this.astNode.nodes
       .filter(isFunctionDefinition)
@@ -133,6 +137,7 @@ export class SolidityContract implements Linkable {
     );
   }
 
+  @memoize
   get ownEvents(): SolidityEvent[] {
     return this.astNode.nodes
       .filter(isEventDefinition)
@@ -146,6 +151,7 @@ export class SolidityContract implements Linkable {
     );
   }
 
+  @memoize
   get ownModifiers(): SolidityModifier[] {
     return this.astNode.nodes
       .filter(isModifierDefinition)
@@ -185,6 +191,7 @@ abstract class SolidityContractItem implements Linkable {
     return `${this.contract.name}-${slug(this.signature)}`
   }
 
+  @memoize
   get args(): SolidityTypedVariable[] {
     return SolidityTypedVariableArray.fromParameterList(
       this.astNode.parameters
@@ -218,6 +225,7 @@ class SolidityFunction extends SolidityContractItem {
     return isRegularFunction ? name : kind;
   }
 
+  @memoize
   get outputs(): SolidityTypedVariable[] {
     return SolidityTypedVariableArray.fromParameterList(
       this.astNode.returnParameters

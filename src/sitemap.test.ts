@@ -4,15 +4,21 @@ import path from 'path';
 import { Sitemap } from './sitemap';
 import { SoliditySource } from './solidity';
 import { SolcOutputBuilder } from './solc';
+import { Filter } from './filter';
 
 const emptyReadme = (dir: string = '') => ({
   path: path.join(dir, 'README.md'),
   contents: '',
 });
 
+const dummyFilter = {
+  matcher: () => true,
+  files: () => { throw new Error('Unsupported'); },
+} as unknown as Filter;
+
 test('single readme', t => {
   const source = buildSoliditySource();
-  const sitemap = Sitemap.generate(source, [emptyReadme()], 'md', false);
+  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme()], 'md', false);
 
   t.is(sitemap.pages.length, 1);
 });
@@ -22,7 +28,7 @@ test('single readme no contracts', t => {
     .file('Foo.sol')
   );
 
-  const sitemap = Sitemap.generate(source, [emptyReadme()], 'md', false);
+  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme()], 'md', false);
   const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 0);
@@ -35,7 +41,7 @@ test('single readme multiple contracts', t => {
       .contract('Bar')
   );
 
-  const sitemap = Sitemap.generate(source, [emptyReadme()], 'md', false);
+  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme()], 'md', false);
   const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 2);
@@ -51,7 +57,7 @@ test('filter subdirectory', t => {
       .contract('Bar')
   );
 
-  const sitemap = Sitemap.generate(source, [emptyReadme('sub')], 'md', false);
+  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme('sub')], 'md', false);
   const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 1);
@@ -66,7 +72,7 @@ test('filter nested subdirectories', t => {
       .contract('Foo')
   );
 
-  const sitemap = Sitemap.generate(source, [emptyReadme('sub')], 'md', false);
+  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme('sub')], 'md', false);
   const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 2);
@@ -82,7 +88,7 @@ test('links', t => {
       .contract('Foo')
   );
 
-  const sitemap = Sitemap.generate(source, [emptyReadme('sub1'), emptyReadme('sub2')], 'md', false);
+  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme('sub1'), emptyReadme('sub2')], 'md', false);
   const links = sitemap.links(sitemap.pages[0]);
 
   t.is(links.length, 2);

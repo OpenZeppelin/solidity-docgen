@@ -1,10 +1,9 @@
 import { fromPairs, pick } from 'lodash';
-import path from 'path';
 import fs from 'fs-extra';
-import globby from 'globby';
 import semver from 'semver';
 
 import { Output as SolcOutput } from './solc';
+import { Filter } from './filter';
 
 const outputSelection = {
   '*': {
@@ -15,16 +14,13 @@ const outputSelection = {
 };
 
 export async function compile(
-  directory: string,
-  ignore: string[] = [],
+  filter: Filter,
   solcModule: string = 'solc',
   solcSettings: object = {optimizer: {enabled: true, runs: 200}},
 ): Promise<SolcOutput> {
   const solc = await SolcAdapter.require(solcModule);
 
-  const files = await globby(path.join(directory, '**/*.sol'), {
-    ignore: ignore.map(i => path.join(i, '**/*')),
-  });
+  const files = await filter.files();
 
   const sources = fromPairs(await Promise.all(files.map(async file => [
     file,
@@ -46,8 +42,6 @@ export async function compile(
     const moreErrors = errors.length === 1 ? '' : ` (And ${errors.length - 1} other errors...)`;
     throw new Error(`Solidity was unable to compile. ${firstError}${moreErrors}`);
   }
-
-  solcOutput.sources = pick(solcOutput.sources, files);
 
   return solcOutput;
 }

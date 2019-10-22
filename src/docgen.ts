@@ -7,6 +7,7 @@ import { VFile } from './vfile';
 import { compile } from './compile';
 import { SoliditySource, SolidityContract } from './solidity';
 import { Sitemap, Link } from './sitemap';
+import { Filter } from './filter';
 
 interface Options {
   input: string;
@@ -25,12 +26,14 @@ interface Templates {
 }
 
 export async function docgen(options: Options) {
-  const solcOutput = await compile(options.input, options.exclude, options['solc-module'], options['solc-settings']);
+  const filter = new Filter(options.input, options.exclude);
+
+  const solcOutput = await compile(filter, options['solc-module'], options['solc-settings']);
   const templates = await getTemplates(options.templates);
   const readmes = await getReadmes(options.input);
 
   const source = new SoliditySource(options.input, solcOutput, templates.contract);
-  const sitemap = Sitemap.generate(source, readmes, options.extension, options['contract-pages']);
+  const sitemap = Sitemap.generate(source, filter, readmes, options.extension, options['contract-pages']);
 
   for (const page of sitemap.pages) {
     const dest = path.join(options.output, page.path);

@@ -1,4 +1,4 @@
-import { fromPairs } from 'lodash';
+import { fromPairs, pick } from 'lodash';
 import path from 'path';
 import fs from 'fs-extra';
 import globby from 'globby';
@@ -47,6 +47,8 @@ export async function compile(
     throw new Error(`Solidity was unable to compile. ${firstError}${moreErrors}`);
   }
 
+  solcOutput.sources = pick(solcOutput.sources, files);
+
   return solcOutput;
 }
 
@@ -61,7 +63,7 @@ class SolcAdapter {
   compile(input: object): SolcOutput {
     const inputJSON = JSON.stringify(input);
 
-    const solcOutputString = this.solc.compileStandardWrapper(inputJSON);
+    const solcOutputString = this.solc.compileStandardWrapper(inputJSON, importCallback);
     const solcOutput = JSON.parse(solcOutputString);
 
     if (semver.satisfies(this.solc.version(), '^0.4')) {
@@ -85,5 +87,19 @@ class SolcAdapter {
     }
 
     return solcOutput;
+  }
+}
+
+type SolidityImport = { contents: string } | { error: string };
+
+function importCallback(path: string): SolidityImport {
+  try {
+    return {
+      contents: fs.readFileSync(path, 'utf8'),
+    };
+  } catch (e) {
+    return {
+      error: e.message,
+    };
   }
 }

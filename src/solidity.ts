@@ -1,6 +1,5 @@
 import { flatten, uniqBy, groupBy } from 'lodash';
 import path from 'path';
-import execall from 'execall';
 import { memoize } from './memoize';
 
 type ContractTemplate = (contract: SolidityContract) => string;
@@ -329,18 +328,13 @@ function parseNatSpec(doc: string): NatSpec {
   // reverse engineered from solc behavior...
   const raw = doc.replace(/\n\n?^[ \t]*\*[ \t]*/mg, '\n\n');
 
-  const untagged = raw.match(/^(?:(?!^@\w+ )[^])+/m);
-  if (untagged) {
-    setOrAppend(res, 'userdoc', untagged[0]);
-  }
+  const tagMatches = execall(/^(?:@(\w+) )?((?:(?!^@\w+ )[^])*)/m, raw);
 
-  const tagMatches = execall(/^@(\w+) ((?:(?!^@\w+ )[^])*)/gm, raw);
-  for (const m of tagMatches) {
-    const [tag, content] = m.subMatches;
+  for (const [, tag, content] of tagMatches) {
     if (tag === 'dev') {
       setOrAppend(res, 'devdoc', content); 
     }
-    if (tag === 'notice') {
+    if (tag === 'notice' || tag === undefined) {
       setOrAppend(res, 'userdoc', content);
     }
     if (tag === 'title') {
@@ -369,6 +363,19 @@ function parseNatSpec(doc: string): NatSpec {
   }
 
   return res;
+}
+
+function* execall(re: RegExp, text: string) {
+  re = new RegExp(re, re.flags + (re.sticky ? '' : 'y'));
+
+  while (true) {
+    const match = re.exec(text);
+    if (match) {
+      yield match;
+    } else {
+      break;
+    }
+  }
 }
 
 function setOrAppend<K extends string>(

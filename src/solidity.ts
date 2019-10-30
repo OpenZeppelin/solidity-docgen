@@ -113,7 +113,8 @@ export class SolidityContract implements Linkable {
     return this.astNode.nodes
       .filter(isFunctionDefinition)
       .filter(n => n.visibility !== 'private')
-      .map(n => new SolidityFunction(this, n));
+      .map(n => new SolidityFunction(this, n))
+      .filter(f => !f.isTrivialConstructor);
   }
 
   get inheritedItems(): InheritedItems[] {
@@ -233,6 +234,15 @@ class SolidityFunction extends SolidityContractItem {
 
   get visibility(): 'internal' | 'external' | 'public' | 'private' {
     return this.astNode.visibility;
+  }
+
+  get isTrivialConstructor(): boolean {
+    return (
+      this.astNode.kind === "constructor" &&
+      this.visibility === "public" &&
+      this.args.length === 0 &&
+      Object.keys(this.natspec).length === 0
+    );
   }
 }
 

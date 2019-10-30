@@ -20,7 +20,7 @@ export async function compile(
 ): Promise<SolcOutput> {
   const solc = await SolcAdapter.require(solcModule);
 
-  const files = await filter.files();
+  const files = await filter.glob('*.sol');
 
   const sources = fromPairs(await Promise.all(files.map(async file => [
     file,

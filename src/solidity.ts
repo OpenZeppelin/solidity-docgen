@@ -380,7 +380,11 @@ function* execall(re: RegExp, text: string) {
 
   while (true) {
     const match = re.exec(text);
-    if (match) {
+
+    // we break out of the loop if the empty string is matched because no
+    // progress will be made and it will loop infinitely
+
+    if (match && match[0] !== '') {
       yield match;
     } else {
       break;

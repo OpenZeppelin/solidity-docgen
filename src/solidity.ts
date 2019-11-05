@@ -104,7 +104,7 @@ export class SolidityContract implements Linkable {
   get functions(): SolidityFunction[] {
     return uniqBy(
       flatten(this.inheritance.map(c => c.ownFunctions)),
-      f => f.signature,
+      f => f.name === 'constructor' ? 'constructor' : f.signature,
     );
   }
 

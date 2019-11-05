@@ -109,3 +109,17 @@ test('grouped inherited items', t => {
   t.is(items[1].contract.name, 'Foo');
   t.is(items[1].functions[0].name, 'foo-test');
 });
+
+test('two inherited constructors', t => {
+  const solcOutput = new SolcOutputBuilder()
+    .file('Foo.sol')
+    .contract('Foo')
+      .function('constructor', 'uint256')
+    .contract('FooFlavor', 'Foo')
+      .function('constructor', 'string');
+
+  const source = buildSource(solcOutput);
+  const foof = source.contracts[1];
+  t.is(foof.name, 'FooFlavor');
+  t.is(foof.functions.length, 1);
+});

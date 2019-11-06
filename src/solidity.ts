@@ -213,7 +213,7 @@ abstract class SolidityContractItem implements Linkable {
   }
 
   get signature(): string {
-    return `${this.name}(${this.args.map(a => a.typeName).join(',')})`;
+    return `${this.name}(${this.args.map(a => a.type).join(',')})`;
   }
 
   get natspec(): NatSpec {
@@ -313,19 +313,24 @@ class SolidityModifier extends SolidityContractItem {
 
 class SolidityTypedVariable {
   constructor(
-    readonly type: solc.ast.TypeName,
+    private readonly typeNode: solc.ast.TypeName,
     readonly name?: string,
   ) { }
 
+  get type(): string {
+    return this.typeNode.typeDescriptions.typeString;
+  }
+
+  // TODO: deprecate
   get typeName() {
-    return this.type.typeDescriptions.typeString;
+    return this.type;
   }
 
   toString(): string {
     if (this.name) {
-      return [this.typeName, this.name].join(' ');
+      return [this.type, this.name].join(' ');
     } else {
-      return this.typeName;
+      return this.type;
     }
   }
 }
@@ -356,7 +361,7 @@ class SolidityTypedVariableArray extends PrettyArray<SolidityTypedVariable> {
   }
 
   get types(): string[] {
-    return this.map(v => v.typeName);
+    return this.map(v => v.type);
   }
 
   get names(): string[] {

@@ -166,4 +166,23 @@ export class SolcOutputBuilder implements Output {
     contract.astNode.nodes.push(astNode);
     return this;
   }
+
+  variable(variableName: string, typeString: string) {
+    const contract = this._currentContract;
+    if (contract === undefined) throw new Error('No contract defined');
+    const astNode: ast.VariableDeclaration = {
+      nodeType: 'VariableDeclaration',
+      visibility: 'public',
+      name: variableName,
+      constant: false,
+      typeName: {
+        nodeType: 'ElementaryTypeName',
+        typeDescriptions: {
+          typeString,
+        },
+      },
+    }
+    contract.astNode.nodes.push(astNode);
+    return this;
+  }
 }

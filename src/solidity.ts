@@ -92,13 +92,25 @@ export class SolidityContract implements Linkable {
   }
 
   get linkable(): Linkable[] {
-    return [this, ...this.modifiers, ...this.functions, ...this.events];
+    return [this, ...this.modifiers, ...this.variables, ...this.functions, ...this.events];
   }
 
   get inheritance(): SolidityContract[] {
     return this.astNode.linearizedBaseContracts.map(id =>
       this.source.contractById(id)
     );
+  }
+
+  get variables(): SolidityStateVariable[] {
+    return flatten(this.inheritance.map(c => c.ownVariables));
+  }
+
+  @memoize
+  get ownVariables(): SolidityStateVariable[] {
+    return this.astNode.nodes
+      .filter(isVariableDeclaration)
+      .filter(n => n.visibility !== 'private')
+      .map(n => new SolidityStateVariable(this, n));
   }
 
   get functions(): SolidityFunction[] {
@@ -118,12 +130,14 @@ export class SolidityContract implements Linkable {
   }
 
   get inheritedItems(): InheritedItems[] {
+    const variables = groupBy(this.variables, f => f.contract.astId);
     const functions = groupBy(this.functions, f => f.contract.astId);
     const events = groupBy(this.events, f => f.contract.astId);
     const modifiers = groupBy(this.modifiers, f => f.contract.astId);
 
     return this.inheritance.map(contract => ({
       contract,
+      variables: variables[contract.astId],
       functions: functions[contract.astId],
       events: events[contract.astId],
       modifiers: modifiers[contract.astId],
@@ -174,32 +188,31 @@ export class SolidityContract implements Linkable {
 abstract class SolidityContractItem implements Linkable {
   constructor(
     readonly contract: SolidityContract,
-    astNode: solc.ast.ContractItem,
   ) { }
 
-  protected abstract astNode: solc.ast.ContractItem;
+  protected abstract astNode: Exclude<solc.ast.ContractItem, solc.ast.VariableDeclaration>;
 
   get name(): string {
     return this.astNode.name;
   }
 
   get fullName(): string {
-    return `${this.contract.name}.${this.name}`
+    return `${this.contract.name}.${this.name}`;
   }
 
   get anchor(): string {
-    return `${this.contract.name}-${slug(this.signature)}`
+    return `${this.contract.name}-${slug(this.signature)}`;
   }
 
   @memoize
   get args(): SolidityTypedVariable[] {
     return SolidityTypedVariableArray.fromParameterList(
-      this.astNode.parameters
+      this.astNode.parameters,
     );
   }
 
   get signature(): string {
-    return `${this.name}(${this.args.map(a => a.typeName).join(',')})`;
+    return `${this.name}(${this.args.map(a => a.type).join(',')})`;
   }
 
   get natspec(): NatSpec {
@@ -211,12 +224,44 @@ abstract class SolidityContractItem implements Linkable {
   }
 }
 
+class SolidityStateVariable implements Linkable {
+  constructor(
+    readonly contract: SolidityContract,
+    protected readonly astNode: solc.ast.VariableDeclaration,
+  ) { }
+
+  get name(): string {
+    return this.astNode.name;
+  }
+
+  get fullName(): string {
+    return `${this.contract.name}.${this.name}`
+  }
+
+  get anchor(): string {
+    return `${this.contract.name}-${this.name}-${slug(this.type)}`
+  }
+
+  get type(): string {
+    return this.astNode.typeName.typeDescriptions.typeString;
+  }
+
+  get signature(): string {
+    return `${this.type} ${this.name}`;
+  }
+
+  get natspec(): {} {
+    warnStateVariableNatspec();
+    return {}
+  }
+}
+
 class SolidityFunction extends SolidityContractItem {
   constructor(
     contract: SolidityContract,
     protected readonly astNode: solc.ast.FunctionDefinition,
   ) {
-    super(contract, astNode);
+    super(contract);
   }
 
   get name(): string {
@@ -251,7 +296,7 @@ class SolidityEvent extends SolidityContractItem {
     contract: SolidityContract,
     protected readonly astNode: solc.ast.EventDefinition,
   ) {
-    super(contract, astNode);
+    super(contract);
   }
 }
 
@@ -260,31 +305,37 @@ class SolidityModifier extends SolidityContractItem {
     contract: SolidityContract,
     protected readonly astNode: solc.ast.ModifierDefinition,
   ) {
-    super(contract, astNode);
+    super(contract);
   }
 }
 
 class SolidityTypedVariable {
   constructor(
-    readonly type: solc.ast.TypeName,
+    private readonly typeNode: solc.ast.TypeName,
     readonly name?: string,
   ) { }
 
+  get type(): string {
+    return this.typeNode.typeDescriptions.typeString;
+  }
+
+  // TODO: deprecate
   get typeName() {
-    return this.type.typeDescriptions.typeString;
+    return this.type;
   }
 
   toString(): string {
     if (this.name) {
-      return [this.typeName, this.name].join(' ');
+      return [this.type, this.name].join(' ');
     } else {
-      return this.typeName;
+      return this.type;
     }
   }
 }
 
 interface InheritedItems {
   contract: SolidityContract;
+  variables: SolidityStateVariable[];
   functions: SolidityFunction[];
   events: SolidityEvent[];
   modifiers: SolidityModifier[];
@@ -309,7 +360,7 @@ class SolidityTypedVariableArray extends PrettyArray<SolidityTypedVariable> {
   }
 
   get types(): string[] {
-    return this.map(v => v.typeName);
+    return this.map(v => v.type);
   }
 
   get names(): string[] {
@@ -408,6 +459,10 @@ interface ToString {
   toString(): string;
 }
 
+function isVariableDeclaration(node: solc.ast.ContractItem): node is solc.ast.VariableDeclaration {
+  return node.nodeType === 'VariableDeclaration';
+}
+
 function isFunctionDefinition(node: solc.ast.ContractItem): node is solc.ast.FunctionDefinition {
   return node.nodeType === 'FunctionDefinition';
 }
@@ -419,3 +474,16 @@ function isEventDefinition(node: solc.ast.ContractItem): node is solc.ast.EventD
 function isModifierDefinition(node: solc.ast.ContractItem): node is solc.ast.ModifierDefinition {
   return node.nodeType === 'ModifierDefinition';
 }
+
+function oneTimeLogger(msg: string): () => void {
+  let warned = false;
+
+  return function () {
+    if (!warned) {
+      console.warn(msg);
+      warned = true;
+    }
+  };
+}
+
+const warnStateVariableNatspec = oneTimeLogger('Warning: NatSpec is currently not available for state variables.');

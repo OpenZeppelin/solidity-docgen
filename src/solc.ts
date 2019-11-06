@@ -25,7 +25,15 @@ export namespace ast {
     linearizedBaseContracts: number[];
   }
 
-  export type ContractItem = FunctionDefinition | EventDefinition | ModifierDefinition;
+  export type ContractItem = VariableDeclaration | FunctionDefinition | EventDefinition | ModifierDefinition;
+
+  export interface VariableDeclaration {
+    nodeType: 'VariableDeclaration';
+    visibility: 'internal' | 'public' | 'private';
+    name: string;
+    constant: boolean;
+    typeName: TypeName;
+  }
 
   export interface FunctionDefinition {
     nodeType: 'FunctionDefinition';
@@ -155,6 +163,25 @@ export class SolcOutputBuilder implements Output {
         parameters: [],
       },
     };
+    contract.astNode.nodes.push(astNode);
+    return this;
+  }
+
+  variable(variableName: string, typeString: string) {
+    const contract = this._currentContract;
+    if (contract === undefined) throw new Error('No contract defined');
+    const astNode: ast.VariableDeclaration = {
+      nodeType: 'VariableDeclaration',
+      visibility: 'public',
+      name: variableName,
+      constant: false,
+      typeName: {
+        nodeType: 'ElementaryTypeName',
+        typeDescriptions: {
+          typeString,
+        },
+      },
+    }
     contract.astNode.nodes.push(astNode);
     return this;
   }

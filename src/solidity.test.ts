@@ -123,3 +123,34 @@ test('two inherited constructors', t => {
   t.is(foof.name, 'FooFlavor');
   t.is(foof.functions.length, 1);
 });
+
+test('a state variable', t => {
+  const solcOutput = new SolcOutputBuilder()
+    .file('Foo.sol')
+    .contract('Foo')
+      .variable('x', 'uint256');
+
+  const source = buildSource(solcOutput);
+  const foo = source.contracts[0];
+  t.is(foo.variables.length, 1);
+  const variable = foo.variables[0];
+  t.is(variable.name, 'x');
+  t.is(variable.type, 'uint256');
+});
+
+test('an inherited state variable', t => {
+  const solcOutput = new SolcOutputBuilder()
+    .file('Foo.sol')
+    .contract('Foo')
+      .variable('x', 'uint256')
+    .contract('Bar', 'Foo')
+      .variable('y', 'uint256');
+
+  const source = buildSource(solcOutput);
+  const foo = source.contracts[1];
+  t.is(foo.name, 'Bar');
+  t.is(foo.variables.length, 2);
+  const variable = foo.variables[1];
+  t.is(variable.name, 'x');
+  t.is(variable.type, 'uint256');
+});

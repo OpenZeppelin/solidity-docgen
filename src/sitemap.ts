@@ -5,6 +5,8 @@ import { maxBy } from 'lodash';
 import { VFile } from './vfile';
 import { SoliditySource, SolidityContract, Linkable } from './solidity';
 import { Page, ReadmePage, DefaultPage, ContractPage } from './page';
+import { Filter } from './filter';
+import { memoize } from './memoize';
 
 export interface Link {
   target: Linkable;
@@ -13,17 +15,32 @@ export interface Link {
 }
 
 export abstract class Sitemap {
-  static generate(source: SoliditySource, readmes: VFile[], ext: string, contractPages: boolean): Sitemap {
+  static generate(
+    source: SoliditySource,
+    filter: Filter,
+    readmes: VFile[],
+    ext: string,
+    contractPages: boolean,
+  ): Sitemap {
+
     if (contractPages) {
-      return new ContractSitemap(source, ext);
+      return new ContractSitemap(source, filter, ext);
     } else if (readmes.length > 0) {
-      return new ReadmeSitemap(source, readmes)
+      return new ReadmeSitemap(source, filter, readmes)
     } else {
-      return new DefaultSitemap(source, ext);
+      return new DefaultSitemap(source, filter, ext);
     }
   }
 
+  protected abstract source: SoliditySource;
+  protected abstract filter: Filter;
+
   abstract pages: Page[];
+
+  @memoize
+  get contracts(): SolidityContract[] {
+    return this.source.contracts.filter(c => this.filter.matcher(c.file.path));
+  }
 
   links(origin: Page): Link[] {
     function* generate(sitemap: Sitemap): IterableIterator<Link> {
@@ -44,27 +61,29 @@ export abstract class Sitemap {
 
 class DefaultSitemap extends Sitemap {
   constructor(
-    private readonly source: SoliditySource,
+    protected readonly source: SoliditySource,
+    protected readonly filter: Filter,
     private readonly ext: string,
   ) {
     super();
   }
 
   get pages(): DefaultPage[] {
-    return [new DefaultPage(this, this.ext, this.source.contracts)];
+    return [new DefaultPage(this, this.ext, this.contracts)];
   }
 }
 
 class ReadmeSitemap extends Sitemap {
   constructor(
-    private readonly source: SoliditySource,
+    protected readonly source: SoliditySource,
+    protected readonly filter: Filter,
     private readonly readmes: VFile[],
   ) {
     super();
   }
 
   get pages(): ReadmePage[] {
-    const contracts = groupBy(this.source.contracts, c => this.locate(c));
+    const contracts = groupBy(this.contracts, c => this.locate(c));
     return this.readmes.map(r =>
       new ReadmePage(this, r, contracts[path.dirname(r.path)] || [])
     );
@@ -83,14 +102,15 @@ class ReadmeSitemap extends Sitemap {
 
 class ContractSitemap extends Sitemap {
   constructor(
-    private readonly source: SoliditySource,
+    protected readonly source: SoliditySource,
+    protected readonly filter: Filter,
     private readonly ext: string,
   ) {
     super();
   }
 
   get pages(): ContractPage[] {
-    return this.source.contracts.map(c => new ContractPage(this, c, this.ext));
+    return this.contracts.map(c => new ContractPage(this, c, this.ext));
   }
 }
 

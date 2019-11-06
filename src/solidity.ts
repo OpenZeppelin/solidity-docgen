@@ -1,6 +1,6 @@
-import { flatten, uniqBy } from 'lodash';
+import { flatten, uniqBy, groupBy } from 'lodash';
 import path from 'path';
-import execall from 'execall';
+import { memoize } from './memoize';
 
 type ContractTemplate = (contract: SolidityContract) => string;
 
@@ -23,6 +23,7 @@ export class SoliditySource {
       .map(fileName => this.file(fileName));
   }
 
+  @memoize
   file(fileName: string): SolidityFile {
     return new SolidityFile(
       this,
@@ -49,6 +50,7 @@ class SolidityFile {
     readonly path: string,
   ) { }
 
+  @memoize
   get contracts(): SolidityContract[] {
     const astNodes = this.ast.nodes.filter(n =>
       n.nodeType === 'ContractDefinition'
@@ -90,7 +92,7 @@ export class SolidityContract implements Linkable {
   }
 
   get linkable(): Linkable[] {
-    return [this, ...this.functions, ...this.events, ...this.variables];
+    return [this, ...this.modifiers, ...this.functions, ...this.events, ...this.variables];
   }
 
   get inheritance(): SolidityContract[] {
@@ -116,15 +118,30 @@ export class SolidityContract implements Linkable {
   get functions(): SolidityFunction[] {
     return uniqBy(
       flatten(this.inheritance.map(c => c.ownFunctions)),
-      f => f.signature,
+      f => f.name === 'constructor' ? 'constructor' : f.signature,
     );
   }
 
+  @memoize
   get ownFunctions(): SolidityFunction[] {
     return this.astNode.nodes
       .filter(isFunctionDefinition)
       .filter(n => n.visibility !== 'private')
-      .map(n => new SolidityFunction(this, n));
+      .map(n => new SolidityFunction(this, n))
+      .filter(f => !f.isTrivialConstructor);
+  }
+
+  get inheritedItems(): InheritedItems[] {
+    const functions = groupBy(this.functions, f => f.contract.astId);
+    const events = groupBy(this.events, f => f.contract.astId);
+    const modifiers = groupBy(this.modifiers, f => f.contract.astId);
+
+    return this.inheritance.map(contract => ({
+      contract,
+      functions: functions[contract.astId],
+      events: events[contract.astId],
+      modifiers: modifiers[contract.astId],
+    }));
   }
 
   get events(): SolidityEvent[] {
@@ -134,6 +151,7 @@ export class SolidityContract implements Linkable {
     );
   }
 
+  @memoize
   get ownEvents(): SolidityEvent[] {
     return this.astNode.nodes
       .filter(isEventDefinition)
@@ -147,6 +165,7 @@ export class SolidityContract implements Linkable {
     );
   }
 
+  @memoize
   get ownModifiers(): SolidityModifier[] {
     return this.astNode.nodes
       .filter(isModifierDefinition)
@@ -186,6 +205,7 @@ abstract class SolidityContractItem implements Linkable {
     return `${this.contract.name}-${slug(this.signature)}`
   }
 
+  @memoize
   get args(): SolidityTypedVariable[] {
     return SolidityTypedVariableArray.fromParameterList(
       this.astNode.parameters
@@ -252,6 +272,7 @@ class SolidityFunction extends SolidityContractItem {
     return isRegularFunction ? name : kind;
   }
 
+  @memoize
   get outputs(): SolidityTypedVariable[] {
     return SolidityTypedVariableArray.fromParameterList(
       this.astNode.returnParameters
@@ -260,6 +281,15 @@ class SolidityFunction extends SolidityContractItem {
 
   get visibility(): 'internal' | 'external' | 'public' | 'private' {
     return this.astNode.visibility;
+  }
+
+  get isTrivialConstructor(): boolean {
+    return (
+      this.astNode.kind === "constructor" &&
+      this.visibility === "public" &&
+      this.args.length === 0 &&
+      Object.keys(this.natspec).length === 0
+    );
   }
 }
 
@@ -300,6 +330,13 @@ class SolidityTypedVariable {
   }
 }
 
+interface InheritedItems {
+  contract: SolidityContract;
+  functions: SolidityFunction[];
+  events: SolidityEvent[];
+  modifiers: SolidityModifier[];
+}
+
 class PrettyArray<T extends ToString> extends Array<T> {
   toString() {
     return this.map(e => e.toString()).join(', ');
@@ -322,8 +359,8 @@ class SolidityTypedVariableArray extends PrettyArray<SolidityTypedVariable> {
     return this.map(v => v.typeName);
   }
 
-  get names(): (string | undefined)[] {
-    return this.map(v => v.name);
+  get names(): string[] {
+    return this.map(v => (v.name === undefined) ? '_' : v.name);
   }
 }
 
@@ -348,18 +385,13 @@ function parseNatSpec(doc: string): NatSpec {
   // reverse engineered from solc behavior...
   const raw = doc.replace(/\n\n?^[ \t]*\*[ \t]*/mg, '\n\n');
 
-  const untagged = raw.match(/^(?:(?!^@\w+ )[^])+/m);
-  if (untagged) {
-    setOrAppend(res, 'userdoc', untagged[0]);
-  }
+  const tagMatches = execall(/^(?:@(\w+) )?((?:(?!^@\w+ )[^])*)/m, raw);
 
-  const tagMatches = execall(/^@(\w+) ((?:(?!^@\w+ )[^])*)/gm, raw);
-  for (const m of tagMatches) {
-    const [tag, content] = m.subMatches;
+  for (const [, tag, content] of tagMatches) {
     if (tag === 'dev') {
       setOrAppend(res, 'devdoc', content); 
     }
-    if (tag === 'notice') {
+    if (tag === 'notice' || tag === undefined) {
       setOrAppend(res, 'userdoc', content);
     }
     if (tag === 'title') {
@@ -388,6 +420,23 @@ function parseNatSpec(doc: string): NatSpec {
   }
 
   return res;
+}
+
+function* execall(re: RegExp, text: string) {
+  re = new RegExp(re, re.flags + (re.sticky ? '' : 'y'));
+
+  while (true) {
+    const match = re.exec(text);
+
+    // we break out of the loop if the empty string is matched because no
+    // progress will be made and it will loop infinitely
+
+    if (match && match[0] !== '') {
+      yield match;
+    } else {
+      break;
+    }
+  }
 }
 
 function setOrAppend<K extends string>(

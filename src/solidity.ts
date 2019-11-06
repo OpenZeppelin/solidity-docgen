@@ -249,6 +249,11 @@ class SolidityStateVariable implements Linkable {
   get signature(): string {
     return `${this.type} ${this.name}`;
   }
+
+  get natspec(): {} {
+    warnStateVariableNatspec();
+    return {}
+  }
 }
 
 class SolidityFunction extends SolidityContractItem {
@@ -469,3 +474,16 @@ function isEventDefinition(node: solc.ast.ContractItem): node is solc.ast.EventD
 function isModifierDefinition(node: solc.ast.ContractItem): node is solc.ast.ModifierDefinition {
   return node.nodeType === 'ModifierDefinition';
 }
+
+function oneTimeLogger(msg: string): () => void {
+  let warned = false;
+
+  return function () {
+    if (!warned) {
+      console.warn(msg);
+      warned = true;
+    }
+  };
+}
+
+const warnStateVariableNatspec = oneTimeLogger('Warning: NatSpec is currently not available for state variables.');

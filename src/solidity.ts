@@ -198,17 +198,17 @@ abstract class SolidityContractItem implements Linkable {
   }
 
   get fullName(): string {
-    return `${this.contract.name}.${this.name}`
+    return `${this.contract.name}.${this.name}`;
   }
 
   get anchor(): string {
-    return `${this.contract.name}-${slug(this.signature)}`
+    return `${this.contract.name}-${slug(this.signature)}`;
   }
 
   @memoize
   get args(): SolidityTypedVariable[] {
     return SolidityTypedVariableArray.fromParameterList(
-      this.astNode.parameters
+      this.astNode.parameters,
     );
   }
 

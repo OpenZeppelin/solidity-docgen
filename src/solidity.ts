@@ -92,7 +92,7 @@ export class SolidityContract implements Linkable {
   }
 
   get linkable(): Linkable[] {
-    return [this, ...this.modifiers, ...this.functions, ...this.events, ...this.variables];
+    return [this, ...this.modifiers, ...this.variables, ...this.functions, ...this.events];
   }
 
   get inheritance(): SolidityContract[] {
@@ -101,18 +101,16 @@ export class SolidityContract implements Linkable {
     );
   }
 
-  get variables(): SolidityVariable[] {
-    return uniqBy(
-      flatten(this.inheritance.map(c => c.ownVariables)),
-      v => v.signature,
-    );
+  get variables(): SolidityStateVariable[] {
+    return flatten(this.inheritance.map(c => c.ownVariables));
   }
 
-  get ownVariables(): SolidityVariable[] {
+  @memoize
+  get ownVariables(): SolidityStateVariable[] {
     return this.astNode.nodes
       .filter(isVariableDeclaration)
-      .filter(n => n.visibility === 'public')
-      .map(n => new SolidityVariable(this, n));
+      .filter(n => n.visibility !== 'private')
+      .map(n => new SolidityStateVariable(this, n));
   }
 
   get functions(): SolidityFunction[] {
@@ -132,12 +130,14 @@ export class SolidityContract implements Linkable {
   }
 
   get inheritedItems(): InheritedItems[] {
+    const variables = groupBy(this.variables, f => f.contract.astId);
     const functions = groupBy(this.functions, f => f.contract.astId);
     const events = groupBy(this.events, f => f.contract.astId);
     const modifiers = groupBy(this.modifiers, f => f.contract.astId);
 
     return this.inheritance.map(contract => ({
       contract,
+      variables: variables[contract.astId],
       functions: functions[contract.astId],
       events: events[contract.astId],
       modifiers: modifiers[contract.astId],
@@ -190,7 +190,7 @@ abstract class SolidityContractItem implements Linkable {
     readonly contract: SolidityContract,
   ) { }
 
-  protected abstract astNode: solc.ast.ContractItem;
+  protected abstract astNode: Exclude<solc.ast.ContractItem, solc.ast.VariableDeclaration>;
 
   get name(): string {
     return this.astNode.name;
@@ -224,13 +224,11 @@ abstract class SolidityContractItem implements Linkable {
   }
 }
 
-class SolidityVariable implements Linkable {
+class SolidityStateVariable implements Linkable {
   constructor(
     readonly contract: SolidityContract,
-    astNode: solc.ast.ContractItem,
+    protected readonly astNode: solc.ast.VariableDeclaration,
   ) { }
-
-  protected abstract astNode: solc.ast.ContractItem;
 
   get name(): string {
     return this.astNode.name;
@@ -241,7 +239,7 @@ class SolidityVariable implements Linkable {
   }
 
   get anchor(): string {
-    return `${this.contract.name}-${slug(this.signature)}`
+    return `${this.contract.name}-${this.name}-${slug(this.type)}`
   }
 
   get type(): string {
@@ -250,10 +248,6 @@ class SolidityVariable implements Linkable {
 
   get signature(): string {
     return `${this.type} ${this.name}`;
-  }
-
-  get natspec(): NatSpec {
-    throw new Error("NatSpec is currently not available for public state variables (see https://github.com/ethereum/solidity/issues/3418)");
   }
 }
 
@@ -336,6 +330,7 @@ class SolidityTypedVariable {
 
 interface InheritedItems {
   contract: SolidityContract;
+  variables: SolidityStateVariable[];
   functions: SolidityFunction[];
   events: SolidityEvent[];
   modifiers: SolidityModifier[];

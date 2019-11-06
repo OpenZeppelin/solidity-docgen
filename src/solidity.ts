@@ -188,7 +188,6 @@ export class SolidityContract implements Linkable {
 abstract class SolidityContractItem implements Linkable {
   constructor(
     readonly contract: SolidityContract,
-    astNode: solc.ast.ContractItem,
   ) { }
 
   protected abstract astNode: solc.ast.ContractItem;
@@ -263,7 +262,7 @@ class SolidityFunction extends SolidityContractItem {
     contract: SolidityContract,
     protected readonly astNode: solc.ast.FunctionDefinition,
   ) {
-    super(contract, astNode);
+    super(contract);
   }
 
   get name(): string {
@@ -298,7 +297,7 @@ class SolidityEvent extends SolidityContractItem {
     contract: SolidityContract,
     protected readonly astNode: solc.ast.EventDefinition,
   ) {
-    super(contract, astNode);
+    super(contract);
   }
 }
 
@@ -307,7 +306,7 @@ class SolidityModifier extends SolidityContractItem {
     contract: SolidityContract,
     protected readonly astNode: solc.ast.ModifierDefinition,
   ) {
-    super(contract, astNode);
+    super(contract);
   }
 }
 

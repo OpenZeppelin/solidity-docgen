@@ -1,5 +1,7 @@
 ## <span id="{{anchor}}"></span> `{{name}}`
 
+{{{natspec.userdoc}}}
+
 {{{natspec.devdoc}}}
 
 {{#modifiers}}
@@ -11,8 +13,11 @@
 {{#events}}
 - [`{{name}}({{args}})`][{{anchor}}]
 {{/events}}
+
 {{#ownModifiers}}
 ### <span id="{{anchor}}"></span> `{{name}}({{args}})`
+
+{{{natspec.userdoc}}}
 
 {{{natspec.devdoc}}}
 
@@ -20,11 +25,15 @@
 {{#ownFunctions}}
 ### <span id="{{anchor}}"></span> `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}})
 
+{{{natspec.userdoc}}}
+
 {{{natspec.devdoc}}}
 
 {{/ownFunctions}}
 {{#ownEvents}}
 ### <span id="{{anchor}}"></span> `{{name}}({{args}})`
+
+{{{natspec.userdoc}}}
 
 {{{natspec.devdoc}}}
 

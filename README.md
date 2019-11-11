@@ -26,3 +26,13 @@ solidity-docgen [ -i <input-dir> ] [ -o <output-dir> ] [ -t <templates-dir> ]
 ```
 
 [NatSpec]: https://solidity.readthedocs.io/en/develop/natspec-format.html
+
+### Contracts with Dependendencies
+
+Dependencies don't work out of the box yet, and you have to manually set up solc remappings.
+
+For example, for OpenZeppelin dependencies like `@openzeppelin/contracts` you would run the following command.
+
+```
+solidity-docgen --solc-settings "{remappings: ['@openzeppelin=$PWD/node_modules/@openzeppelin']}"
+```

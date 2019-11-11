@@ -47,7 +47,7 @@
     "codecov": "^3.6.1",
     "concurrently": "^5.0.0",
     "nyc": "^14.1.1",
-    "typescript": "^3.6.3"
+    "typescript": "^3.7.2"
   },
   "keywords": [
     "solidity",

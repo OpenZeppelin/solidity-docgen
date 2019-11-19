@@ -92,7 +92,7 @@ export class SolidityContract implements Linkable {
   }
 
   get linkable(): Linkable[] {
-    return [this, ...this.modifiers, ...this.variables, ...this.functions, ...this.events];
+    return [this, ...this.ownModifiers, ...this.ownVariables, ...this.ownFunctions, ...this.ownEvents];
   }
 
   get inheritance(): SolidityContract[] {

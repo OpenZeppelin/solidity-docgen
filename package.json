@@ -14,6 +14,8 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "coverage": "nyc --reporter=lcov npm test",
+    "docs": "oz-docs -c docs",
+    "docs:watch": "npm run docs watch",
     "test": "tsc && ava",
     "test:watch": "concurrently -krs first -n ava,tsc 'ava --watch' 'tsc --watch --preserveWatchOutput'",
     "prepare": "npm run build"
@@ -47,6 +49,7 @@
     "codecov": "^3.6.1",
     "concurrently": "^5.0.0",
     "nyc": "^14.1.1",
+    "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils",
     "typescript": "^3.7.2"
   },
   "keywords": [

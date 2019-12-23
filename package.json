@@ -50,7 +50,7 @@
     "concurrently": "^5.0.1",
     "nyc": "^15.0.0",
     "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils",
-    "typescript": "^3.7.3"
+    "typescript": "^3.7.4"
   },
   "keywords": [
     "solidity",

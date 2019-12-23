@@ -33,7 +33,7 @@
     "micromatch": "^4.0.2",
     "minimatch": "^3.0.4",
     "semver": "^7.1.1",
-    "solc": "^0.5.14"
+    "solc": "^0.6.0"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.0",

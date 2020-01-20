@@ -1,5 +1,4 @@
 export default {
-  babel: false,
-  files: ['**/*.test.js'],
+  ignoredByWatcher: ['**/*.ts'],
   verbose: true,
 };

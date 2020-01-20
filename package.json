@@ -44,7 +44,7 @@
     "@types/minimatch": "^3.0.3",
     "@types/node": "^10.17.13",
     "@types/semver": "^6.0.2",
-    "ava": "^2.4.0",
+    "ava": "^3.0.0",
     "code-style": "github:OpenZeppelin/code-style",
     "codecov": "^3.6.1",
     "fgbg": "^0.1.4",

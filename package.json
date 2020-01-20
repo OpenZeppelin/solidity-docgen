@@ -17,7 +17,7 @@
     "docs": "oz-docs -c docs",
     "docs:watch": "npm run docs watch",
     "test": "tsc && ava",
-    "test:watch": "concurrently -krs first -n ava,tsc 'ava --watch' 'tsc --watch --preserveWatchOutput'",
+    "test:watch": "fgbg 'ava --watch' 'tsc --watch'",
     "prepare": "npm run build"
   },
   "dependencies": {
@@ -47,7 +47,7 @@
     "ava": "^2.4.0",
     "code-style": "github:OpenZeppelin/code-style",
     "codecov": "^3.6.1",
-    "concurrently": "^5.0.2",
+    "fgbg": "^0.1.4",
     "nyc": "^15.0.0",
     "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils",
     "typescript": "^3.7.4"

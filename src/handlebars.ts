@@ -32,7 +32,11 @@ H.registerHelper({
 export type Template<Context> = (context: Context) => string;
 
 export function compile(template: string): Template<unknown> {
-  return H.compile(template, { noEscape: true });
+  const compiledTemplate = H.compile(template, { noEscape: true });
+  return context => compiledTemplate(context, {
+      allowProtoPropertiesByDefault: true,
+      allowProtoMethodsByDefault: true,
+  });
 }
 
 export function slug(str: string): string {

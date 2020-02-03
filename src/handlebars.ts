@@ -35,7 +35,7 @@ export function compile(template: string): Template<unknown> {
   const compiledTemplate = H.compile(template, { noEscape: true });
   return context => compiledTemplate(context, {
       allowProtoPropertiesByDefault: true,
-      allowProtoMethodsByDefault: true
+      allowProtoMethodsByDefault: true,
   });
 }
 

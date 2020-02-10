@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@oclif/command": "^1.5.19",
-    "@oclif/config": "^1.13.3",
+    "@oclif/config": "^1.14.0",
     "@oclif/errors": "^1.2.2",
     "@oclif/plugin-help": "^2.2.3",
     "fs-extra": "^8.1.0",

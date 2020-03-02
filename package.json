@@ -50,7 +50,7 @@
     "fgbg": "^0.1.4",
     "nyc": "^15.0.0",
     "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils",
-    "typescript": "^3.8.2"
+    "typescript": "^3.8.3"
   },
   "keywords": [
     "solidity",

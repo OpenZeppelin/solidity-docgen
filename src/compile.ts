@@ -5,7 +5,7 @@ import semver from 'semver';
 import { Output as SolcOutput } from './solc';
 import { Filter } from './filter';
 
-const outputSelection = {
+export const outputSelection = {
   '*': {
     '': [
       'ast',
@@ -46,7 +46,7 @@ export async function compile(
   return solcOutput;
 }
 
-class SolcAdapter {
+export class SolcAdapter {
   static async require(solcModule: string): Promise<SolcAdapter> {
     const solc = await import(solcModule);
     return new SolcAdapter(solc);

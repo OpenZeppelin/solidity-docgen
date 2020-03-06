@@ -57,7 +57,10 @@ export class SolcAdapter {
   compile(input: object): SolcOutput {
     const inputJSON = JSON.stringify(input);
 
-    const solcOutputString = this.solc.compileStandardWrapper(inputJSON, importCallback);
+    const solcOutputString = semver.satisfies(this.solc.version(), '^0.6')
+      ? this.solc.compile(inputJSON, { import: importCallback })
+      : this.solc.compileStandardWrapper(inputJSON, importCallback);
+
     const solcOutput = JSON.parse(solcOutputString);
 
     if (semver.satisfies(this.solc.version(), '^0.4')) {

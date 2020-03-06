@@ -1,20 +1,34 @@
-import test from 'ava';
+import test, { ExecutionContext } from 'ava';
 
 import { SolcAdapter, outputSelection } from './compile';
 
-test('smoke test', async t => {
-  const adapter = await SolcAdapter.require('solc');
+function smokeTest<T>(t: ExecutionContext<T>, adapter: SolcAdapter, version: string) {
   const output = adapter.compile({
     language: 'Solidity',
     sources: {
       test: {
-        content: 'pragma solidity ^0.5; contract Foo { }',
+        content: `pragma solidity ^${version}; contract Foo { }`,
       },
     },
     settings: {
-      outputSelection
+      outputSelection,
     },
   });
-  t.is(typeof output, 'object');
-  t.is(output.errors, undefined);
+  t.is('object', typeof output);
+  t.is(undefined, output.errors);
+}
+
+test('smoke test 0.6', async t => {
+  const adapter = await SolcAdapter.require('solc');
+  smokeTest(t, adapter, '0.6');
+});
+
+test('smoke test 0.5', async t => {
+  const adapter = await SolcAdapter.require('solc-0-5');
+  smokeTest(t, adapter, '0.5');
+});
+
+test('smoke test 0.4', async t => {
+  const adapter = await SolcAdapter.require('solc-0-4');
+  smokeTest(t, adapter, '0.4');
 });

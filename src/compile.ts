@@ -83,6 +83,24 @@ export class SolcAdapter {
       };
     }
 
+    if (semver.satisfies(this.solc.version(), '^0.6')) {
+      const adaptDocumentation = (node: any) => {
+        if (node.documentation?.text) {
+          node.documentation = node.documentation.text;
+        }
+      };
+      for (const source of Object.values(solcOutput.sources) as any[]) {
+        for (const fileNode of source.ast.nodes) {
+          adaptDocumentation(fileNode);
+          if (fileNode.nodeType === 'ContractDefinition') {
+            for (const contractNode of fileNode.nodes) {
+              adaptDocumentation(contractNode);
+            }
+          }
+        }
+      }
+    }
+
     return solcOutput;
   }
 }

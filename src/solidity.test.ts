@@ -161,6 +161,9 @@ test('using real compiler output (0.6)', async t => {
     pragma solidity ^0.6;
     contract Foo {
       uint public x;
+      /**
+       * @dev docs
+       */
       function fun(uint a) public pure returns (uint r) { return a; }
       event Ev(uint a);
       modifier mod(uint a) { _; }
@@ -200,6 +203,7 @@ test('using real compiler output (0.6)', async t => {
   t.is('public', fun.visibility);
   t.deepEqual(['uint256 a'], Array.from(fun.args, a => a.toString()));
   t.deepEqual(['uint256 r'], Array.from(fun.outputs, a => a.toString()));
+  t.is('docs', fun.natspec.devdoc);
 
   const mod = foo.functions[0];
   t.deepEqual(['uint256 a'], Array.from(mod.args, a => a.toString()));

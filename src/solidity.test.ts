@@ -1,9 +1,10 @@
-import test from 'ava';
+import test, { ExecutionContext } from 'ava';
 
-import { SolcOutputBuilder } from './solc';
+import { SolcOutputBuilder, Output as SolcOutput } from './solc';
 import { SoliditySource } from './solidity';
+import { SolcAdapter, outputSelection } from './compile';
 
-function buildSource(solcOutput: SolcOutputBuilder): SoliditySource {
+function buildSource(solcOutput: SolcOutput): SoliditySource {
   return new SoliditySource('', solcOutput, c => c.name);
 }
 
@@ -153,4 +154,53 @@ test('an inherited state variable', t => {
   const variable = foo.variables[1];
   t.is(variable.name, 'x');
   t.is(variable.type, 'uint256');
+});
+
+test('using real compiler output (0.6)', async t => {
+  const sourceText = `
+    pragma solidity ^0.6;
+    contract Foo {
+      uint public x;
+      function fun(uint a) public pure returns (uint r) { return a; }
+      event Ev(uint a);
+      modifier mod(uint a) { _; }
+      receive() external payable {}
+    }
+  `;
+
+  const adapter = await SolcAdapter.require('solc');
+  const solcOutput = adapter.compile({
+    language: 'Solidity',
+    sources: {
+      test: {
+        content: sourceText,
+      },
+    },
+    settings: {
+      outputSelection,
+    },
+  });
+
+  t.is('object', typeof solcOutput);
+  t.is(undefined, solcOutput.errors);
+
+  const getName = (x: { name: string }) => x.name;
+
+  const source = buildSource(solcOutput);
+  t.deepEqual(['Foo'], source.contracts.map(getName));
+
+  const foo = source.contracts[0];
+
+  t.deepEqual(['x'],    foo.variables.map(getName));
+  t.deepEqual(['fun', 'receive'],  foo.functions.map(getName));
+  t.deepEqual(['mod'],  foo.modifiers.map(getName));
+  t.deepEqual(['Ev'],   foo.events.map(getName));
+
+  const fun = foo.functions[0];
+  t.is('public', fun.visibility);
+  t.deepEqual(['uint256 a'], Array.from(fun.args, a => a.toString()));
+  t.deepEqual(['uint256 r'], Array.from(fun.outputs, a => a.toString()));
+
+  const mod = foo.functions[0];
+  t.deepEqual(['uint256 a'], Array.from(mod.args, a => a.toString()));
 });

@@ -2,7 +2,7 @@ import test from 'ava';
 import path from 'path';
 
 import { Sitemap } from './sitemap';
-import { SoliditySource } from './solidity';
+import { Source } from './solidity';
 import { SolcOutputBuilder } from './solc';
 import { Filter } from './filter';
 
@@ -104,8 +104,8 @@ test('links', t => {
   t.is(foo.relativePath, 'sub2.md');
 });
 
-function buildSoliditySource(builder?: (b: SolcOutputBuilder) => void): SoliditySource {
+function buildSoliditySource(builder?: (b: SolcOutputBuilder) => void): Source {
   const solcOutput = new SolcOutputBuilder();
   if (builder) builder(solcOutput);
-  return new SoliditySource('', solcOutput, c => c.name);
+  return new Source('', solcOutput, c => c.name);
 }

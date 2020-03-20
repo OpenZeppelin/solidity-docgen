@@ -3,7 +3,7 @@ import minimatch from 'minimatch';
 import { maxBy } from 'lodash';
 
 import { VFile } from './vfile';
-import { SoliditySource, SolidityContract, Linkable } from './solidity';
+import { Source, SourceContract, Linkable } from './solidity';
 import { Page, ReadmePage, DefaultPage, ContractPage } from './page';
 import { Filter } from './filter';
 import { memoize } from './memoize';
@@ -16,7 +16,7 @@ export interface Link {
 
 export abstract class Sitemap {
   static generate(
-    source: SoliditySource,
+    source: Source,
     filter: Filter,
     readmes: VFile[],
     ext: string,
@@ -32,13 +32,13 @@ export abstract class Sitemap {
     }
   }
 
-  protected abstract source: SoliditySource;
+  protected abstract source: Source;
   protected abstract filter: Filter;
 
   abstract pages: Page[];
 
   @memoize
-  get contracts(): SolidityContract[] {
+  get contracts(): SourceContract[] {
     return this.source.contracts.filter(c => this.filter.matcher(c.file.path));
   }
 
@@ -61,7 +61,7 @@ export abstract class Sitemap {
 
 class DefaultSitemap extends Sitemap {
   constructor(
-    protected readonly source: SoliditySource,
+    protected readonly source: Source,
     protected readonly filter: Filter,
     private readonly ext: string,
   ) {
@@ -75,7 +75,7 @@ class DefaultSitemap extends Sitemap {
 
 class ReadmeSitemap extends Sitemap {
   constructor(
-    protected readonly source: SoliditySource,
+    protected readonly source: Source,
     protected readonly filter: Filter,
     private readonly readmes: VFile[],
   ) {
@@ -89,7 +89,7 @@ class ReadmeSitemap extends Sitemap {
     );
   }
 
-  private locate(contract: SolidityContract): string | undefined {
+  private locate(contract: SourceContract): string | undefined {
     const matches = this.locations.filter(l =>
       isContainedIn(l, contract.file.path));
     return maxBy(matches, l => l.length);
@@ -102,7 +102,7 @@ class ReadmeSitemap extends Sitemap {
 
 class ContractSitemap extends Sitemap {
   constructor(
-    protected readonly source: SoliditySource,
+    protected readonly source: Source,
     protected readonly filter: Filter,
     private readonly ext: string,
   ) {

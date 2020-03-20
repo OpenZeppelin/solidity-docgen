@@ -4,14 +4,14 @@ import { defaults, keyBy } from 'lodash';
 
 import { VFile } from './vfile';
 import { Sitemap, Link } from './sitemap';
-import { SolidityContract } from './solidity';
+import { SourceContract } from './solidity';
 
 type Template<T> = (data: T) => string;
 type PreludeTemplate = Template<{ links: Link[] }>;
 
 export abstract class Page {
   abstract path: string;
-  abstract contracts: SolidityContract[];
+  abstract contracts: SourceContract[];
   abstract contents: string;
 
   constructor(private readonly sitemap: Sitemap) { }
@@ -27,7 +27,7 @@ export class DefaultPage extends Page {
   constructor(
     sitemap: Sitemap,
     private readonly ext: string,
-    readonly contracts: SolidityContract[],
+    readonly contracts: SourceContract[],
   ) {
     super(sitemap);
   }
@@ -48,7 +48,7 @@ export class ReadmePage extends Page {
   constructor(
     sitemap: Sitemap,
     private readonly readme: VFile,
-    readonly contracts: SolidityContract[],
+    readonly contracts: SourceContract[],
   ) {
     super(sitemap);
     defaults(this, keyBy(this.contracts, c => c.name));
@@ -79,7 +79,7 @@ export class ReadmePage extends Page {
 export class ContractPage extends Page {
   constructor(
     sitemap: Sitemap,
-    private readonly contract: SolidityContract,
+    private readonly contract: SourceContract,
     private readonly ext: string,
   ) {
     super(sitemap);
@@ -89,7 +89,7 @@ export class ContractPage extends Page {
     return this.contract.toString();
   }
 
-  get contracts(): SolidityContract[] {
+  get contracts(): SourceContract[] {
     return [this.contract];
   }
 

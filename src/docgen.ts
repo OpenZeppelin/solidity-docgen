@@ -5,7 +5,7 @@ import globby from 'globby';
 import * as handlebars from './handlebars';
 import { VFile } from './vfile';
 import { compile } from './compile';
-import { SoliditySource, SolidityContract } from './solidity';
+import { Source, SourceContract } from './solidity';
 import { Sitemap, Link } from './sitemap';
 import { Filter } from './filter';
 
@@ -21,7 +21,7 @@ interface Options {
 }
 
 interface Templates {
-  contract: handlebars.Template<SolidityContract>;
+  contract: handlebars.Template<SourceContract>;
   prelude: handlebars.Template<{ links: Link[] }>;
 }
 
@@ -32,7 +32,7 @@ export async function docgen(options: Options) {
   const templates = await getTemplates(options.templates);
   const readmes = await getReadmes(filter);
 
-  const source = new SoliditySource(options.input, solcOutput, templates.contract);
+  const source = new Source(options.input, solcOutput, templates.contract);
   const sitemap = Sitemap.generate(source, filter, readmes, options.extension, options['contract-pages']);
 
   for (const page of sitemap.pages) {

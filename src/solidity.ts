@@ -2,37 +2,37 @@ import { flatten, uniqBy, groupBy } from 'lodash';
 import path from 'path';
 import { memoize } from './memoize';
 
-type ContractTemplate = (contract: SolidityContract) => string;
+type ContractTemplate = (contract: SourceContract) => string;
 
 import { slug } from './handlebars';
 import * as solc from './solc';
 
-export class SoliditySource {
+export class Source {
   constructor(
     private readonly contractsDir: string,
     private readonly solcOutput: solc.Output,
     readonly contractTemplate: ContractTemplate,
   ) { }
 
-  get contracts(): SolidityContract[] {
+  get contracts(): SourceContract[] {
     return flatten(this.files.map(file => file.contracts));
   }
 
-  get files(): SolidityFile[] {
+  get files(): SourceFile[] {
     return Object.keys(this.solcOutput.sources)
       .map(fileName => this.file(fileName));
   }
 
   @memoize
-  file(fileName: string): SolidityFile {
-    return new SolidityFile(
+  file(fileName: string): SourceFile {
+    return new SourceFile(
       this,
       this.solcOutput.sources[fileName].ast,
       path.relative(this.contractsDir, fileName),
     );
   }
 
-  contractById(id: number): SolidityContract {
+  contractById(id: number): SourceContract {
     const contract = this.contracts.find(c => c.astId === id);
 
     if (contract === undefined) {
@@ -43,21 +43,21 @@ export class SoliditySource {
   }
 }
 
-class SolidityFile {
+class SourceFile {
   constructor(
-    private readonly source: SoliditySource,
+    private readonly source: Source,
     private readonly ast: solc.ast.SourceUnit,
     readonly path: string,
   ) { }
 
   @memoize
-  get contracts(): SolidityContract[] {
+  get contracts(): SourceContract[] {
     const astNodes = this.ast.nodes.filter(n =>
       n.nodeType === 'ContractDefinition'
     );
 
     return astNodes.map(node => 
-      new SolidityContract(this.source, this, node)
+      new SourceContract(this.source, this, node)
     );
   }
 }
@@ -68,10 +68,10 @@ export interface Linkable {
   fullName: string;
 }
 
-export class SolidityContract implements Linkable {
+export class SourceContract implements Linkable {
   constructor(
-    private readonly source: SoliditySource,
-    readonly file: SolidityFile,
+    private readonly source: Source,
+    readonly file: SourceFile,
     private readonly astNode: solc.ast.ContractDefinition,
   ) { }
 
@@ -95,25 +95,25 @@ export class SolidityContract implements Linkable {
     return [this, ...this.ownModifiers, ...this.ownVariables, ...this.ownFunctions, ...this.ownEvents];
   }
 
-  get inheritance(): SolidityContract[] {
+  get inheritance(): SourceContract[] {
     return this.astNode.linearizedBaseContracts.map(id =>
       this.source.contractById(id)
     );
   }
 
-  get variables(): SolidityStateVariable[] {
+  get variables(): SourceStateVariable[] {
     return flatten(this.inheritance.map(c => c.ownVariables));
   }
 
   @memoize
-  get ownVariables(): SolidityStateVariable[] {
+  get ownVariables(): SourceStateVariable[] {
     return this.astNode.nodes
       .filter(isVariableDeclaration)
       .filter(n => n.visibility !== 'private')
-      .map(n => new SolidityStateVariable(this, n));
+      .map(n => new SourceStateVariable(this, n));
   }
 
-  get functions(): SolidityFunction[] {
+  get functions(): SourceFunction[] {
     return uniqBy(
       flatten(this.inheritance.map(c => c.ownFunctions)),
       f => f.name === 'constructor' ? 'constructor' : f.signature,
@@ -121,11 +121,11 @@ export class SolidityContract implements Linkable {
   }
 
   @memoize
-  get ownFunctions(): SolidityFunction[] {
+  get ownFunctions(): SourceFunction[] {
     return this.astNode.nodes
       .filter(isFunctionDefinition)
       .filter(n => n.visibility !== 'private')
-      .map(n => new SolidityFunction(this, n))
+      .map(n => new SourceFunction(this, n))
       .filter(f => !f.isTrivialConstructor);
   }
 
@@ -144,7 +144,7 @@ export class SolidityContract implements Linkable {
     }));
   }
 
-  get events(): SolidityEvent[] {
+  get events(): SourceEvent[] {
     return uniqBy(
       flatten(this.inheritance.map(c => c.ownEvents)),
       f => f.signature,
@@ -152,13 +152,13 @@ export class SolidityContract implements Linkable {
   }
 
   @memoize
-  get ownEvents(): SolidityEvent[] {
+  get ownEvents(): SourceEvent[] {
     return this.astNode.nodes
       .filter(isEventDefinition)
-      .map(n => new SolidityEvent(this, n));
+      .map(n => new SourceEvent(this, n));
   }
 
-  get modifiers(): SolidityModifier[] {
+  get modifiers(): SourceModifier[] {
     return uniqBy(
       flatten(this.inheritance.map(c => c.ownModifiers)),
       f => f.signature,
@@ -166,10 +166,10 @@ export class SolidityContract implements Linkable {
   }
 
   @memoize
-  get ownModifiers(): SolidityModifier[] {
+  get ownModifiers(): SourceModifier[] {
     return this.astNode.nodes
       .filter(isModifierDefinition)
-      .map(n => new SolidityModifier(this, n));
+      .map(n => new SourceModifier(this, n));
   }
 
   get natspec(): NatSpec {
@@ -185,9 +185,9 @@ export class SolidityContract implements Linkable {
   }
 }
 
-abstract class SolidityContractItem implements Linkable {
+abstract class SourceContractItem implements Linkable {
   constructor(
-    readonly contract: SolidityContract,
+    readonly contract: SourceContract,
   ) { }
 
   protected abstract astNode: Exclude<solc.ast.ContractItem, solc.ast.VariableDeclaration>;
@@ -205,8 +205,8 @@ abstract class SolidityContractItem implements Linkable {
   }
 
   @memoize
-  get args(): SolidityTypedVariable[] {
-    return SolidityTypedVariableArray.fromParameterList(
+  get args(): SourceTypedVariable[] {
+    return SourceTypedVariableArray.fromParameterList(
       this.astNode.parameters,
     );
   }
@@ -224,9 +224,9 @@ abstract class SolidityContractItem implements Linkable {
   }
 }
 
-class SolidityStateVariable implements Linkable {
+class SourceStateVariable implements Linkable {
   constructor(
-    readonly contract: SolidityContract,
+    readonly contract: SourceContract,
     protected readonly astNode: solc.ast.VariableDeclaration,
   ) { }
 
@@ -256,9 +256,9 @@ class SolidityStateVariable implements Linkable {
   }
 }
 
-class SolidityFunction extends SolidityContractItem {
+class SourceFunction extends SourceContractItem {
   constructor(
-    contract: SolidityContract,
+    contract: SourceContract,
     protected readonly astNode: solc.ast.FunctionDefinition,
   ) {
     super(contract);
@@ -271,8 +271,8 @@ class SolidityFunction extends SolidityContractItem {
   }
 
   @memoize
-  get outputs(): SolidityTypedVariable[] {
-    return SolidityTypedVariableArray.fromParameterList(
+  get outputs(): SourceTypedVariable[] {
+    return SourceTypedVariableArray.fromParameterList(
       this.astNode.returnParameters
     );
   }
@@ -291,25 +291,25 @@ class SolidityFunction extends SolidityContractItem {
   }
 }
 
-class SolidityEvent extends SolidityContractItem {
+class SourceEvent extends SourceContractItem {
   constructor(
-    contract: SolidityContract,
+    contract: SourceContract,
     protected readonly astNode: solc.ast.EventDefinition,
   ) {
     super(contract);
   }
 }
 
-class SolidityModifier extends SolidityContractItem {
+class SourceModifier extends SourceContractItem {
   constructor(
-    contract: SolidityContract,
+    contract: SourceContract,
     protected readonly astNode: solc.ast.ModifierDefinition,
   ) {
     super(contract);
   }
 }
 
-class SolidityTypedVariable {
+class SourceTypedVariable {
   constructor(
     private readonly typeNode: solc.ast.TypeName,
     readonly name?: string,
@@ -334,11 +334,11 @@ class SolidityTypedVariable {
 }
 
 interface InheritedItems {
-  contract: SolidityContract;
-  variables: SolidityStateVariable[];
-  functions: SolidityFunction[];
-  events: SolidityEvent[];
-  modifiers: SolidityModifier[];
+  contract: SourceContract;
+  variables: SourceStateVariable[];
+  functions: SourceFunction[];
+  events: SourceEvent[];
+  modifiers: SourceModifier[];
 }
 
 class PrettyArray<T extends ToString> extends Array<T> {
@@ -347,11 +347,11 @@ class PrettyArray<T extends ToString> extends Array<T> {
   }
 }
 
-class SolidityTypedVariableArray extends PrettyArray<SolidityTypedVariable> {
-  static fromParameterList(parameters: solc.ast.ParameterList): SolidityTypedVariable[] {
-    return SolidityTypedVariableArray.from(
+class SourceTypedVariableArray extends PrettyArray<SourceTypedVariable> {
+  static fromParameterList(parameters: solc.ast.ParameterList): SourceTypedVariable[] {
+    return SourceTypedVariableArray.from(
       parameters.parameters.map(p =>
-        new SolidityTypedVariable(
+        new SourceTypedVariable(
           p.typeName,
           p.name || undefined,
         )

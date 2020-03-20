@@ -1,11 +1,11 @@
 import test, { ExecutionContext } from 'ava';
 
 import { SolcOutputBuilder, Output as SolcOutput } from './solc';
-import { SoliditySource } from './solidity';
+import { Source } from './solidity';
 import { SolcAdapter, outputSelection } from './compile';
 
-function buildSource(solcOutput: SolcOutput): SoliditySource {
-  return new SoliditySource('', solcOutput, c => c.name);
+function buildSource(solcOutput: SolcOutput): Source {
+  return new Source('', solcOutput, c => c.name);
 }
 
 test('no files', t => {

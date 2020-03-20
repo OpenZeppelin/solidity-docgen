@@ -1,6 +1,6 @@
 import test, { ExecutionContext } from 'ava';
 
-import { SolcAdapter, outputSelection } from './compile';
+import { SolcAdapter, outputSelection } from './solc';
 
 function smokeTest<T>(t: ExecutionContext<T>, adapter: SolcAdapter, version: string) {
   const output = adapter.compile({

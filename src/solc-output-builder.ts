@@ -1,7 +1,7 @@
-import { Output, ast } from './solc';
+import { SolcOutput, ast } from './solc';
 
 // fake solc output builder for tests
-export class SolcOutputBuilder implements Output {
+export class SolcOutputBuilder implements SolcOutput {
   sources: { [file: string]: { ast: ast.SourceUnit } };
 
   errors: [] = [];

@@ -1,9 +1,9 @@
 import test, { ExecutionContext } from 'ava';
 
 import { SolcOutputBuilder } from './solc-output-builder';
-import { Output as SolcOutput } from './solc';
+import { SolcOutput } from './solc';
 import { Source } from './source';
-import { SolcAdapter, outputSelection } from './compile';
+import { SolcAdapter, outputSelection } from './solc';
 
 function buildSource(solcOutput: SolcOutput): Source {
   return new Source('', solcOutput, c => c.name);

@@ -5,12 +5,12 @@ import { memoize } from './memoize';
 type ContractTemplate = (contract: SourceContract) => string;
 
 import { slug } from './handlebars';
-import * as solc from './solc';
+import { SolcOutput, ast } from './solc';
 
 export class Source {
   constructor(
     private readonly contractsDir: string,
-    private readonly solcOutput: solc.Output,
+    private readonly solcOutput: SolcOutput,
     readonly contractTemplate: ContractTemplate,
   ) { }
 
@@ -46,7 +46,7 @@ export class Source {
 class SourceFile {
   constructor(
     private readonly source: Source,
-    private readonly ast: solc.ast.SourceUnit,
+    private readonly ast: ast.SourceUnit,
     readonly path: string,
   ) { }
 
@@ -72,7 +72,7 @@ export class SourceContract implements Linkable {
   constructor(
     private readonly source: Source,
     readonly file: SourceFile,
-    private readonly astNode: solc.ast.ContractDefinition,
+    private readonly astNode: ast.ContractDefinition,
   ) { }
 
   toString(): string {
@@ -190,7 +190,7 @@ abstract class SourceContractItem implements Linkable {
     readonly contract: SourceContract,
   ) { }
 
-  protected abstract astNode: Exclude<solc.ast.ContractItem, solc.ast.VariableDeclaration>;
+  protected abstract astNode: Exclude<ast.ContractItem, ast.VariableDeclaration>;
 
   get name(): string {
     return this.astNode.name;
@@ -227,7 +227,7 @@ abstract class SourceContractItem implements Linkable {
 class SourceStateVariable implements Linkable {
   constructor(
     readonly contract: SourceContract,
-    protected readonly astNode: solc.ast.VariableDeclaration,
+    protected readonly astNode: ast.VariableDeclaration,
   ) { }
 
   get name(): string {
@@ -259,7 +259,7 @@ class SourceStateVariable implements Linkable {
 class SourceFunction extends SourceContractItem {
   constructor(
     contract: SourceContract,
-    protected readonly astNode: solc.ast.FunctionDefinition,
+    protected readonly astNode: ast.FunctionDefinition,
   ) {
     super(contract);
   }
@@ -294,7 +294,7 @@ class SourceFunction extends SourceContractItem {
 class SourceEvent extends SourceContractItem {
   constructor(
     contract: SourceContract,
-    protected readonly astNode: solc.ast.EventDefinition,
+    protected readonly astNode: ast.EventDefinition,
   ) {
     super(contract);
   }
@@ -303,7 +303,7 @@ class SourceEvent extends SourceContractItem {
 class SourceModifier extends SourceContractItem {
   constructor(
     contract: SourceContract,
-    protected readonly astNode: solc.ast.ModifierDefinition,
+    protected readonly astNode: ast.ModifierDefinition,
   ) {
     super(contract);
   }
@@ -311,7 +311,7 @@ class SourceModifier extends SourceContractItem {
 
 class SourceTypedVariable {
   constructor(
-    private readonly typeNode: solc.ast.TypeName,
+    private readonly typeNode: ast.TypeName,
     readonly name?: string,
   ) { }
 
@@ -348,7 +348,7 @@ class PrettyArray<T extends ToString> extends Array<T> {
 }
 
 class SourceTypedVariableArray extends PrettyArray<SourceTypedVariable> {
-  static fromParameterList(parameters: solc.ast.ParameterList): SourceTypedVariable[] {
+  static fromParameterList(parameters: ast.ParameterList): SourceTypedVariable[] {
     return SourceTypedVariableArray.from(
       parameters.parameters.map(p =>
         new SourceTypedVariable(
@@ -459,19 +459,19 @@ interface ToString {
   toString(): string;
 }
 
-function isVariableDeclaration(node: solc.ast.ContractItem): node is solc.ast.VariableDeclaration {
+function isVariableDeclaration(node: ast.ContractItem): node is ast.VariableDeclaration {
   return node.nodeType === 'VariableDeclaration';
 }
 
-function isFunctionDefinition(node: solc.ast.ContractItem): node is solc.ast.FunctionDefinition {
+function isFunctionDefinition(node: ast.ContractItem): node is ast.FunctionDefinition {
   return node.nodeType === 'FunctionDefinition';
 }
 
-function isEventDefinition(node: solc.ast.ContractItem): node is solc.ast.EventDefinition {
+function isEventDefinition(node: ast.ContractItem): node is ast.EventDefinition {
   return node.nodeType === 'EventDefinition';
 }
 
-function isModifierDefinition(node: solc.ast.ContractItem): node is solc.ast.ModifierDefinition {
+function isModifierDefinition(node: ast.ContractItem): node is ast.ModifierDefinition {
   return node.nodeType === 'ModifierDefinition';
 }
 

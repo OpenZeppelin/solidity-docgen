@@ -184,8 +184,9 @@ type SolidityImport = { contents: string } | { error: string };
 
 function importCallback(path: string): SolidityImport {
   try {
+    const resolved = require.resolve(path, { paths: ['.'] });
     return {
-      contents: fs.readFileSync(path, 'utf8'),
+      contents: fs.readFileSync(resolved, 'utf8'),
     };
   } catch (e) {
     return {

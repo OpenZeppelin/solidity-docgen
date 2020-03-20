@@ -4,7 +4,7 @@ import { defaults, keyBy } from 'lodash';
 
 import { VFile } from './vfile';
 import { Sitemap, Link } from './sitemap';
-import { SourceContract } from './solidity';
+import { SourceContract } from './source';
 
 type Template<T> = (data: T) => string;
 type PreludeTemplate = Template<{ links: Link[] }>;

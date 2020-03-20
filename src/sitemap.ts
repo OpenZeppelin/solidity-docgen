@@ -3,7 +3,7 @@ import minimatch from 'minimatch';
 import { maxBy } from 'lodash';
 
 import { VFile } from './vfile';
-import { Source, SourceContract, Linkable } from './solidity';
+import { Source, SourceContract, Linkable } from './source';
 import { Page, ReadmePage, DefaultPage, ContractPage } from './page';
 import { Filter } from './filter';
 import { memoize } from './memoize';

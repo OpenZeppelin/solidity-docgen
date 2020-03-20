@@ -2,7 +2,7 @@ import test from 'ava';
 import path from 'path';
 
 import { Sitemap } from './sitemap';
-import { Source } from './solidity';
+import { Source } from './source';
 import { SolcOutputBuilder } from './solc';
 import { Filter } from './filter';
 

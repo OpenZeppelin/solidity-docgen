@@ -5,7 +5,7 @@ import globby from 'globby';
 import * as handlebars from './handlebars';
 import { VFile } from './vfile';
 import { compile } from './compile';
-import { Source, SourceContract } from './solidity';
+import { Source, SourceContract } from './source';
 import { Sitemap, Link } from './sitemap';
 import { Filter } from './filter';
 

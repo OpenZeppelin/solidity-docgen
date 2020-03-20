@@ -1,7 +1,7 @@
 import test, { ExecutionContext } from 'ava';
 
 import { SolcOutputBuilder, Output as SolcOutput } from './solc';
-import { Source } from './solidity';
+import { Source } from './source';
 import { SolcAdapter, outputSelection } from './compile';
 
 function buildSource(solcOutput: SolcOutput): Source {

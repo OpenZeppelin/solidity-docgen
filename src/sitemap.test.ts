@@ -3,7 +3,7 @@ import path from 'path';
 
 import { Sitemap } from './sitemap';
 import { Source } from './source';
-import { SolcOutputBuilder } from './solc';
+import { SolcOutputBuilder } from './solc-output-builder';
 import { Filter } from './filter';
 
 const emptyReadme = (dir: string = '') => ({

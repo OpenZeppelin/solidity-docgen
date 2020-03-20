@@ -1,6 +1,7 @@
 import test, { ExecutionContext } from 'ava';
 
-import { SolcOutputBuilder, Output as SolcOutput } from './solc';
+import { SolcOutputBuilder } from './solc-output-builder';
+import { Output as SolcOutput } from './solc';
 import { Source } from './source';
 import { SolcAdapter, outputSelection } from './compile';
 

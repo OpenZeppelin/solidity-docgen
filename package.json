@@ -28,7 +28,7 @@
     "fs-extra": "^8.1.0",
     "globby": "^11.0.0",
     "handlebars": "^4.7.3",
-    "json5": "^2.1.0",
+    "json5": "^2.1.2",
     "lodash": "^4.17.15",
     "micromatch": "^4.0.2",
     "minimatch": "^3.0.4",

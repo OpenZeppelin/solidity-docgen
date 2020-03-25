@@ -25,7 +25,7 @@
     "@oclif/config": "^1.14.0",
     "@oclif/errors": "^1.2.2",
     "@oclif/plugin-help": "^2.2.3",
-    "fs-extra": "^8.1.0",
+    "fs-extra": "^9.0.0",
     "globby": "^11.0.0",
     "handlebars": "^4.7.3",
     "json5": "^2.1.2",

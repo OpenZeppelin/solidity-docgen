@@ -6,7 +6,7 @@ import * as handlebars from './handlebars';
 import { VFile } from './vfile';
 import { compile } from './solc';
 import { Source, SourceContract } from './source';
-import { Sitemap, Link } from './sitemap';
+import { Sitemap, SitemapKind, Link } from './sitemap';
 import { Filter } from './filter';
 
 interface Options {
@@ -17,7 +17,7 @@ interface Options {
   extension: string;
   'solc-module'?: string;
   'solc-settings'?: object;
-  'contract-pages': boolean;
+  'output-structure': SitemapKind;
 }
 
 interface Templates {
@@ -33,7 +33,7 @@ export async function docgen(options: Options) {
   const readmes = await getReadmes(filter);
 
   const source = new Source(options.input, solcOutput, templates.contract);
-  const sitemap = Sitemap.generate(source, filter, readmes, options.extension, options['contract-pages']);
+  const sitemap = Sitemap.generate(source, filter, readmes, options.extension, options['output-structure']);
 
   for (const page of sitemap.pages) {
     const dest = path.join(options.output, page.path);

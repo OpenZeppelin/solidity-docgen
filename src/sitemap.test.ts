@@ -18,7 +18,7 @@ const dummyFilter = {
 
 test('single readme', t => {
   const source = buildSoliditySource();
-  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme()], 'md', false);
+  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme()], 'md', 'readmes');
 
   t.is(sitemap.pages.length, 1);
 });
@@ -28,7 +28,7 @@ test('single readme no contracts', t => {
     .file('Foo.sol')
   );
 
-  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme()], 'md', false);
+  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme()], 'md', 'readmes');
   const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 0);
@@ -41,7 +41,7 @@ test('single readme multiple contracts', t => {
       .contract('Bar')
   );
 
-  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme()], 'md', false);
+  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme()], 'md', 'readmes');
   const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 2);
@@ -57,7 +57,7 @@ test('filter subdirectory', t => {
       .contract('Bar')
   );
 
-  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme('sub')], 'md', false);
+  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme('sub')], 'md', 'readmes');
   const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 1);
@@ -72,7 +72,7 @@ test('filter nested subdirectories', t => {
       .contract('Foo')
   );
 
-  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme('sub')], 'md', false);
+  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme('sub')], 'md', 'readmes');
   const { pages: [page] } = sitemap;
 
   t.is(page.contracts.length, 2);
@@ -88,7 +88,7 @@ test('links', t => {
       .contract('Foo')
   );
 
-  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme('sub1'), emptyReadme('sub2')], 'md', false);
+  const sitemap = Sitemap.generate(source, dummyFilter, [emptyReadme('sub1'), emptyReadme('sub2')], 'md', 'readmes');
   const links = sitemap.links(sitemap.pages[0]);
 
   t.is(links.length, 2);

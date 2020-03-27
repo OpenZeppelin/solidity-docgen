@@ -5,6 +5,7 @@ import path from 'path';
 import JSON5 from 'json5';
 
 import { docgen } from './docgen';
+import { SitemapKind, sitemapKinds } from './sitemap';
 
 class Docgen extends Command {
   static flags = {
@@ -59,9 +60,11 @@ class Docgen extends Command {
       description: 'compiler settings for solc module',
     }),
 
-    'contract-pages': flags.boolean({
-      default: false,
-      description: 'enable one page per contract',
+    'output-structure': flags.enum<SitemapKind>({
+      char: 's',
+      options: Array.from(sitemapKinds),
+      default: 'contracts',
+      description: 'how to structure contracts across output files',
     }),
   }
 

@@ -8,6 +8,9 @@ import { Page, ReadmePage, DefaultPage, ContractPage } from './page';
 import { Filter } from './filter';
 import { memoize } from './memoize';
 
+export const sitemapKinds = ['contracts', 'readmes', 'single'] as const;
+export type SitemapKind = typeof sitemapKinds[number];
+
 export interface Link {
   target: Linkable;
   path: string;
@@ -20,15 +23,16 @@ export abstract class Sitemap {
     filter: Filter,
     readmes: VFile[],
     ext: string,
-    contractPages: boolean,
+    kind: SitemapKind,
   ): Sitemap {
 
-    if (contractPages) {
-      return new ContractSitemap(source, filter, ext);
-    } else if (readmes.length > 0) {
-      return new ReadmeSitemap(source, filter, readmes)
-    } else {
-      return new DefaultSitemap(source, filter, ext);
+    switch (kind) {
+      case 'contracts':
+        return new ContractSitemap(source, filter, ext);
+      case 'readmes':
+        return new ReadmeSitemap(source, filter, readmes)
+      case 'single':
+        return new DefaultSitemap(source, filter, ext);
     }
   }
 

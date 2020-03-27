@@ -53,7 +53,7 @@ async function getReadmes(filter: Filter): Promise<VFile[]> {
 
 async function getTemplates(directory?: string): Promise<Templates> {
   if (directory === undefined) {
-    directory = path.join(__dirname, '..');
+    directory = path.join(__dirname, '../templates');
   }
   const contract = await readTemplate(path.join(directory, 'contract.hbs'));
   const prelude = await readTemplate(path.join(directory, 'prelude.hbs'), true);

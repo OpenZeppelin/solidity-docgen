@@ -1,12 +1,11 @@
 # `solidity-docgen`
 
-**Documentation generator for smart contract libraries.**
+**Documentation generator for smart contract libraries.** Use the inline
+documentation in your Solidity code for generating websites or any sort of
+document.
 
-`solidity-docgen` allows you to document your code inline using [NatSpec]
-comments (a format similar to Javadoc and JSDoc) and then produce a website
-to publish the documentation.
-
-Built with :heart: by OpenZeppelin.
+The output is completely customizable through Handlebars templates that provide
+easy access to all the metadata of your smart contract.
 
 ## Usage
 

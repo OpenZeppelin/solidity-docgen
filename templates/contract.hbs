@@ -4,37 +4,39 @@
 
 {{{natspec.devdoc}}}
 
-{{#modifiers}}
+{{#each modifiers}}
 - [`{{name}}({{args}})`][{{anchor}}]
-{{/modifiers}}
-{{#functions}}
+{{/each}}
+{{#each functions}}
 - [`{{name}}({{args}})`][{{anchor}}]
-{{/functions}}
-{{#events}}
+{{/each}}
+{{#each events}}
 - [`{{name}}({{args}})`][{{anchor}}]
-{{/events}}
+{{/each}}
 
-{{#ownModifiers}}
+{{#each ownModifiers}}
 ### `{{name}}({{args}})`
 
 {{{natspec.userdoc}}}
 
 {{{natspec.devdoc}}}
 
-{{/ownModifiers}}
-{{#ownFunctions}}
+{{/each}}
+
+{{#each ownFunctions}}
 ### `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}})
 
 {{{natspec.userdoc}}}
 
 {{{natspec.devdoc}}}
 
-{{/ownFunctions}}
-{{#ownEvents}}
+{{/each}}
+
+{{#each ownEvents}}
 ### `{{name}}({{args}})`
 
 {{{natspec.userdoc}}}
 
 {{{natspec.devdoc}}}
 
-{{/ownEvents}}
+{{/each}}

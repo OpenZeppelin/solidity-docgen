@@ -2,8 +2,8 @@
 
 ## 0.5.0 (unreleased)
 
-- Replace `--contract-pages` with `--output-structure [contracts|readmes|single]`.
-- Change default output structure. The new default is equivalent to the old `--contract-pages`.
+- Replaced `--contract-pages` with `--output-structure [contracts|readmes|single]`.
+- Changed default output structure. The new default is equivalent to the old `--contract-pages`.
 
 If you were using `--contract-pages`, you should remove it, since it is the new
 default. If you were using the previous defaults, you should now use
@@ -12,11 +12,11 @@ default. If you were using the previous defaults, you should now use
 
 ## 0.4.1
 
-- Support dependency imports in input contracts.
+- Implemented support for dependency imports in input contracts.
 
 ## 0.4.0
 
-- Upgrade solc to 0.6.
+- Upgraded solc to 0.6.
 
 If you would like to upgrade `solidity-docgen` but continue using the 0.5
 compiler, you can install `solc@0.5` in your project and run `solidity-docgen

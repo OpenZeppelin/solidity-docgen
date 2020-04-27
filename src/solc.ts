@@ -90,7 +90,7 @@ export const outputSelection = {
 
 export async function compile(
   filter: Filter,
-  solcModule: string = 'solc',
+  solcModule: string = require.resolve('solc'),
   solcSettings: object = {optimizer: {enabled: true, runs: 200}},
 ): Promise<SolcOutput> {
   const solc = await SolcAdapter.require(solcModule);

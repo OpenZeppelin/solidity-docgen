@@ -44,7 +44,7 @@ class Docgen extends Command {
     }),
 
     'solc-module': flags.string({
-      parse: s => path.resolve(s),
+      parse: s => require.resolve(s, { paths: ['.'] }),
       description: 'path to an alternative solc module',
     }),
 

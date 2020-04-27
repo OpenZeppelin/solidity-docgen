@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.2
+
+- Changed `--solc-module` option to use Node module resolution algorithm.
+
+This is a small breaking change. If you were using this option before, you need
+to make sure its value is now either the name of an installed Node module or a
+path beginning with `./`, `../`, or `/`.
+
 ## 0.5.1
 
 - Fixed a bug in the npm package.
@@ -18,7 +26,16 @@ default. If you were using the previous defaults, you should now use
 
 - Removed the default prelude template.
 
-The prelude is an advanced feature that most users will not care about. It can be used to create cross-references in your documentation. If you were using the default templates before and you would like to keep the prelude, you will have to copy them into your project. Take `contract.hbs` and `prelude.sample.hbs` from the [`templates`](templates) directory, rename the latter to `prelude.hbs`, and put them in a directory in your project. Then invoke `solidity-docgen` with the `-t <templates-directory>` option.
+The prelude is an advanced feature that most users will not care about. It can
+be used to create cross-references in your documentation. If you were using the
+default templates before and you would like to keep the prelude, you will have
+to copy them into your project. Take `contract.hbs` and `prelude.sample.hbs`
+from the [`templates`](templates) directory, rename the latter to
+`prelude.hbs`, and put them in a directory in your project. Then invoke
+`solidity-docgen` with the `-t <templates-directory>` option.
+
+There is one additional breaking change in 0.5.2. Please refer to the relevant
+entry above.
 
 ## 0.4.1
 

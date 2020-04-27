@@ -4,9 +4,13 @@
 
 - Changed `--solc-module` option to use Node module resolution algorithm.
 
+For example, if you've installed `solc@0.5` alongside `solidity-docgen`, you
+can now run `solidity-docgen --solc-module solc`.
+
 This is a small breaking change. If you were using this option before, you need
-to make sure its value is now either the name of an installed Node module or a
-path beginning with `./`, `../`, or `/`.
+to make sure its value is now something that Node recognizes as a module, such
+as the name of an installed Node module or a path beginning with `./`, `../`,
+or `/`.
 
 ## 0.5.1
 

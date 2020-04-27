@@ -7,7 +7,7 @@ import JSON5 from 'json5';
 import { docgen } from './docgen';
 import { SitemapKind, sitemapKinds } from './sitemap';
 
-class Docgen extends Command {
+export class Docgen extends Command {
   static flags = {
     version: flags.version(),
     help: flags.help(),
@@ -75,4 +75,6 @@ class Docgen extends Command {
   }
 }
 
-Docgen.run().then(undefined, require('@oclif/errors/handle'));
+if (require.main === module) {
+  Docgen.run().then(undefined, require('@oclif/errors/handle'));
+}

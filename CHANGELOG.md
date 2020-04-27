@@ -16,6 +16,10 @@ default. If you were using the previous defaults, you should now use
 `--output-structure single` if you want a single page with all contracts, or
 `--output-structure readmes` if you use READMEs to structure your output pages.
 
+- Removed the default prelude template.
+
+The prelude is an advanced feature that most users will not care about. It can be used to create cross-references in your documentation. If you were using the default templates before and you would like to keep the prelude, you will have to copy them into your project. Take `contract.hbs` and `prelude.sample.hbs` from the [`templates`](templates) directory, rename the latter to `prelude.hbs`, and put them in a directory in your project. Then invoke `solidity-docgen` with the `-t <templates-directory>` option.
+
 ## 0.4.1
 
 - Implemented support for dependency imports in input contracts.

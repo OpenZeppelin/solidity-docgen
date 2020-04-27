@@ -13,7 +13,7 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "coverage": "nyc --reporter=lcov npm test",
+    "coverage": "nyc npm test",
     "docs": "oz-docs -c docs",
     "docs:watch": "npm run docs watch",
     "test": "tsc && ava",
@@ -36,7 +36,6 @@
     "solc": "^0.6.6"
   },
   "devDependencies": {
-    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/fs-extra": "^8.1.0",
     "@types/json5": "0.0.30",
     "@types/lodash": "^4.14.150",

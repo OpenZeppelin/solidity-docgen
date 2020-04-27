@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.5.2
+## 0.5.2, 0.5.3
 
 - Changed `--solc-module` option to use Node module resolution algorithm.
 

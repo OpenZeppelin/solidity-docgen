@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1
+
+- Fixed a bug in the npm package.
+
 ## 0.5.0
 
 **This release contains breaking changes.**

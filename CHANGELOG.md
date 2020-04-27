@@ -1,6 +1,8 @@
 # Changelog
 
-## 0.5.0 (unreleased)
+## 0.5.0
+
+**This release contains breaking changes.**
 
 - Replaced `--contract-pages` with `--output-structure [contracts|readmes|single]`.
 - Changed default output structure. The new default is equivalent to the old `--contract-pages`.

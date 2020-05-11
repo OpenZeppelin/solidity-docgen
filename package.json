@@ -20,7 +20,7 @@
     "prepare": "npm run build"
   },
   "dependencies": {
-    "@oclif/command": "^1.6.0",
+    "@oclif/command": "^1.6.1",
     "@oclif/config": "^1.15.1",
     "@oclif/errors": "^1.2.2",
     "@oclif/plugin-help": "^2.2.3",

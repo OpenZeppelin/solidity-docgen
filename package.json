@@ -35,7 +35,7 @@
     "solc": "^0.6.7"
   },
   "devDependencies": {
-    "@types/fs-extra": "^8.1.0",
+    "@types/fs-extra": "^9.0.0",
     "@types/json5": "0.0.30",
     "@types/lodash": "^4.14.150",
     "@types/micromatch": "^4.0.1",

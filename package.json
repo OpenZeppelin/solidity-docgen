@@ -50,7 +50,7 @@
     "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils",
     "solc-0-5": "npm:solc@^0.5.14",
     "solc-0-4": "npm:solc@^0.4.24",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.2"
   },
   "keywords": [
     "solidity",

@@ -1,14 +1,18 @@
 import test from 'ava';
 import { promises as fs } from 'fs';
+import proc from 'child_process';
+import events from 'events';
 
 import { Docgen } from './cli';
 
 test('fixture 001', async t => {
-  await Docgen.run([
+  await cleanFixtureOutput('001');
+  const child = proc.fork(require.resolve('./cli'), [
     '--input', 'fixtures/001/input',
     '--output', 'fixtures/001/output',
     '--output-structure', 'single',
   ]);
+  await events.once(child, 'exit');
   const output = await fs.readFile('fixtures/001/output/index.md', 'utf8');
   t.snapshot(output);
 });

@@ -1,5 +1,5 @@
 import { fromPairs, pick } from 'lodash';
-import fs from 'fs-extra';
+import fs from 'fs';
 import semver from 'semver';
 
 import { Filter } from './filter';
@@ -99,7 +99,7 @@ export async function compile(
 
   const sources = fromPairs(await Promise.all(files.map(async file => [
     file,
-    { content: await fs.readFile(file, 'utf8') },
+    { content: await fs.promises.readFile(file, 'utf8') },
   ])));
 
   const solcInput = {

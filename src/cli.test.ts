@@ -1,10 +1,13 @@
 import test from 'ava';
-import fs from 'fs-extra';
+import { promises as fs } from 'fs';
 
 import { Docgen } from './cli';
 
 test('fixture 001', async t => {
-  await fs.remove('fixtures/001/output');
+  for (const e of await fs.readdir('fixtures/001/output')) {
+    await fs.unlink(`fixtures/001/output/${e}`);
+  }
+  await fs.rmdir('fixtures/001/output');
   await Docgen.run([
     '--input', 'fixtures/001/input',
     '--output', 'fixtures/001/output',

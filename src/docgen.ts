@@ -1,5 +1,5 @@
 import path from 'path';
-import fs from 'fs-extra';
+import { promises as fs } from 'fs';
 import globby from 'globby';
 
 import * as handlebars from './handlebars';
@@ -37,7 +37,8 @@ export async function docgen(options: Options) {
 
   for (const page of sitemap.pages) {
     const dest = path.join(options.output, page.path);
-    await fs.outputFile(dest, page.render(templates.prelude));
+    await fs.mkdir(path.dirname(dest), { recursive: true });
+    await fs.writeFile(dest, page.render(templates.prelude));
   }
 }
 

@@ -1,14 +1,17 @@
 {
   "extends": [
     "config:base",
-    "group:allNonMajor",
     "helpers:disableTypesNodeMajor"
   ],
   "packageRules": [
     {
-      "packagePatterns": "^solc-[-0-9]+",
+      "packagePatterns": "^solc-[-0-9]+$",
       "updateTypes": ["major", "minor"],
       "enabled": false
+    },
+    {
+      "excludePackageNames": ["solc"],
+      "extends": ["group:allNonMajor"]
     }
   ]
 }

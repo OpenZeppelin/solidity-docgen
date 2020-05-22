@@ -1,4 +1,5 @@
 {
+  "masterIssue": true,
   "extends": [
     "config:base",
     "helpers:disableTypesNodeMajor",

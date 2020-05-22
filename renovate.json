@@ -2,8 +2,7 @@
   "masterIssue": true,
   "rangeStrategy": "update-lockfile",
   "extends": [
-    "config:base",
-    "helpers:disableTypesNodeMajor"
+    "config:base"
   ],
   "packageRules": [
     {

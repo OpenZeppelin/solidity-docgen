@@ -47,8 +47,8 @@
     "fgbg": "^0.1.4",
     "nyc": "^15.0.1",
     "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils",
-    "solc-0-5": "npm:solc@^0.5.14",
     "solc-0-4": "npm:solc@^0.4.24",
+    "solc-0-5": "npm:solc@^0.5.14",
     "typescript": "^3.8.3"
   },
   "keywords": [

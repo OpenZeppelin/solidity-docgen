@@ -1,9 +1,9 @@
 {
   "masterIssue": true,
+  "rangeStrategy": "update-lockfile",
   "extends": [
     "config:base",
-    "helpers:disableTypesNodeMajor",
-    ":preserveSemverRanges"
+    "helpers:disableTypesNodeMajor"
   ],
   "packageRules": [
     {

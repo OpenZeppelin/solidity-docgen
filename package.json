@@ -43,7 +43,6 @@
     "@types/semver": "^7.1.0",
     "ava": "^3.8.2",
     "code-style": "github:OpenZeppelin/code-style",
-    "codecov": "^3.6.5",
     "fgbg": "^0.1.4",
     "nyc": "^15.0.1",
     "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils",

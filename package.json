@@ -13,12 +13,12 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "coverage": "nyc npm test",
+    "coverage": "nyc yarn test",
     "docs": "oz-docs -c docs",
-    "docs:watch": "npm run docs watch",
+    "docs:watch": "yarn docs watch",
     "test": "tsc && ava",
     "test:watch": "fgbg 'ava --watch' 'tsc --watch'",
-    "prepare": "npm run build"
+    "prepare": "yarn build"
   },
   "dependencies": {
     "@oclif/command": "^1.6.1",

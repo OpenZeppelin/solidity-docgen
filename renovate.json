@@ -1,5 +1,4 @@
 {
-  "masterIssue": true,
   "rangeStrategy": "update-lockfile",
   "extends": [
     "config:base"

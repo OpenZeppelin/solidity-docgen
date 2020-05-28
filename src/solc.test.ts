@@ -7,7 +7,7 @@ function smokeTest<T>(t: ExecutionContext<T>, adapter: SolcAdapter, version: str
     language: 'Solidity',
     sources: {
       test: {
-        content: `pragma solidity ^${version}; contract Foo { }`,
+        content: `// SPDX-License-Identifier: MIT\npragma solidity ^${version}; contract Foo { }`,
       },
     },
     settings: {

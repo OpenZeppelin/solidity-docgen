@@ -158,7 +158,7 @@ test('an inherited state variable', t => {
 });
 
 test('using real compiler output (0.6)', async t => {
-  const sourceText = `
+  const sourceText = `// SPDX-License-Identifier: MIT
     pragma solidity ^0.6;
     contract Foo {
       uint public x;

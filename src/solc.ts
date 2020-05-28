@@ -11,7 +11,7 @@ export interface SolcOutput {
     };
   };
   errors: {
-    severity: 'error';
+    severity: string;
     formattedMessage: string;
   }[];
 }

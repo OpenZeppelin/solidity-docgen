@@ -1,7 +1,8 @@
 {
   "rangeStrategy": "update-lockfile",
   "extends": [
-    "config:base"
+    "config:base",
+    "schedule:weekly"
   ],
   "packageRules": [
     {

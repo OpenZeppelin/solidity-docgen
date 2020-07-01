@@ -4,5 +4,5 @@ export default {
     'fixtures/*/output',
   ],
   verbose: true,
-  timeout: '20s',
+  timeout: '1m',
 };

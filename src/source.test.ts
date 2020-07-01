@@ -3,7 +3,9 @@ import test, { ExecutionContext } from 'ava';
 import { SolcOutputBuilder } from './solc-output-builder';
 import { SolcOutput } from './solc';
 import { Source } from './source';
-import { SolcAdapter, outputSelection } from './solc';
+import { outputSelection } from './solc';
+
+import { solcCompile } from './solc-fork';
 
 function buildSource(solcOutput: SolcOutput): Source {
   return new Source('', solcOutput, c => c.name);
@@ -172,8 +174,7 @@ test('using real compiler output (0.6)', async t => {
     }
   `;
 
-  const adapter = await SolcAdapter.require('solc');
-  const solcOutput = adapter.compile({
+  const solcOutput = await solcCompile('solc', {
     language: 'Solidity',
     sources: {
       test: {

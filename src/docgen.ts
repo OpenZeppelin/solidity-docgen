@@ -15,6 +15,7 @@ interface Options {
   templates?: string;
   exclude?: string[];
   extension: string;
+  helpers?: string;
   'solc-module'?: string;
   'solc-settings'?: object;
   'output-structure': SitemapKind;
@@ -29,6 +30,11 @@ export async function docgen(options: Options) {
   const filter = new Filter(options.input, options.exclude);
 
   const solcOutput = await compile(filter, options['solc-module'], options['solc-settings']);
+
+  if (options.helpers) {
+    handlebars.registerHelpers(await import(options.helpers));
+  }
+
   const templates = await getTemplates(options.templates);
   const readmes = await getReadmes(filter);
 

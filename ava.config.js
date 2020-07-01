@@ -1,4 +1,7 @@
 export default {
-  ignoredByWatcher: ['**/*.ts'],
+  ignoredByWatcher: [
+    '**/*.ts',
+    'fixtures/*/output',
+  ],
   verbose: true,
 };

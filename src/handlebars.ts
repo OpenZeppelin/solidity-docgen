@@ -1,4 +1,4 @@
-import handlebars from 'handlebars';
+import handlebars, { HelperDeclareSpec } from 'handlebars';
 
 const H = handlebars.create();
 H.registerHelper('slug', slug);
@@ -30,6 +30,10 @@ H.registerHelper({
 });
 
 export type Template<Context> = (context: Context) => string;
+
+export function registerHelpers(helpers: HelperDeclareSpec) {
+  H.registerHelper(helpers);
+};
 
 export function compile(template: string): Template<unknown> {
   const compiledTemplate = H.compile(template, { noEscape: true });

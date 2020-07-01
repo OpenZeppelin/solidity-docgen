@@ -17,6 +17,20 @@ test('fixture 001', async t => {
   t.snapshot(output);
 });
 
+test('fixture 002', async t => {
+  await cleanFixtureOutput('002');
+  const child = proc.fork(require.resolve('./cli'), [
+    '--input', 'fixtures/002/input',
+    '--output', 'fixtures/002/output',
+    '--helpers', 'fixtures/002/helpers.js',
+    '--templates', 'fixtures/002/templates',
+    '--output-structure', 'single',
+  ]);
+  await events.once(child, 'exit');
+  const output = await fs.readFile('fixtures/002/output/index.md', 'utf8');
+  t.snapshot(output);
+});
+
 async function cleanFixtureOutput(num: string) {
   const outputPath = `fixtures/${num}/output`;
 
@@ -26,8 +40,8 @@ async function cleanFixtureOutput(num: string) {
     return;
   }
 
-  for (const e of await fs.readdir('fixtures/001/output')) {
-    await fs.unlink(`fixtures/001/output/${e}`);
+  for (const e of await fs.readdir(`fixtures/${num}/output`)) {
+    await fs.unlink(`fixtures/${num}/output/${e}`);
   }
-  await fs.rmdir('fixtures/001/output');
+  await fs.rmdir(`fixtures/${num}/output`);
 }

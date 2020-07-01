@@ -43,6 +43,12 @@ export class Docgen extends Command {
       description: 'file extension for generated pages, not necessary when using READMEs',
     }),
 
+    helpers: flags.string({
+      char: 'H',
+      parse: s => path.resolve(s),
+      description: 'path to a file whose exports will be registered as handlebars helpers',
+    }),
+
     'solc-module': flags.string({
       parse: s => require.resolve(s, { paths: ['.'] }),
       description: 'path to an alternative solc module',

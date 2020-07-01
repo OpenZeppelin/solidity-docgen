@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Added a `--helpers` (`-H`) option: a path to a file whose exports will be
+  registed as handlebars helpers.
+
 ## 0.5.2, 0.5.3
 
 - Changed `--solc-module` option to use Node module resolution algorithm.

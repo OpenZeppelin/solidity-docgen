@@ -1,6 +1,6 @@
 {
   "name": "solidity-docgen",
-  "version": "0.5.4-0",
+  "version": "0.5.4",
   "description": "Solidity API documentation automatic generator.",
   "repository": "github:OpenZeppelin/solidity-docgen",
   "bin": {

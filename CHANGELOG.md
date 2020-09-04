@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.5.4
 
 - Added a `--helpers` (`-H`) option: a path to a file whose exports will be
   registed as handlebars helpers.

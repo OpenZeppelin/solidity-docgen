@@ -49,6 +49,21 @@ test('single readme multiple contracts', t => {
   t.assert(page.contracts.some(c => c.name === 'Bar'));
 });
 
+test('single source with file multiple contracts', t => {
+  const source = buildSoliditySource(b => b
+    .file('test.sol')
+      .contract('Foo')
+      .contract('Bar')
+  );
+
+  const sitemap = Sitemap.generate(source, dummyFilter, [], 'md', 'contracts');
+  const { pages } = sitemap;
+
+  t.is(pages.length, 2);
+  t.assert(pages.some(p => p.path === './Foo.md'));
+  t.assert(pages.some(p => p.path === './Bar.md'));
+});
+
 test('filter subdirectory', t => {
   const source = buildSoliditySource(b => b
     .file('Foo.sol')

@@ -94,8 +94,8 @@ export class ContractPage extends Page {
   }
 
   get path(): string {
-    const { dir, name } = path.parse(this.contract.file.path);
-    return path.format({ dir, name, ext: '.' + this.ext });
+    const dir = path.dirname(this.contract.file.path);
+    return path.format({ dir, name: this.contract.name, ext: '.' + this.ext });
   }
 }
 

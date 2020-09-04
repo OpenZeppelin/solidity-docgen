@@ -2,6 +2,7 @@
   "rangeStrategy": "update-lockfile",
   "extends": [
     "config:base",
+    ":maintainLockFilesWeekly",
     "schedule:weekly"
   ],
   "packageRules": [
@@ -14,5 +15,8 @@
       "excludePackageNames": ["solc"],
       "extends": ["group:allNonMajor"]
     }
-  ]
+  ],
+  "lockFileMaintenance": {
+    "commitMessageAction": "Update lockfile"
+  }
 }

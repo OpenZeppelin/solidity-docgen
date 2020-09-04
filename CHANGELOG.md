@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.5.5
+
+- Fixed a bug in the `contracts` output structure that would result in
+  contracts missing from the output if there was more than one defined in the
+  same Solidity source file.
+
+This is technically a breaking change in how output paths are generated, but it
+should not affect most people. In particular, users who follow the convention
+of naming Solidity files by the contract that they contain will not be affected
+at all. Users who follow a different convention and who use the `contracts`
+output structure (the default) will see output files generated in a
+different path.
+
 ## 0.5.4
 
 - Added a `--helpers` (`-H`) option: a path to a file whose exports will be

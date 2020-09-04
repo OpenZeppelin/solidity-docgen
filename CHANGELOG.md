@@ -4,6 +4,13 @@
 
 - Fixed a bug that prevented using solc 0.7 with the `--solc-module` option.
 
+The built in compiler remains solc 0.6, but users who want to use the newer compiler version can do so by installing the desired solc version and using the flag `--solc-module`. Here's an example using npm aliases:
+
+```
+npm install -D solc-0.7@npm:solc@^0.7.0
+npx solidity-docgen --solc-module solc-0.7
+```
+
 ## 0.5.5
 
 - Fixed a bug in the `contracts` output structure that would result in

@@ -39,7 +39,7 @@
     "@types/lodash": "^4.14.161",
     "@types/micromatch": "^4.0.1",
     "@types/minimatch": "^3.0.3",
-    "@types/node": "^10.17.28",
+    "@types/node": "^10.17.29",
     "@types/semver": "^7.3.3",
     "ava": "^3.8.2",
     "code-style": "github:OpenZeppelin/code-style",

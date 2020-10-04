@@ -173,7 +173,7 @@ export class SourceContract implements Linkable {
   }
 
   get natspec(): NatSpec {
-    if (this.astNode.documentation === null) {
+    if (this.astNode.documentation === null || this.astNode.documentation === undefined) {
       return {};
     }
 
@@ -216,7 +216,7 @@ abstract class SourceContractItem implements Linkable {
   }
 
   get natspec(): NatSpec {
-    if (this.astNode.documentation === null) {
+    if (this.astNode.documentation === null || this.astNode.documentation === undefined) {
       return {};
     }
 

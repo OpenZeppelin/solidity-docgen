@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.7
+
+- Fixed a bug that caused `solidity-docgen` to fail with solc >=0.7.1.
+
 ## 0.5.6
 
 - Fixed a bug that prevented using solc 0.7 with the `--solc-module` option.

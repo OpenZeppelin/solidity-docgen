@@ -1,6 +1,6 @@
 export default {
   ignoredByWatcher: [
-    '**/*.{ts,d.ts,d.ts.map,tsbuildinfo}',
+    '**/*.{ts,map,tsbuildinfo}',
     'fixtures/*/output',
   ],
   typescript: { rewritePaths: { 'src/': 'dist/' } },

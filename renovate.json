@@ -1,5 +1,12 @@
 {
   "extends": [
     "github>OpenZeppelin/code-style"
+  ],
+  "packageRules": [
+    {
+      "packagePatterns": "^solc-[-0-9]+$",
+      "updateTypes": ["major", "minor"],
+      "enabled": false
+    }
   ]
 }

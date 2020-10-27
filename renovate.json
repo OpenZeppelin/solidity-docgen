@@ -1,22 +1,5 @@
 {
-  "rangeStrategy": "update-lockfile",
   "extends": [
-    "config:base",
-    ":maintainLockFilesWeekly",
-    "schedule:weekly"
-  ],
-  "packageRules": [
-    {
-      "packagePatterns": "^solc-[-0-9]+$",
-      "updateTypes": ["major", "minor"],
-      "enabled": false
-    },
-    {
-      "excludePackageNames": ["solc"],
-      "extends": ["group:allNonMajor"]
-    }
-  ],
-  "lockFileMaintenance": {
-    "commitMessageAction": "Update lockfile"
-  }
+    "github>OpenZeppelin/code-style"
+  ]
 }

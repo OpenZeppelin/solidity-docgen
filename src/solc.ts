@@ -158,10 +158,12 @@ export class SolcAdapter {
       };
     }
 
+    const reader = new ASTReader(input, solcOutput);
+
     if (semver.satisfies(this.solc.version(), '>=0.6')) {
       const adaptDocumentation = (node: any) => {
         if (node.documentation?.text) {
-          node.documentation = node.documentation.text;
+          node.documentation = cleanUpDocstring(reader.read(node.documentation));
         }
       };
       for (const source of Object.values(solcOutput.sources) as any[]) {
@@ -193,4 +195,33 @@ function importCallback(path: string): SolidityImport {
       error: e.message,
     };
   }
+}
+
+class ASTReader {
+  constructor(private readonly input: any, private readonly output: any) {}
+
+  read(node: { src: string }): string {
+    const { source, start, length } = this.decodeSrc(node.src);
+    const { content } = this.input.sources[source];
+    if (content === undefined) {
+      throw new Error(`Content missing for ${source}`);
+    }
+    return content.slice(start, start + length);
+  }
+
+  private decodeSrc(src: string): { source: string; start: number; length: number } {
+    const [start, length, sourceId] = src.split(':').map(s => parseInt(s));
+    const source = Object.keys(this.output.sources).find(s => this.output.sources[s].id === sourceId);
+    if (source === undefined) {
+      throw new Error(`No source with id ${sourceId}`);
+    }
+    return { source, start, length };
+  }
+}
+
+function cleanUpDocstring(text: string) {
+  return text
+    .replace(/^\/\*\*(.*)\*\/$/s, '$1')
+    .trim()
+    .replace(/^[ \t]*(\*|\/\/\/)[ \t]?/mg, '');
 }

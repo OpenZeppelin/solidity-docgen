@@ -2,6 +2,7 @@
 
 ## 0.5.8
 
+- Fixed trimming of whitespace at the beginning of NatSpec lines.
 - Fixed issues with ignored newlines in solc >= 0.6.9.
 
 This may change the output slightly for all users of solc >= 0.6. This

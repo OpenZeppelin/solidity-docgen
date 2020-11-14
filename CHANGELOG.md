@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.8
+
+- Fixed issues with ignored newlines in solc >= 0.6.9.
+
+This may change the output slightly for all users of solc >= 0.6. This
+shouldn't be an issue if the output format is Markdown.
+
 ## 0.5.7
 
 - Fixed a bug that caused `solidity-docgen` to fail with solc >=0.7.1.

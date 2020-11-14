@@ -342,8 +342,10 @@ interface InheritedItems {
 }
 
 class PrettyArray<T extends ToString> extends Array<T> {
+  separator = ', ';
+
   toString() {
-    return this.map(e => e.toString()).join(', ');
+    return this.map(e => e.toString()).join(this.separator);
   }
 }
 
@@ -369,8 +371,8 @@ class SourceTypedVariableArray extends PrettyArray<SourceTypedVariable> {
 }
 
 interface NatSpec {
-  devdoc?: string;
-  userdoc?: string;
+  devdoc?: NatSpecDocArray;
+  userdoc?: NatSpecDocArray;
   title?: string;
   params?: {
     param: string;
@@ -380,6 +382,14 @@ interface NatSpec {
     param: string;
     description: string;
   }[];
+}
+
+class NatSpecDocArray<T extends ToString = string> extends PrettyArray<T> {
+  separator = '\n\n';
+
+  static of<T>(...args: T[]): NatSpecDocArray<T> {
+    return super.of(...args) as NatSpecDocArray<T>;
+  }
 }
 
 function parseNatSpec(doc: string): NatSpec {
@@ -444,14 +454,15 @@ function* execall(re: RegExp, text: string) {
 }
 
 function setOrAppend<K extends string>(
-  obj: { [key in K]?: string },
+  obj: { [key in K]?: NatSpecDocArray },
   key: K,
   value: string,
 ) {
-  if (obj[key] === undefined) {
-    obj[key] = value;
+  const arr = obj[key];
+  if (arr !== undefined) {
+    arr.push(value);
   } else {
-    obj[key] += value;
+    obj[key] = NatSpecDocArray.of(value);
   }
 }
 

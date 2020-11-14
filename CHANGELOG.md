@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.5.8
+
+- Added a workaround for getting multiple newlines when using solc >= 0.6.9.
+
+If your NatSpec contains multiple consecutive newlines, for example to format
+paragraphs in Markdown, solc will replace them with a single space. As a
+workaround for solidity-docgen, to obtain double newlines in the output you can
+insert a new entry of the same NatSpec tag, which will be joined with the
+previous entry with two newlines.
+
+For example, previously you may have had:
+
+```
+/**
+ * @dev Paragraph 1.
+ *
+ * Paragraph 2.
+ */
+```
+
+But for solc >= 0.6.9 you would have to write:
+
+```
+/**
+ * @dev Paragraph 1.
+ *
+ * @dev Paragraph 2.
+ */
+```
+
 ## 0.5.7
 
 - Fixed a bug that caused `solidity-docgen` to fail with solc >=0.7.1.

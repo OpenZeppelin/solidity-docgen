@@ -160,19 +160,24 @@ export class SolcAdapter {
 
     const reader = new ASTReader(input, solcOutput);
 
-    if (semver.satisfies(this.solc.version(), '>=0.6')) {
-      const adaptDocumentation = (node: any) => {
-        if (node.documentation?.text) {
-          node.documentation = cleanUpDocstring(reader.read(node.documentation));
-        }
-      };
-      for (const source of Object.values(solcOutput.sources) as any[]) {
-        for (const fileNode of source.ast.nodes) {
-          adaptDocumentation(fileNode);
-          if (fileNode.nodeType === 'ContractDefinition') {
-            for (const contractNode of fileNode.nodes) {
-              adaptDocumentation(contractNode);
-            }
+    const adaptDocumentation = (node: any) => {
+      if (typeof node.documentation === 'string') {
+        // fix solc buggy parsing of doc comments
+        // reverse engineered from solc behavior...
+        node.documentation = node.documentation
+          .replace(/\n\n?^[ \t]*(?:\*|\/\/\/)/mg, '\n\n')
+          .replace(/^[ \t]?/mg, '');
+      } else if (node.documentation?.text) {
+        node.documentation = cleanUpDocstring(reader.read(node.documentation));
+      }
+    };
+
+    for (const source of Object.values(solcOutput.sources) as any[]) {
+      for (const fileNode of source.ast.nodes) {
+        adaptDocumentation(fileNode);
+        if (fileNode.nodeType === 'ContractDefinition') {
+          for (const contractNode of fileNode.nodes) {
+            adaptDocumentation(contractNode);
           }
         }
       }

@@ -385,11 +385,7 @@ interface NatSpec {
 function parseNatSpec(doc: string): NatSpec {
   const res: NatSpec = {};
 
-  // fix solc buggy parsing of doc comments
-  // reverse engineered from solc behavior...
-  const raw = doc.replace(/\n\n?^[ \t]*(?:\*|\/\/\/)/mg, '\n\n').replace(/^[ \t]*/mg, '');
-
-  const tagMatches = execall(/^(?:@(\w+) )?((?:(?!^@\w+ )[^])*)/m, raw);
+  const tagMatches = execall(/^(?:@(\w+) )?((?:(?!^@\w+ )[^])*)/m, doc);
 
   for (const [, tag, content] of tagMatches) {
     if (tag === 'dev') {

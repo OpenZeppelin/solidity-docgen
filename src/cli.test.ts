@@ -1,35 +1,39 @@
 import test from 'ava';
-import { promises as fs } from 'fs';
+import fs from 'promisified/fs';
 import proc from 'child_process';
 import events from 'events';
 
 import { Docgen } from './cli';
 
-test('fixture 001', async t => {
-  await cleanFixtureOutput('001');
-  const child = proc.fork(require.resolve('./cli'), [
-    '--input', 'fixtures/001/input',
-    '--output', 'fixtures/001/output',
-    '--output-structure', 'single',
-  ]);
-  await events.once(child, 'exit');
-  const output = await fs.readFile('fixtures/001/output/index.md', 'utf8');
-  t.snapshot(output);
-});
+for (const f of fs.readdirSync('fixtures')) {
+  testFixture(f);
+}
 
-test('fixture 002', async t => {
-  await cleanFixtureOutput('002');
-  const child = proc.fork(require.resolve('./cli'), [
-    '--input', 'fixtures/002/input',
-    '--output', 'fixtures/002/output',
-    '--helpers', 'fixtures/002/helpers.js',
-    '--templates', 'fixtures/002/templates',
-    '--output-structure', 'single',
-  ]);
-  await events.once(child, 'exit');
-  const output = await fs.readFile('fixtures/002/output/index.md', 'utf8');
-  t.snapshot(output);
-});
+function testFixture(num: string) {
+  test(`fixture ${num}`, async t => {
+    await cleanFixtureOutput(num);
+    const templates = await fs.access(`fixtures/${num}/templates`, fs.constants.F_OK)
+      .then(
+        () => ['--templates', `fixtures/${num}/templates`],
+        () => [],
+      );
+    const helpers = await fs.access(`fixtures/${num}/helpers.js`, fs.constants.F_OK)
+      .then(
+        () => ['--helpers', `fixtures/${num}/helpers.js`],
+        () => [],
+      );
+    const child = proc.fork(require.resolve('./cli'), [
+      '--input', `fixtures/${num}/input`,
+      '--output', `fixtures/${num}/output`,
+      ...templates,
+      ...helpers,
+      '--output-structure', 'single',
+    ]);
+    await events.once(child, 'exit');
+    const output = await fs.readFile(`fixtures/${num}/output/index.md`, 'utf8');
+    t.snapshot(output);
+  });
+}
 
 async function cleanFixtureOutput(num: string) {
   const outputPath = `fixtures/${num}/output`;

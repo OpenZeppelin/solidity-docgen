@@ -927,7 +927,6 @@ code-point-at@^1.0.0:
 
 "code-style@github:OpenZeppelin/code-style":
   version "0.1.0"
-  uid "03a49c7704c99ae3d796f475da422b17d19380f2"
   resolved "https://codeload.github.com/OpenZeppelin/code-style/tar.gz/03a49c7704c99ae3d796f475da422b17d19380f2"
 
 collection-visit@^1.0.0:
@@ -2771,7 +2770,6 @@ onetime@^5.1.0:
 
 "openzeppelin-docs-utils@github:OpenZeppelin/docs-utils":
   version "0.1.0"
-  uid dbdcce52e45c89f67f07683c536baf4b541ba68a
   resolved "https://codeload.github.com/OpenZeppelin/docs-utils/tar.gz/dbdcce52e45c89f67f07683c536baf4b541ba68a"
   dependencies:
     chalk "^3.0.0"
@@ -3081,6 +3079,11 @@ process-on-spawn@^1.0.0:
   integrity sha512-1WsPDsUSMmZH5LeMLegqkPDrsGgsWwk1Exipy2hvB0o/F0ASzbpIctSCcZIK1ykJvtTJULEH+20WOFjMvGnCTg==
   dependencies:
     fromentries "^1.2.0"
+
+promisified@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/promisified/-/promisified-0.5.0.tgz#3a4fdb9a565a243c089f8e6e61dc4b1159ad5789"
+  integrity sha512-2DwVPsTkapN5pM6rF7PGfciqYy8W6GIJ3CC0xM4vqR6A5w3s426kj6oJ5mukDSiZFcv1OBpSWBJnh7xi4MEOKg==
 
 proxy-middleware@latest:
   version "0.15.0"

@@ -164,12 +164,16 @@ export class SolcAdapter {
       if (typeof node.documentation === 'string') {
         // fix solc buggy parsing of doc comments
         // reverse engineered from solc behavior...
-        node.documentation = node.documentation
-          .replace(/\n\n?^[ \t]*(?:\*|\/\/\/)/mg, '\n\n')
-          .replace(/^[ \t]?/mg, '');
-      } else if (node.documentation?.text) {
-        node.documentation = cleanUpDocstring(reader.read(node.documentation));
+        node.documentation = cleanUpDocstringFromSolc(node.documentation);
+      } else if (node.documentation?.text !== undefined) {
+        const source = reader.read(node.documentation);
+        if (source !== undefined) {
+          node.documentation = cleanUpDocstringFromSource(source);
+        } else {
+          node.documentation = cleanUpDocstringFromSolc(node.documentation.text);
+        }
       }
+      // console.log(JSON.stringify(node.documentation));
     };
 
     for (const source of Object.values(solcOutput.sources) as any[]) {
@@ -205,13 +209,9 @@ function importCallback(path: string): SolidityImport {
 class ASTReader {
   constructor(private readonly input: any, private readonly output: any) {}
 
-  read(node: { src: string }): string {
+  read(node: { src: string }): string | undefined {
     const { source, start, length } = this.decodeSrc(node.src);
-    const { content } = this.input.sources[source];
-    if (content === undefined) {
-      throw new Error(`Content missing for ${source}`);
-    }
-    return content.slice(start, start + length);
+    return this.input.sources[source]?.content.slice(start, start + length);
   }
 
   private decodeSrc(src: string): { source: string; start: number; length: number } {
@@ -224,7 +224,15 @@ class ASTReader {
   }
 }
 
-function cleanUpDocstring(text: string) {
+function cleanUpDocstringFromSolc(text: string) {
+  // fix solc buggy parsing of doc comments
+  // reverse engineered from solc behavior
+  return text
+    .replace(/\n\n?^[ \t]*(?:\*|\/\/\/)/mg, '\n\n')
+    .replace(/^[ \t]?/mg, '');
+}
+
+function cleanUpDocstringFromSource(text: string) {
   return text
     .replace(/^\/\*\*(.*)\*\/$/s, '$1')
     .trim()

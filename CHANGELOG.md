@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.9
+
+- Fix bug introduced in 0.5.8 for projects with dependencies.
+
 ## 0.5.8
 
 - Fixed trimming of whitespace at the beginning of NatSpec lines.

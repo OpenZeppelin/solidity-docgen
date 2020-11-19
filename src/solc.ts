@@ -173,7 +173,6 @@ export class SolcAdapter {
           node.documentation = cleanUpDocstringFromSolc(node.documentation.text);
         }
       }
-      // console.log(JSON.stringify(node.documentation));
     };
 
     for (const source of Object.values(solcOutput.sources) as any[]) {

@@ -1,4 +1,4 @@
-import { flatten, uniqBy, groupBy } from 'lodash';
+import { flatten, uniqBy, groupBy, defaults } from 'lodash';
 import path from 'path';
 import { memoize } from './memoize';
 
@@ -207,12 +207,13 @@ export class SourceContract implements Linkable {
       .map(n => new SourceModifier(this, n));
   }
 
+  @memoize
   get natspec(): NatSpec {
     if (this.astNode.documentation === null || this.astNode.documentation === undefined) {
       return {};
     }
 
-    return parseNatSpec(this.astNode.documentation);
+    return parseNatSpec(this.astNode.documentation, this);
   }
 
   get astId(): number {
@@ -250,12 +251,13 @@ abstract class SourceContractItem implements Linkable {
     return `${this.name}(${this.args.map(a => a.type).join(',')})`;
   }
 
+  @memoize
   get natspec(): NatSpec {
     if (this.astNode.documentation === null || this.astNode.documentation === undefined) {
       return {};
     }
 
-    return parseNatSpec(this.astNode.documentation);
+    return parseNatSpec(this.astNode.documentation, this);
   }
 }
 
@@ -417,10 +419,12 @@ interface NatSpec {
   }[];
 }
 
-function parseNatSpec(doc: string): NatSpec {
+function parseNatSpec(doc: string, context: SourceContractItem | SourceContract): NatSpec {
   const res: NatSpec = {};
 
   const tagMatches = execall(/^(?:@(\w+) )?((?:(?!^@\w+ )[^])*)/m, doc);
+
+  let inheritFrom: SourceFunction | undefined;
 
   for (const [, tag, content] of tagMatches) {
     if (tag === 'dev') {
@@ -452,6 +456,17 @@ function parseNatSpec(doc: string): NatSpec {
         res.returns.push({ param, description });
       }
     }
+    if (tag === 'inheritdoc') {
+      if (!(context instanceof SourceFunction)) {
+        throw new Error('@inheritdoc only supported in functions');
+      }
+      const parentContract = context.contract.file.contractsInScope[content.trim()];
+      inheritFrom = parentContract.functions.find(f => f.name === context.name);
+    }
+  }
+
+  if (inheritFrom) {
+    defaults(res, inheritFrom.natspec);
   }
 
   return res;

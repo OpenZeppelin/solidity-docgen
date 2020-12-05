@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.10
+
+- Add support for @inheritdoc NatSpec tag.
+
 ## 0.5.9
 
 - Fix bug introduced in 0.5.8 for projects with dependencies.

@@ -19,7 +19,22 @@ export interface SolcOutput {
 export namespace ast {
   export interface SourceUnit {
     nodeType: 'SourceUnit';
-    nodes: ContractDefinition[];
+    id: number;
+    nodes: SourceItem[];
+  }
+
+  export type SourceItem = ContractDefinition | ImportDirective;
+
+  export interface ImportDirective {
+    nodeType: 'ImportDirective';
+    id: number;
+    sourceUnit: number;
+    symbolAliases: {
+      foreign: {
+        name: string;
+      };
+      local?: null | string;
+    }[]
   }
 
   export interface ContractDefinition {

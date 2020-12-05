@@ -25,8 +25,24 @@ export class SolcOutputBuilder implements SolcOutput {
       ast: {
         nodeType: 'SourceUnit',
         nodes: [],
+        id: this._getNextId(),
       },
     };
+    return this;
+  }
+
+  import(importedFileName: string, aliases: [string, string?][] = []) {
+    const importedSourceUnit = this.sources[importedFileName]?.ast;
+    if (importedSourceUnit === undefined) throw new Error('Imported file does not exist');
+    const fileName = this._currentFile;
+    if (fileName === undefined) throw new Error('No file defined');
+    const astNode: ast.ImportDirective = {
+      nodeType: 'ImportDirective',
+      id: this._getNextId(),
+      sourceUnit: importedSourceUnit.id,
+      symbolAliases: aliases.map(([name, local]) => ({ foreign: { name }, local })),
+    };
+    this.sources[fileName].ast.nodes.push(astNode);
     return this;
   }
 
@@ -54,11 +70,16 @@ export class SolcOutputBuilder implements SolcOutput {
     if (contractName in this._contractIds) {
       return this._contractIds[contractName];
     } else {
-      const id = this._nextId;
-      this._nextId += 1;
+      const id = this._getNextId();
       this._contractIds[contractName] = id;
       return id;
     }
+  }
+
+  _getNextId() {
+    const id = this._nextId;
+    this._nextId += 1;
+    return id;
   }
 
   function(functionName: string, ...argTypes: string[]) {

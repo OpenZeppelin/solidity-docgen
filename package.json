@@ -18,7 +18,7 @@
     "docs": "oz-docs -c docs",
     "docs:watch": "yarn docs watch",
     "test": "tsc && ava",
-    "test:watch": "fgbg 'ava --watch' 'tsc --watch'",
+    "test:watch": "fgbg 'ava --watch' 'tsc --watch' --",
     "prepublish": "rimraf dist tsconfig.tsbuildinfo",
     "prepare": "yarn build"
   },

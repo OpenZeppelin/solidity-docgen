@@ -159,6 +159,61 @@ test('an inherited state variable', t => {
   t.is(variable.type, 'uint256');
 });
 
+test('contracts in scope from imported files', t => {
+  const solcOutput = new SolcOutputBuilder()
+    .file('Foo.sol')
+      .contract('Foo')
+    .file('Bar.sol')
+      .import('Foo.sol')
+      .contract('Bar');
+
+  const source = buildSource(solcOutput);
+  const bar = source.file('Bar.sol');
+  const scope = bar.contractsInScope;
+  t.like(scope, {
+    Foo: { name: 'Foo' },
+    Bar: { name: 'Bar' },
+  });
+});
+
+test('contracts in scope from imported files with alias', t => {
+  const solcOutput = new SolcOutputBuilder()
+    .file('Foo.sol')
+      .contract('Foo')
+    .file('Bar.sol')
+      .import('Foo.sol', [['Foo', 'FooRenamed']])
+      .contract('Bar');
+
+  const source = buildSource(solcOutput);
+  const bar = source.file('Bar.sol');
+  const scope = bar.contractsInScope;
+  t.like(scope, {
+    FooRenamed: { name: 'Foo' },
+    Bar: { name: 'Bar' },
+  });
+});
+
+test('contracts in scope from imported files transitively', t => {
+  const solcOutput = new SolcOutputBuilder()
+    .file('Foo.sol')
+      .contract('Foo')
+    .file('Bar.sol')
+      .import('Foo.sol')
+      .contract('Bar')
+    .file('Baz.sol')
+      .import('Bar.sol')
+      .contract('Baz');
+
+  const source = buildSource(solcOutput);
+  const baz = source.file('Baz.sol');
+  const scope = baz.contractsInScope;
+  t.like(scope, {
+    Foo: { name: 'Foo' },
+    Bar: { name: 'Bar' },
+    Baz: { name: 'Baz' },
+  });
+});
+
 test('using real compiler output (0.6)', async t => {
   const sourceText = `// SPDX-License-Identifier: MIT
     pragma solidity ^0.6;

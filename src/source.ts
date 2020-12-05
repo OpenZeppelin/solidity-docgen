@@ -32,6 +32,16 @@ export class Source {
     );
   }
 
+  fileById(id: number): SourceFile {
+    const file = this.files.find(f => f.astId === id);
+
+    if (file === undefined) {
+      throw new Error(`File with id ${id} not found`);
+    }
+
+    return file;
+  }
+
   contractById(id: number): SourceContract {
     const contract = this.contracts.find(c => c.astId === id);
 
@@ -52,13 +62,38 @@ class SourceFile {
 
   @memoize
   get contracts(): SourceContract[] {
-    const astNodes = this.ast.nodes.filter(n =>
-      n.nodeType === 'ContractDefinition'
-    );
+    const astNodes = this.ast.nodes.filter(isContractDefinition);
 
     return astNodes.map(node => 
       new SourceContract(this.source, this, node)
     );
+  }
+
+  @memoize
+  get contractsInScope(): Record<string, SourceContract> {
+    const scope: Record<string, SourceContract> = {};
+
+    for (const c of this.contracts) {
+      scope[c.name] = c;
+    }
+
+    const imports = this.ast.nodes.filter(isImportDirective);
+    for (const i of imports) {
+      const importedFile = this.source.fileById(i.sourceUnit);
+      if (i.symbolAliases.length === 0) {
+        Object.assign(scope, importedFile.contractsInScope);
+      } else {
+        for (const a of i.symbolAliases) {
+          scope[a.local ?? a.foreign.name] = importedFile.contractsInScope[a.foreign.name];
+        }
+      }
+    };
+
+    return scope;
+  }
+
+  get astId(): number {
+    return this.ast.id;
   }
 }
 
@@ -469,6 +504,14 @@ function isEventDefinition(node: ast.ContractItem): node is ast.EventDefinition 
 
 function isModifierDefinition(node: ast.ContractItem): node is ast.ModifierDefinition {
   return node.nodeType === 'ModifierDefinition';
+}
+
+function isContractDefinition(node: ast.SourceItem): node is ast.ContractDefinition {
+  return node.nodeType === 'ContractDefinition';
+}
+
+function isImportDirective(node: ast.SourceItem): node is ast.ImportDirective {
+  return node.nodeType === 'ImportDirective';
 }
 
 function oneTimeLogger(msg: string): () => void {

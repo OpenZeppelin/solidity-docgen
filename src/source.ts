@@ -164,6 +164,14 @@ export class SourceContract implements Linkable {
       .filter(f => !f.isTrivialConstructor);
   }
 
+  @memoize
+  get privateFunctions(): SourceFunction[] {
+    return this.astNode.nodes
+      .filter(isFunctionDefinition)
+      .filter(n => n.visibility === 'private')
+      .map(n => new SourceFunction(this, n));
+  }
+
   get inheritedItems(): InheritedItems[] {
     const variables = groupBy(this.variables, f => f.contract.astId);
     const functions = groupBy(this.functions, f => f.contract.astId);

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.11
+
+- Provide a `privateFunctions` array variable in the contract template.
+
 ## 0.5.10
 
 - Add support for @inheritdoc NatSpec tag.

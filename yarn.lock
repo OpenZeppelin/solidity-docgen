@@ -937,7 +937,6 @@ code-point-at@^1.0.0:
 
 "code-style@github:OpenZeppelin/code-style":
   version "0.1.0"
-  uid a0b381b9d02b31aa1a1e66a3b13a9757b3c4c88a
   resolved "https://codeload.github.com/OpenZeppelin/code-style/tar.gz/a0b381b9d02b31aa1a1e66a3b13a9757b3c4c88a"
 
 collection-visit@^1.0.0:
@@ -2798,7 +2797,6 @@ onetime@^5.1.0:
 
 "openzeppelin-docs-utils@github:OpenZeppelin/docs-utils":
   version "0.1.0"
-  uid dbdcce52e45c89f67f07683c536baf4b541ba68a
   resolved "https://codeload.github.com/OpenZeppelin/docs-utils/tar.gz/dbdcce52e45c89f67f07683c536baf4b541ba68a"
   dependencies:
     chalk "^3.0.0"
@@ -3536,6 +3534,21 @@ snapdragon@^0.8.1:
   version "0.7.6"
   resolved "https://registry.yarnpkg.com/solc/-/solc-0.7.6.tgz#21fc5dc11b85fcc518c181578b454f3271c27252"
   integrity sha512-WsR/W7CXwh2VnmZapB4JrsDeLlshoKBz5Pz/zYNulB6LBsOEHI2Zj/GeKLMFcvv57OHiXHvxq5ZOQB+EdqxlxQ==
+  dependencies:
+    command-exists "^1.2.8"
+    commander "3.0.2"
+    follow-redirects "^1.12.1"
+    fs-extra "^0.30.0"
+    js-sha3 "0.8.0"
+    memorystream "^0.3.1"
+    require-from-string "^2.0.0"
+    semver "^5.5.0"
+    tmp "0.0.33"
+
+"solc-0-8@npm:solc@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/solc/-/solc-0.8.0.tgz#99828ebf4f61d298875936e8649ebe4a09f029f7"
+  integrity sha512-ypgvqYZhb/i5BM6cw9/5QkSlDJm/rLynsbWGP3kz6HeB6oNxPK6UMiB7jMr+tNVbQbBM/8l47vrI3XaDCHShjQ==
   dependencies:
     command-exists "^1.2.8"
     commander "3.0.2"

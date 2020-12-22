@@ -26,6 +26,10 @@ async function smokeTest<T>(t: ExecutionContext<T>, solcModule: string, version:
   t.is(undefined, output.errors);
 }
 
+test('smoke test 0.8', async t => {
+  await smokeTest(t, 'solc-0-8', '0.8');
+});
+
 test('smoke test 0.7', async t => {
   await smokeTest(t, 'solc-0-7', '0.7');
 });

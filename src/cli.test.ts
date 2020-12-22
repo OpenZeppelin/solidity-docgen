@@ -22,11 +22,17 @@ function testFixture(num: string) {
         () => ['--helpers', `fixtures/${num}/helpers.js`],
         () => [],
       );
+    const solc = await fs.access(`fixtures/${num}/solc`, fs.constants.F_OK)
+      .then(
+        async () => ['--solc-module', (await fs.readFile(`fixtures/${num}/solc`, 'utf8')).trim()],
+        () => [],
+      );
     const child = proc.fork(require.resolve('./cli'), [
       '--input', `fixtures/${num}/input`,
       '--output', `fixtures/${num}/output`,
       ...templates,
       ...helpers,
+      ...solc,
       '--output-structure', 'single',
     ]);
     await events.once(child, 'exit');

@@ -2,6 +2,9 @@
   "extends": [
     "github>OpenZeppelin/code-style"
   ],
+  "lockFileMaintenance": {
+    "extends": ["schedule:monthly"]
+  },
   "packageRules": [
     {
       "packagePatterns": "^solc-[-0-9]+$",

@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@ava/typescript": "^1.1.1",
-    "@openzeppelin/contracts": "^3.2.0",
+    "@openzeppelin/contracts": "^4.0.0",
     "@types/json5": "0.0.30",
     "@types/lodash": "^4.14.161",
     "@types/micromatch": "^4.0.1",

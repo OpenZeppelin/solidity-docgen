@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.12
+
+- Add support for @custom: NatSpec tags.
+
 ## 0.5.11
 
 - Provide a `privateFunctions` array variable in the contract template.

@@ -425,21 +425,26 @@ interface NatSpec {
     param: string;
     description: string;
   }[];
+  custom?: {
+    [tag: string]: string;
+  };
 }
 
 function parseNatSpec(doc: string, context: SourceContractItem | SourceContract): NatSpec {
   const res: NatSpec = {};
 
-  const tagMatches = execall(/^(?:@(\w+) )?((?:(?!^@\w+ )[^])*)/m, doc);
+  const tagMatches = execall(/^(?:@(\w+|custom:[a-z][a-z-]*) )?((?:(?!^@(?:\w+|custom:[a-z][a-z-]*) )[^])*)/m, doc);
 
   let inheritFrom: SourceFunction | undefined;
 
   for (const [, tag, content] of tagMatches) {
     if (tag === 'dev') {
-      setOrAppend(res, 'devdoc', content); 
+      res.devdoc ??= '';
+      res.devdoc += content;
     }
     if (tag === 'notice' || tag === undefined) {
-      setOrAppend(res, 'userdoc', content);
+      res.userdoc ??= '';
+      res.userdoc += content;
     }
     if (tag === 'title') {
       res.title = content;
@@ -448,9 +453,7 @@ function parseNatSpec(doc: string, context: SourceContractItem | SourceContract)
       const paramMatches = content.match(/(\w+) ([^]*)/);
       if (paramMatches) {
         const [, param, description] = paramMatches;
-        if (res.params === undefined) {
-          res.params = [];
-        }
+        res.params ??= [];
         res.params.push({ param, description });
       }
     }
@@ -458,9 +461,7 @@ function parseNatSpec(doc: string, context: SourceContractItem | SourceContract)
       const paramMatches = content.match(/(\w+) ([^]*)/);
       if (paramMatches) {
         const [, param, description] = paramMatches;
-        if (res.returns === undefined) {
-          res.returns = [];
-        }
+        res.returns ??= [];
         res.returns.push({ param, description });
       }
     }
@@ -470,6 +471,12 @@ function parseNatSpec(doc: string, context: SourceContractItem | SourceContract)
       }
       const parentContract = context.contract.file.contractsInScope[content.trim()];
       inheritFrom = parentContract.functions.find(f => f.name === context.name);
+    }
+    if (tag.startsWith('custom:')) {
+      const key = tag.replace(/^custom:/, '');
+      res.custom ??= {};
+      res.custom[key] ??= '';
+      res.custom[key] += content;
     }
   }
 
@@ -494,18 +501,6 @@ function* execall(re: RegExp, text: string) {
     } else {
       break;
     }
-  }
-}
-
-function setOrAppend<K extends string>(
-  obj: { [key in K]?: string },
-  key: K,
-  value: string,
-) {
-  if (obj[key] === undefined) {
-    obj[key] = value;
-  } else {
-    obj[key] += value;
   }
 }
 

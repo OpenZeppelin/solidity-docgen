@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.13
+
+- Fix a bug when parsing @custom NatSpec tags.
+
 ## 0.5.12
 
 - Add support for @custom: NatSpec tags.

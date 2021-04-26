@@ -472,7 +472,7 @@ function parseNatSpec(doc: string, context: SourceContractItem | SourceContract)
       const parentContract = context.contract.file.contractsInScope[content.trim()];
       inheritFrom = parentContract.functions.find(f => f.name === context.name);
     }
-    if (tag.startsWith('custom:')) {
+    if (tag?.startsWith('custom:')) {
       const key = tag.replace(/^custom:/, '');
       res.custom ??= {};
       res.custom[key] ??= '';

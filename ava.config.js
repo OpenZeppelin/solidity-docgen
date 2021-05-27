@@ -5,5 +5,5 @@ export default {
   ],
   typescript: { rewritePaths: { 'src/': 'dist/' } },
   verbose: true,
-  timeout: '1m',
+  timeout: '3m',
 };

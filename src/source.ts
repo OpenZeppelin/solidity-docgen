@@ -185,6 +185,8 @@ export class SourceContract implements Linkable {
     const functions = groupBy(this.functions, f => f.contract.astId);
     const events = groupBy(this.events, f => f.contract.astId);
     const modifiers = groupBy(this.modifiers, f => f.contract.astId);
+    const structs = groupBy(this.enums, f => f.contract.astId);
+    const enums = groupBy(this.enums, f => f.contract.astId);
 
     return this.inheritance.map(contract => ({
       contract,
@@ -192,6 +194,8 @@ export class SourceContract implements Linkable {
       functions: functions[contract.astId],
       events: events[contract.astId],
       modifiers: modifiers[contract.astId],
+      structs: structs[contract.astId],
+      enums: enums[contract.astId],
     }));
   }
 
@@ -509,6 +513,8 @@ interface InheritedItems {
   functions: SourceFunction[];
   events: SourceEvent[];
   modifiers: SourceModifier[];
+  structs: SourceStruct[];
+  enums: SourceEnum[];
 }
 
 class PrettyArray<T extends ToString> extends Array<T> {

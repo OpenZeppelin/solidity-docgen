@@ -127,7 +127,15 @@ export class SourceContract implements Linkable {
   }
 
   get linkable(): Linkable[] {
-    return [this, ...this.ownModifiers, ...this.ownVariables, ...this.ownFunctions, ...this.ownEvents, ...this.ownStructs];
+    return [
+      this,
+      ...this.ownModifiers,
+      ...this.ownVariables,
+      ...this.ownFunctions,
+      ...this.ownEvents,
+      ...this.ownStructs,
+      ...this.ownEnums,
+    ];
   }
 
   get inheritance(): SourceContract[] {
@@ -227,6 +235,20 @@ export class SourceContract implements Linkable {
     return this.astNode.nodes
       .filter(isStructDefinition)
       .map(n => new SourceStruct(this, n))
+  }
+
+  get enums(): SourceEnum[] {
+    return uniqBy(
+      flatten(this.inheritance.map(c => c.ownEnums)),
+      f => f.signature,
+    )
+  }
+
+  @memoize
+  get ownEnums(): SourceEnum[] {
+    return this.astNode.nodes
+      .filter(isEnumDefinition)
+      .map(n => new SourceEnum(this, n))
   }
 
   @memoize
@@ -414,6 +436,49 @@ class SourceStruct extends SourceContractItem {
   }
 }
 
+class SourceEnum extends SourceContractItem {
+  constructor(
+    contract: SourceContract,
+    protected readonly astNode: ast.EnumDefinition,
+  ) {
+    super(contract);
+  }
+
+  @memoize
+  get members(): SourceEnumValue[] {
+    return this.astNode.members.map(m => new SourceEnumValue(this, m));
+  }
+}
+
+class SourceEnumValue implements Linkable {
+  constructor(
+    readonly enumerate: SourceEnum,
+    protected readonly astNode: ast.EnumValue,
+  ) { }
+
+
+  get name(): string {
+    return this.astNode.name;
+  }
+
+  get fullName(): string {
+    return `${this.enumerate.contract.name}.${this.enumerate.name}.${this.name}`;
+  }
+
+  get anchor(): string {
+    return `${this.enumerate.contract.name}-${this.enumerate.name}-${this.name}-${slug(this.id.toString())}`;
+  }
+
+  get id(): number {
+    return this.astNode.id;
+  }
+
+  get signature(): string {
+    return `${this.id} ${this.name}`;
+  }
+}
+
+
 class SourceTypedVariable {
   constructor(
     private readonly typeNode: ast.TypeName,
@@ -586,6 +651,10 @@ function isModifierDefinition(node: ast.ContractItem): node is ast.ModifierDefin
 
 function isStructDefinition(node: ast.ContractItem): node is ast.StructDefinition {
   return node.nodeType == 'StructDefinition';
+}
+
+function isEnumDefinition(node: ast.ContractItem): node is ast.EnumDefinition {
+  return node.nodeType == 'EnumDefinition';
 }
 
 function isContractDefinition(node: ast.SourceItem): node is ast.ContractDefinition {

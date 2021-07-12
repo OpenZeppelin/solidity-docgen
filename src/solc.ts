@@ -46,7 +46,7 @@ export namespace ast {
     linearizedBaseContracts: number[];
   }
 
-  export type ContractItem = VariableDeclaration | FunctionDefinition | EventDefinition | ModifierDefinition | StructDefinition;
+  export type ContractItem = VariableDeclaration | FunctionDefinition | EventDefinition | ModifierDefinition | StructDefinition | EnumDefinition;
 
   export interface VariableDeclaration {
     nodeType: 'VariableDeclaration';
@@ -85,6 +85,18 @@ export namespace ast {
     name: string;
     members: VariableDeclaration[];
     visibility: 'internal' | 'external' | 'public' | 'private';
+  }
+
+  export interface EnumDefinition {
+    nodeType: 'EnumDefinition';
+    name: string;
+    members: EnumValue[];
+  }
+
+  export interface EnumValue {
+    nodeType: 'EnumValue';
+    id: number;
+    name: string;
   }
 
   export interface ParameterList {

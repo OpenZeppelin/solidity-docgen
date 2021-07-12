@@ -46,7 +46,7 @@ export namespace ast {
     linearizedBaseContracts: number[];
   }
 
-  export type ContractItem = VariableDeclaration | FunctionDefinition | EventDefinition | ModifierDefinition;
+  export type ContractItem = VariableDeclaration | FunctionDefinition | EventDefinition | ModifierDefinition | StructDefinition;
 
   export interface VariableDeclaration {
     nodeType: 'VariableDeclaration';
@@ -78,6 +78,13 @@ export namespace ast {
     name: string;
     documentation: string | null;
     parameters: ParameterList;
+  }
+
+  export interface StructDefinition {
+    nodeType: 'StructDefinition';
+    name: string;
+    members: VariableDeclaration[];
+    visibility: 'internal' | 'external' | 'public' | 'private';
   }
 
   export interface ParameterList {

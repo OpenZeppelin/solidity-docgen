@@ -127,7 +127,7 @@ export class SourceContract implements Linkable {
   }
 
   get linkable(): Linkable[] {
-    return [this, ...this.ownModifiers, ...this.ownVariables, ...this.ownFunctions, ...this.ownEvents];
+    return [this, ...this.ownModifiers, ...this.ownVariables, ...this.ownFunctions, ...this.ownEvents, ...this.ownStructs];
   }
 
   get inheritance(): SourceContract[] {
@@ -215,6 +215,20 @@ export class SourceContract implements Linkable {
       .map(n => new SourceModifier(this, n));
   }
 
+  get structs(): SourceStruct[] {
+    return uniqBy(
+      flatten(this.inheritance.map(c => c.ownStructs)),
+      f => f.signature,
+    )
+  }
+
+  @memoize
+  get ownStructs(): SourceStruct[] {
+    return this.astNode.nodes
+      .filter(isStructDefinition)
+      .map(n => new SourceStruct(this, n))
+  }
+
   @memoize
   get natspec(): NatSpec {
     if (this.astNode.documentation === null || this.astNode.documentation === undefined) {
@@ -251,7 +265,7 @@ abstract class SourceContractItem implements Linkable {
   @memoize
   get args(): SourceTypedVariable[] {
     return SourceTypedVariableArray.fromParameterList(
-      this.astNode.parameters,
+      ('parameters' in this.astNode)?this.astNode.parameters:{parameters: []},
     );
   }
 
@@ -261,7 +275,7 @@ abstract class SourceContractItem implements Linkable {
 
   @memoize
   get natspec(): NatSpec {
-    if (this.astNode.documentation === null || this.astNode.documentation === undefined) {
+    if (!('documentation' in this.astNode) || this.astNode.documentation === null || this.astNode.documentation === undefined) {
       return {};
     }
 
@@ -285,6 +299,38 @@ class SourceStateVariable implements Linkable {
 
   get anchor(): string {
     return `${this.contract.name}-${this.name}-${slug(this.type)}`
+  }
+
+  get type(): string {
+    return this.astNode.typeName.typeDescriptions.typeString;
+  }
+
+  get signature(): string {
+    return `${this.type} ${this.name}`;
+  }
+
+  get natspec(): {} {
+    warnStateVariableNatspec();
+    return {}
+  }
+}
+
+class SourceStructVariable implements Linkable {
+  constructor(
+    readonly struct: SourceStruct,
+    protected readonly astNode: ast.VariableDeclaration,
+  ) { }
+
+  get name(): string {
+    return this.astNode.name;
+  }
+
+  get fullName(): string {
+    return `${this.struct.contract.name}.${this.struct.name}.${this.name}`
+  }
+
+  get anchor(): string {
+    return `${this.struct.contract.name}-${this.struct.name}-${this.name}-${slug(this.type)}`
   }
 
   get type(): string {
@@ -351,6 +397,20 @@ class SourceModifier extends SourceContractItem {
     protected readonly astNode: ast.ModifierDefinition,
   ) {
     super(contract);
+  }
+}
+
+class SourceStruct extends SourceContractItem {
+  constructor(
+    contract: SourceContract,
+    protected readonly astNode: ast.StructDefinition,
+  ) {
+    super(contract);
+  }
+
+  @memoize
+  get members(): SourceStructVariable[] {
+    return this.astNode.members.map(m => new SourceStructVariable(this, m));
   }
 }
 
@@ -522,6 +582,10 @@ function isEventDefinition(node: ast.ContractItem): node is ast.EventDefinition 
 
 function isModifierDefinition(node: ast.ContractItem): node is ast.ModifierDefinition {
   return node.nodeType === 'ModifierDefinition';
+}
+
+function isStructDefinition(node: ast.ContractItem): node is ast.StructDefinition {
+  return node.nodeType == 'StructDefinition';
 }
 
 function isContractDefinition(node: ast.SourceItem): node is ast.ContractDefinition {

@@ -83,6 +83,7 @@ export namespace ast {
   export interface StructDefinition {
     nodeType: 'StructDefinition';
     name: string;
+    documentation: string | null;
     members: VariableDeclaration[];
     visibility: 'internal' | 'external' | 'public' | 'private';
   }
@@ -90,6 +91,7 @@ export namespace ast {
   export interface EnumDefinition {
     nodeType: 'EnumDefinition';
     name: string;
+    documentation: string | null;
     members: EnumValue[];
   }
 
@@ -97,6 +99,7 @@ export namespace ast {
     nodeType: 'EnumValue';
     id: number;
     name: string;
+    documentation: string | null;
   }
 
   export interface ParameterList {

@@ -185,7 +185,7 @@ export class SourceContract implements Linkable {
     const functions = groupBy(this.functions, f => f.contract.astId);
     const events = groupBy(this.events, f => f.contract.astId);
     const modifiers = groupBy(this.modifiers, f => f.contract.astId);
-    const structs = groupBy(this.enums, f => f.contract.astId);
+    const structs = groupBy(this.structs, f => f.contract.astId);
     const enums = groupBy(this.enums, f => f.contract.astId);
 
     return this.inheritance.map(contract => ({
@@ -290,8 +290,16 @@ abstract class SourceContractItem implements Linkable {
 
   @memoize
   get args(): SourceTypedVariable[] {
+    let parametersList: ast.ParameterList = {parameters: []};
+    if(
+      this.astNode.nodeType == 'FunctionDefinition' ||
+      this.astNode.nodeType == 'ModifierDefinition' ||
+      this.astNode.nodeType == 'EventDefinition'
+    ) {
+      parametersList = this.astNode.parameters;
+    }
     return SourceTypedVariableArray.fromParameterList(
-      ('parameters' in this.astNode)?this.astNode.parameters:{parameters: []},
+      parametersList,
     );
   }
 
@@ -301,7 +309,7 @@ abstract class SourceContractItem implements Linkable {
 
   @memoize
   get natspec(): NatSpec {
-    if (!('documentation' in this.astNode) || this.astNode.documentation === null || this.astNode.documentation === undefined) {
+    if (this.astNode.documentation === null || this.astNode.documentation === undefined) {
       return {};
     }
 

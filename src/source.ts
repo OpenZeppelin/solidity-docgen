@@ -127,7 +127,15 @@ export class SourceContract implements Linkable {
   }
 
   get linkable(): Linkable[] {
-    return [this, ...this.ownModifiers, ...this.ownVariables, ...this.ownFunctions, ...this.ownEvents];
+    return [
+      this,
+      ...this.ownModifiers,
+      ...this.ownVariables,
+      ...this.ownFunctions,
+      ...this.ownEvents,
+      ...this.ownStructs,
+      ...this.ownEnums,
+    ];
   }
 
   get inheritance(): SourceContract[] {
@@ -177,6 +185,8 @@ export class SourceContract implements Linkable {
     const functions = groupBy(this.functions, f => f.contract.astId);
     const events = groupBy(this.events, f => f.contract.astId);
     const modifiers = groupBy(this.modifiers, f => f.contract.astId);
+    const structs = groupBy(this.structs, f => f.contract.astId);
+    const enums = groupBy(this.enums, f => f.contract.astId);
 
     return this.inheritance.map(contract => ({
       contract,
@@ -184,6 +194,8 @@ export class SourceContract implements Linkable {
       functions: functions[contract.astId],
       events: events[contract.astId],
       modifiers: modifiers[contract.astId],
+      structs: structs[contract.astId],
+      enums: enums[contract.astId],
     }));
   }
 
@@ -213,6 +225,34 @@ export class SourceContract implements Linkable {
     return this.astNode.nodes
       .filter(isModifierDefinition)
       .map(n => new SourceModifier(this, n));
+  }
+
+  get structs(): SourceStruct[] {
+    return uniqBy(
+      flatten(this.inheritance.map(c => c.ownStructs)),
+      f => f.signature,
+    )
+  }
+
+  @memoize
+  get ownStructs(): SourceStruct[] {
+    return this.astNode.nodes
+      .filter(isStructDefinition)
+      .map(n => new SourceStruct(this, n))
+  }
+
+  get enums(): SourceEnum[] {
+    return uniqBy(
+      flatten(this.inheritance.map(c => c.ownEnums)),
+      f => f.signature,
+    )
+  }
+
+  @memoize
+  get ownEnums(): SourceEnum[] {
+    return this.astNode.nodes
+      .filter(isEnumDefinition)
+      .map(n => new SourceEnum(this, n))
   }
 
   @memoize
@@ -250,8 +290,16 @@ abstract class SourceContractItem implements Linkable {
 
   @memoize
   get args(): SourceTypedVariable[] {
+    let parametersList: ast.ParameterList = {parameters: []};
+    if(
+      this.astNode.nodeType == 'FunctionDefinition' ||
+      this.astNode.nodeType == 'ModifierDefinition' ||
+      this.astNode.nodeType == 'EventDefinition'
+    ) {
+      parametersList = this.astNode.parameters;
+    }
     return SourceTypedVariableArray.fromParameterList(
-      this.astNode.parameters,
+      parametersList,
     );
   }
 
@@ -285,6 +333,38 @@ class SourceStateVariable implements Linkable {
 
   get anchor(): string {
     return `${this.contract.name}-${this.name}-${slug(this.type)}`
+  }
+
+  get type(): string {
+    return this.astNode.typeName.typeDescriptions.typeString;
+  }
+
+  get signature(): string {
+    return `${this.type} ${this.name}`;
+  }
+
+  get natspec(): {} {
+    warnStateVariableNatspec();
+    return {}
+  }
+}
+
+class SourceStructVariable implements Linkable {
+  constructor(
+    readonly struct: SourceStruct,
+    protected readonly astNode: ast.VariableDeclaration,
+  ) { }
+
+  get name(): string {
+    return this.astNode.name;
+  }
+
+  get fullName(): string {
+    return `${this.struct.contract.name}.${this.struct.name}.${this.name}`
+  }
+
+  get anchor(): string {
+    return `${this.struct.contract.name}-${this.struct.name}-${this.name}-${slug(this.type)}`
   }
 
   get type(): string {
@@ -354,6 +434,63 @@ class SourceModifier extends SourceContractItem {
   }
 }
 
+class SourceStruct extends SourceContractItem {
+  constructor(
+    contract: SourceContract,
+    protected readonly astNode: ast.StructDefinition,
+  ) {
+    super(contract);
+  }
+
+  @memoize
+  get members(): SourceStructVariable[] {
+    return this.astNode.members.map(m => new SourceStructVariable(this, m));
+  }
+}
+
+class SourceEnum extends SourceContractItem {
+  constructor(
+    contract: SourceContract,
+    protected readonly astNode: ast.EnumDefinition,
+  ) {
+    super(contract);
+  }
+
+  @memoize
+  get members(): SourceEnumValue[] {
+    return this.astNode.members.map(m => new SourceEnumValue(this, m));
+  }
+}
+
+class SourceEnumValue implements Linkable {
+  constructor(
+    readonly enumerate: SourceEnum,
+    protected readonly astNode: ast.EnumValue,
+  ) { }
+
+
+  get name(): string {
+    return this.astNode.name;
+  }
+
+  get fullName(): string {
+    return `${this.enumerate.contract.name}.${this.enumerate.name}.${this.name}`;
+  }
+
+  get anchor(): string {
+    return `${this.enumerate.contract.name}-${this.enumerate.name}-${this.name}-${slug(this.id.toString())}`;
+  }
+
+  get id(): number {
+    return this.astNode.id;
+  }
+
+  get signature(): string {
+    return `${this.id} ${this.name}`;
+  }
+}
+
+
 class SourceTypedVariable {
   constructor(
     private readonly typeNode: ast.TypeName,
@@ -384,6 +521,8 @@ interface InheritedItems {
   functions: SourceFunction[];
   events: SourceEvent[];
   modifiers: SourceModifier[];
+  structs: SourceStruct[];
+  enums: SourceEnum[];
 }
 
 class PrettyArray<T extends ToString> extends Array<T> {
@@ -522,6 +661,14 @@ function isEventDefinition(node: ast.ContractItem): node is ast.EventDefinition 
 
 function isModifierDefinition(node: ast.ContractItem): node is ast.ModifierDefinition {
   return node.nodeType === 'ModifierDefinition';
+}
+
+function isStructDefinition(node: ast.ContractItem): node is ast.StructDefinition {
+  return node.nodeType == 'StructDefinition';
+}
+
+function isEnumDefinition(node: ast.ContractItem): node is ast.EnumDefinition {
+  return node.nodeType == 'EnumDefinition';
 }
 
 function isContractDefinition(node: ast.SourceItem): node is ast.ContractDefinition {

@@ -30,3 +30,25 @@
 {{{natspec.devdoc}}}
 
 {{/each}}
+
+{{#each ownStructs}}
+### `{{name}}`
+
+{{#each members}}
+
+{{type}} {{name}}
+
+{{/each}}
+
+{{/each}}
+
+{{#each ownEnums}}
+### `{{name}}`
+
+{{#each members}}
+
+{{name}}
+
+{{/each}}
+
+{{/each}}

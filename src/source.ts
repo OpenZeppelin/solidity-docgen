@@ -228,10 +228,7 @@ export class SourceContract implements Linkable {
   }
 
   get structs(): SourceStruct[] {
-    return uniqBy(
-      flatten(this.inheritance.map(c => c.ownStructs)),
-      f => f.signature,
-    )
+    return flatten(this.inheritance.map(c => c.ownStructs));
   }
 
   @memoize
@@ -242,10 +239,7 @@ export class SourceContract implements Linkable {
   }
 
   get enums(): SourceEnum[] {
-    return uniqBy(
-      flatten(this.inheritance.map(c => c.ownEnums)),
-      f => f.signature,
-    )
+    return flatten(this.inheritance.map(c => c.ownEnums));
   }
 
   @memoize
@@ -270,11 +264,11 @@ export class SourceContract implements Linkable {
 }
 
 abstract class SourceContractItem implements Linkable {
+  protected abstract astNode: Exclude<ast.ContractItem, ast.VariableDeclaration>;
+
   constructor(
     readonly contract: SourceContract,
   ) { }
-
-  protected abstract astNode: Exclude<ast.ContractItem, ast.VariableDeclaration>;
 
   get name(): string {
     return this.astNode.name;
@@ -285,21 +279,27 @@ abstract class SourceContractItem implements Linkable {
   }
 
   get anchor(): string {
+    return `${this.contract.name}-${this.name}`;
+  }
+}
+
+abstract class SourceFunctionLike extends SourceContractItem {
+  protected abstract astNode: ast.FunctionDefinition | ast.ModifierDefinition | ast.EventDefinition;
+
+  constructor(
+    readonly contract: SourceContract,
+  ) {
+    super(contract);
+  }
+
+  get anchor(): string {
     return `${this.contract.name}-${slug(this.signature)}`;
   }
 
   @memoize
   get args(): SourceTypedVariable[] {
-    let parametersList: ast.ParameterList = {parameters: []};
-    if(
-      this.astNode.nodeType == 'FunctionDefinition' ||
-      this.astNode.nodeType == 'ModifierDefinition' ||
-      this.astNode.nodeType == 'EventDefinition'
-    ) {
-      parametersList = this.astNode.parameters;
-    }
     return SourceTypedVariableArray.fromParameterList(
-      parametersList,
+      this.astNode.parameters,
     );
   }
 
@@ -349,7 +349,7 @@ class SourceStateVariable implements Linkable {
   }
 }
 
-class SourceStructVariable implements Linkable {
+class SourceStructVariable {
   constructor(
     readonly struct: SourceStruct,
     protected readonly astNode: ast.VariableDeclaration,
@@ -359,29 +359,12 @@ class SourceStructVariable implements Linkable {
     return this.astNode.name;
   }
 
-  get fullName(): string {
-    return `${this.struct.contract.name}.${this.struct.name}.${this.name}`
-  }
-
-  get anchor(): string {
-    return `${this.struct.contract.name}-${this.struct.name}-${this.name}-${slug(this.type)}`
-  }
-
   get type(): string {
     return this.astNode.typeName.typeDescriptions.typeString;
   }
-
-  get signature(): string {
-    return `${this.type} ${this.name}`;
-  }
-
-  get natspec(): {} {
-    warnStateVariableNatspec();
-    return {}
-  }
 }
 
-class SourceFunction extends SourceContractItem {
+class SourceFunction extends SourceFunctionLike {
   constructor(
     contract: SourceContract,
     protected readonly astNode: ast.FunctionDefinition,
@@ -416,7 +399,7 @@ class SourceFunction extends SourceContractItem {
   }
 }
 
-class SourceEvent extends SourceContractItem {
+class SourceEvent extends SourceFunctionLike {
   constructor(
     contract: SourceContract,
     protected readonly astNode: ast.EventDefinition,
@@ -425,7 +408,7 @@ class SourceEvent extends SourceContractItem {
   }
 }
 
-class SourceModifier extends SourceContractItem {
+class SourceModifier extends SourceFunctionLike {
   constructor(
     contract: SourceContract,
     protected readonly astNode: ast.ModifierDefinition,
@@ -446,6 +429,11 @@ class SourceStruct extends SourceContractItem {
   get members(): SourceStructVariable[] {
     return this.astNode.members.map(m => new SourceStructVariable(this, m));
   }
+
+  get natspec(): {} {
+    warnStateVariableNatspec();
+    return {}
+  }
 }
 
 class SourceEnum extends SourceContractItem {
@@ -457,39 +445,15 @@ class SourceEnum extends SourceContractItem {
   }
 
   @memoize
-  get members(): SourceEnumValue[] {
-    return this.astNode.members.map(m => new SourceEnumValue(this, m));
+  get members(): string[] {
+    return this.astNode.members.map(m => m.name);
+  }
+
+  get natspec(): {} {
+    warnStateVariableNatspec();
+    return {}
   }
 }
-
-class SourceEnumValue implements Linkable {
-  constructor(
-    readonly enumerate: SourceEnum,
-    protected readonly astNode: ast.EnumValue,
-  ) { }
-
-
-  get name(): string {
-    return this.astNode.name;
-  }
-
-  get fullName(): string {
-    return `${this.enumerate.contract.name}.${this.enumerate.name}.${this.name}`;
-  }
-
-  get anchor(): string {
-    return `${this.enumerate.contract.name}-${this.enumerate.name}-${this.name}-${slug(this.id.toString())}`;
-  }
-
-  get id(): number {
-    return this.astNode.id;
-  }
-
-  get signature(): string {
-    return `${this.id} ${this.name}`;
-  }
-}
-
 
 class SourceTypedVariable {
   constructor(
@@ -569,7 +533,7 @@ interface NatSpec {
   };
 }
 
-function parseNatSpec(doc: string, context: SourceContractItem | SourceContract): NatSpec {
+function parseNatSpec(doc: string, context: SourceFunctionLike | SourceContract): NatSpec {
   const res: NatSpec = {};
 
   const tagMatches = execall(/^(?:@(\w+|custom:[a-z][a-z-]*) )?((?:(?!^@(?:\w+|custom:[a-z][a-z-]*) )[^])*)/m, doc);
@@ -690,4 +654,4 @@ function oneTimeLogger(msg: string): () => void {
   };
 }
 
-const warnStateVariableNatspec = oneTimeLogger('Warning: NatSpec is currently not available for state variables.');
+const warnStateVariableNatspec = oneTimeLogger('Warning: NatSpec is currently not available for state variables, structs, or enums.');

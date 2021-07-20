@@ -18,4 +18,4 @@ jobs:
     - run: yarn
     - run: yarn test
     - run: yarn coverage
-    - uses: codecov/codecov-action@v1
+    - uses: codecov/codecov-action@v2

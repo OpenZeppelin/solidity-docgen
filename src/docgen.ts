@@ -1,6 +1,6 @@
 import path from 'path';
 import { promises as fs } from 'fs';
-import globby from 'globby';
+import { globby } from 'globby';
 
 import * as handlebars from './handlebars';
 import { VFile } from './vfile';

@@ -3,7 +3,7 @@
 // POSIX-specific path module to ensure everything stays forward-slashed
 
 import { posix as path, sep as platformPathSep } from 'path';
-import globby from 'globby';
+import { globby } from 'globby';
 import micromatch from 'micromatch';
 
 import { memoize } from './memoize';

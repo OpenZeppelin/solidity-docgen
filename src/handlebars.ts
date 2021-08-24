@@ -1,7 +1,19 @@
+// @ts-nocheck
+// This is needed because ts doesn't allow the use of this within a function block.
+// Maybe there is a better way to solve this. I am not aware of it.
+
 import handlebars, { HelperDeclareSpec } from 'handlebars';
 
 const H = handlebars.create();
 H.registerHelper('slug', slug);
+
+H.registerHelper('strip', function(options){
+    let str = options.fn(this);
+    str = str.trim();
+    str = str.replace("\n", "");
+    return new handlebars.SafeString(str);
+});
+
 H.registerHelper({
     eq: function (v1, v2) {
         return v1 === v2;

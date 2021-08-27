@@ -1,0 +1,27 @@
+{{name}}
+
+### devdoc
+
+{{natspec.devdoc}}
+
+### userdoc
+
+{{natspec.userdoc}}
+
+{{#each ownStructs}}
+### `{{name}}`
+
+{{#each members}}
+
+{{type}} {{name}}
+
+{{/each}}
+
+{{/each}}
+
+{{#each ownEnums}}
+### `{{name}}`
+
+{{members}}
+
+{{/each}}

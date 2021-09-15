@@ -127,7 +127,15 @@ export class SourceContract implements Linkable {
   }
 
   get linkable(): Linkable[] {
-    return [this, ...this.ownModifiers, ...this.ownVariables, ...this.ownFunctions, ...this.ownEvents];
+    return [
+      this,
+      ...this.ownModifiers,
+      ...this.ownVariables,
+      ...this.ownFunctions,
+      ...this.ownEvents,
+      ...this.ownStructs,
+      ...this.ownEnums,
+    ];
   }
 
   get inheritance(): SourceContract[] {
@@ -177,6 +185,8 @@ export class SourceContract implements Linkable {
     const functions = groupBy(this.functions, f => f.contract.astId);
     const events = groupBy(this.events, f => f.contract.astId);
     const modifiers = groupBy(this.modifiers, f => f.contract.astId);
+    const structs = groupBy(this.structs, f => f.contract.astId);
+    const enums = groupBy(this.enums, f => f.contract.astId);
 
     return this.inheritance.map(contract => ({
       contract,
@@ -184,6 +194,8 @@ export class SourceContract implements Linkable {
       functions: functions[contract.astId],
       events: events[contract.astId],
       modifiers: modifiers[contract.astId],
+      structs: structs[contract.astId],
+      enums: enums[contract.astId],
     }));
   }
 
@@ -215,6 +227,28 @@ export class SourceContract implements Linkable {
       .map(n => new SourceModifier(this, n));
   }
 
+  get structs(): SourceStruct[] {
+    return flatten(this.inheritance.map(c => c.ownStructs));
+  }
+
+  @memoize
+  get ownStructs(): SourceStruct[] {
+    return this.astNode.nodes
+      .filter(isStructDefinition)
+      .map(n => new SourceStruct(this, n))
+  }
+
+  get enums(): SourceEnum[] {
+    return flatten(this.inheritance.map(c => c.ownEnums));
+  }
+
+  @memoize
+  get ownEnums(): SourceEnum[] {
+    return this.astNode.nodes
+      .filter(isEnumDefinition)
+      .map(n => new SourceEnum(this, n))
+  }
+
   @memoize
   get natspec(): NatSpec {
     if (this.astNode.documentation === null || this.astNode.documentation === undefined) {
@@ -230,11 +264,11 @@ export class SourceContract implements Linkable {
 }
 
 abstract class SourceContractItem implements Linkable {
+  protected abstract astNode: Exclude<ast.ContractItem, ast.VariableDeclaration>;
+
   constructor(
     readonly contract: SourceContract,
   ) { }
-
-  protected abstract astNode: Exclude<ast.ContractItem, ast.VariableDeclaration>;
 
   get name(): string {
     return this.astNode.name;
@@ -242,6 +276,20 @@ abstract class SourceContractItem implements Linkable {
 
   get fullName(): string {
     return `${this.contract.name}.${this.name}`;
+  }
+
+  get anchor(): string {
+    return `${this.contract.name}-${this.name}`;
+  }
+}
+
+abstract class SourceFunctionLike extends SourceContractItem {
+  protected abstract astNode: ast.FunctionDefinition | ast.ModifierDefinition | ast.EventDefinition;
+
+  constructor(
+    readonly contract: SourceContract,
+  ) {
+    super(contract);
   }
 
   get anchor(): string {
@@ -301,7 +349,22 @@ class SourceStateVariable implements Linkable {
   }
 }
 
-class SourceFunction extends SourceContractItem {
+class SourceStructVariable {
+  constructor(
+    readonly struct: SourceStruct,
+    protected readonly astNode: ast.VariableDeclaration,
+  ) { }
+
+  get name(): string {
+    return this.astNode.name;
+  }
+
+  get type(): string {
+    return this.astNode.typeName.typeDescriptions.typeString;
+  }
+}
+
+class SourceFunction extends SourceFunctionLike {
   constructor(
     contract: SourceContract,
     protected readonly astNode: ast.FunctionDefinition,
@@ -336,7 +399,7 @@ class SourceFunction extends SourceContractItem {
   }
 }
 
-class SourceEvent extends SourceContractItem {
+class SourceEvent extends SourceFunctionLike {
   constructor(
     contract: SourceContract,
     protected readonly astNode: ast.EventDefinition,
@@ -345,12 +408,50 @@ class SourceEvent extends SourceContractItem {
   }
 }
 
-class SourceModifier extends SourceContractItem {
+class SourceModifier extends SourceFunctionLike {
   constructor(
     contract: SourceContract,
     protected readonly astNode: ast.ModifierDefinition,
   ) {
     super(contract);
+  }
+}
+
+class SourceStruct extends SourceContractItem {
+  constructor(
+    contract: SourceContract,
+    protected readonly astNode: ast.StructDefinition,
+  ) {
+    super(contract);
+  }
+
+  @memoize
+  get members(): SourceStructVariable[] {
+    return this.astNode.members.map(m => new SourceStructVariable(this, m));
+  }
+
+  get natspec(): {} {
+    warnStateVariableNatspec();
+    return {}
+  }
+}
+
+class SourceEnum extends SourceContractItem {
+  constructor(
+    contract: SourceContract,
+    protected readonly astNode: ast.EnumDefinition,
+  ) {
+    super(contract);
+  }
+
+  @memoize
+  get members(): string[] {
+    return this.astNode.members.map(m => m.name);
+  }
+
+  get natspec(): {} {
+    warnStateVariableNatspec();
+    return {}
   }
 }
 
@@ -384,6 +485,8 @@ interface InheritedItems {
   functions: SourceFunction[];
   events: SourceEvent[];
   modifiers: SourceModifier[];
+  structs: SourceStruct[];
+  enums: SourceEnum[];
 }
 
 class PrettyArray<T extends ToString> extends Array<T> {
@@ -430,7 +533,7 @@ interface NatSpec {
   };
 }
 
-function parseNatSpec(doc: string, context: SourceContractItem | SourceContract): NatSpec {
+function parseNatSpec(doc: string, context: SourceFunctionLike | SourceContract): NatSpec {
   const res: NatSpec = {};
 
   const tagMatches = execall(/^(?:@(\w+|custom:[a-z][a-z-]*) )?((?:(?!^@(?:\w+|custom:[a-z][a-z-]*) )[^])*)/m, doc);
@@ -524,6 +627,14 @@ function isModifierDefinition(node: ast.ContractItem): node is ast.ModifierDefin
   return node.nodeType === 'ModifierDefinition';
 }
 
+function isStructDefinition(node: ast.ContractItem): node is ast.StructDefinition {
+  return node.nodeType == 'StructDefinition';
+}
+
+function isEnumDefinition(node: ast.ContractItem): node is ast.EnumDefinition {
+  return node.nodeType == 'EnumDefinition';
+}
+
 function isContractDefinition(node: ast.SourceItem): node is ast.ContractDefinition {
   return node.nodeType === 'ContractDefinition';
 }
@@ -543,4 +654,4 @@ function oneTimeLogger(msg: string): () => void {
   };
 }
 
-const warnStateVariableNatspec = oneTimeLogger('Warning: NatSpec is currently not available for state variables.');
+const warnStateVariableNatspec = oneTimeLogger('Warning: NatSpec is currently not available for state variables, structs, or enums.');

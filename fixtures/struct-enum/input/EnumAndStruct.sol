@@ -2,18 +2,16 @@
 
 pragma solidity ^0.6;
 
-/**
- * @dev dev docs
- * @notice user docs
- */
-contract EnumAndStructFoo {
-  /// @custom:enum Foo enum
+contract StructAndEnum {
+  /// @dev This is foo
   enum Foo {
     FOO,
     BAR
   }
 
+  /// @dev This is bar
   struct Bar {
     uint256 foo;
+    string bar;
   }
 }

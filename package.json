@@ -19,8 +19,8 @@
     "docs:watch": "yarn docs watch",
     "test": "tsc && ava",
     "test:watch": "fgbg 'ava --watch' 'tsc --watch' --",
-    "prepublish": "rimraf dist tsconfig.tsbuildinfo",
-    "prepare": "yarn build"
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "prepare": "yarn clean && yarn build"
   },
   "dependencies": {
     "@oclif/command": "^1.8.0",

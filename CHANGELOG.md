@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.14
+
+- Add support for documenting structs and enums: `{{structs}}`, `{{ownStructs}}`, and likewise for enums.
+
 ## 0.5.13
 
 - Fix a bug when parsing @custom NatSpec tags.

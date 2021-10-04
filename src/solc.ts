@@ -232,7 +232,7 @@ function importCallback(path: string): SolidityImport {
     return {
       contents: fs.readFileSync(resolved, 'utf8'),
     };
-  } catch (e) {
+  } catch (e: any) {
     return {
       error: e.message,
     };

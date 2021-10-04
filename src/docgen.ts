@@ -71,7 +71,7 @@ async function readTemplate(path: string, allowMissing: boolean = false): Promis
   try {
     const template = await fs.readFile(path, 'utf8');
     return handlebars.compile(template);
-  } catch (e) {
+  } catch (e: any) {
     if (e.code === 'ENOENT' && allowMissing) {
       // default to empty template
       return () => '';

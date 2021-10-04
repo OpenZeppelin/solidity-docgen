@@ -319,10 +319,10 @@
     widest-line "^3.1.0"
     wrap-ansi "^4.0.0"
 
-"@openzeppelin/contracts@^4.0.0":
-  version "4.3.2"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.3.2.tgz#ff80affd6d352dbe1bbc5b4e1833c41afd6283b6"
-  integrity sha512-AybF1cesONZStg5kWf6ao9OlqTZuPqddvprc0ky7lrUVOjXeKpmQ2Y9FK+6ygxasb+4aic4O5pneFBfwVsRRRg==
+"@openzeppelin/contracts@4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.2.0.tgz#260d921d99356e48013d9d760caaa6cea35dc642"
+  integrity sha512-LD4NnkKpHHSMo5z9MvFsG4g1xxZUDqV3A3Futu3nvyfs4wPwXxqOgMaxOoa2PeyGL2VNeSlbxT54enbQzGcgJQ==
 
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
@@ -1001,7 +1001,6 @@ code-point-at@^1.0.0:
 
 "code-style@github:OpenZeppelin/code-style":
   version "0.1.0"
-  uid eaed2f687ad4fa86b325ee1f94e447ab7c98eab6
   resolved "https://codeload.github.com/OpenZeppelin/code-style/tar.gz/eaed2f687ad4fa86b325ee1f94e447ab7c98eab6"
 
 collection-visit@^1.0.0:
@@ -2914,7 +2913,6 @@ onetime@^5.1.0, onetime@^5.1.2:
 
 "openzeppelin-docs-utils@github:OpenZeppelin/docs-utils":
   version "0.1.0"
-  uid dbdcce52e45c89f67f07683c536baf4b541ba68a
   resolved "https://codeload.github.com/OpenZeppelin/docs-utils/tar.gz/dbdcce52e45c89f67f07683c536baf4b541ba68a"
   dependencies:
     chalk "^3.0.0"

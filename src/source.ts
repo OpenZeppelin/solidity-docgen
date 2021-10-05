@@ -55,8 +55,8 @@ export class Source {
 
 class SourceFile {
   constructor(
-    private readonly source: Source,
-    private readonly ast: ast.SourceUnit,
+    readonly source: Source,
+    readonly ast: ast.SourceUnit,
     readonly path: string,
   ) { }
 
@@ -69,32 +69,43 @@ class SourceFile {
     );
   }
 
-  @memoize
   get contractsInScope(): Record<string, SourceContract> {
-    const scope: Record<string, SourceContract> = {};
-
-    for (const c of this.contracts) {
-      scope[c.name] = c;
-    }
-
-    const imports = this.ast.nodes.filter(isImportDirective);
-    for (const i of imports) {
-      const importedFile = this.source.fileById(i.sourceUnit);
-      if (i.symbolAliases.length === 0) {
-        Object.assign(scope, importedFile.contractsInScope);
-      } else {
-        for (const a of i.symbolAliases) {
-          scope[a.local ?? a.foreign.name] = importedFile.contractsInScope[a.foreign.name];
-        }
-      }
-    };
-
-    return scope;
+    return contractsInScope(this);
   }
 
   get astId(): number {
     return this.ast.id;
   }
+}
+
+const scopeCache = new WeakMap<SourceFile, Record<string, SourceContract>>();
+
+function contractsInScope(file: SourceFile): Record<string, SourceContract> {
+  if (scopeCache.has(file)) {
+    return scopeCache.get(file)!;
+  }
+
+  const scope: Record<string, SourceContract> = {};
+
+  scopeCache.set(file, scope);
+
+  for (const c of file.contracts) {
+    scope[c.name] = c;
+  }
+
+  const imports = file.ast.nodes.filter(isImportDirective);
+  for (const i of imports) {
+    const importedFile = file.source.fileById(i.sourceUnit);
+    if (i.symbolAliases.length === 0) {
+      Object.assign(scope, importedFile.contractsInScope);
+    } else {
+      for (const a of i.symbolAliases) {
+        scope[a.local ?? a.foreign.name] = importedFile.contractsInScope[a.foreign.name];
+      }
+    }
+  };
+
+  return scope;
 }
 
 export interface Linkable {

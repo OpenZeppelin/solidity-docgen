@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.15
+
+- Fix use of `@inheritdoc` in circularly dependent files.
+
 ## 0.5.14
 
 - Add support for documenting structs and enums: `{{structs}}`, `{{ownStructs}}`, and likewise for enums.

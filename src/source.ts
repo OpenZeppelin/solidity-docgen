@@ -69,6 +69,7 @@ class SourceFile {
     );
   }
 
+  @memoize
   get contractsInScope(): Record<string, SourceContract> {
     return contractsInScope(this);
   }
@@ -78,16 +79,22 @@ class SourceFile {
   }
 }
 
-const scopeCache = new WeakMap<SourceFile, Record<string, SourceContract>>();
-
-function contractsInScope(file: SourceFile): Record<string, SourceContract> {
-  if (scopeCache.has(file)) {
-    return scopeCache.get(file)!;
+function contractsInScope(
+  file: SourceFile,
+  stack = new Set<SourceFile>(),
+  aliasedImport = false,
+): Record<string, SourceContract> {
+  if (stack.has(file)) {
+    if (aliasedImport) {
+      throw new Error('Circular dependency detected: aliased imports not supported');
+    } else {
+      return {};
+    }
   }
 
-  const scope: Record<string, SourceContract> = {};
+  stack.add(file);
 
-  scopeCache.set(file, scope);
+  const scope: Record<string, SourceContract> = {};
 
   for (const c of file.contracts) {
     scope[c.name] = c;
@@ -96,14 +103,17 @@ function contractsInScope(file: SourceFile): Record<string, SourceContract> {
   const imports = file.ast.nodes.filter(isImportDirective);
   for (const i of imports) {
     const importedFile = file.source.fileById(i.sourceUnit);
+    const importedScope = contractsInScope(importedFile, stack, aliasedImport || i.symbolAliases.length > 0);
     if (i.symbolAliases.length === 0) {
-      Object.assign(scope, importedFile.contractsInScope);
+      Object.assign(scope, importedScope);
     } else {
       for (const a of i.symbolAliases) {
-        scope[a.local ?? a.foreign.name] = importedFile.contractsInScope[a.foreign.name];
+        scope[a.local ?? a.foreign.name] = importedScope[a.foreign.name];
       }
     }
   };
+
+  stack.delete(file);
 
   return scope;
 }

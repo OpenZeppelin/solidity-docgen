@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity ^0.6;
+
+import "./C.sol";
 
 contract A {
     /**
@@ -16,5 +17,5 @@ contract B is A {
      * @inheritdoc A
      * @notice userdoc redefined in B
      */
-    function foo(uint x) external override {}
+    function foo(uint x) external virtual override {}
 }

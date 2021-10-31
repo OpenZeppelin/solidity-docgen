@@ -3,6 +3,7 @@
 // POSIX-specific path module to ensure everything stays forward-slashed
 
 import { posix as path, sep as platformPathSep } from 'path';
+import fs from 'fs';
 import globby from 'globby';
 import micromatch from 'micromatch';
 
@@ -23,13 +24,35 @@ export class Filter {
   @memoize
   get matcher(): (path: string) => boolean {
     return micromatch.matcher('**/*.sol', {
-      ignore: this.excludePaths.map(e => path.join(path.relative(this.root, e), '**/*')),
+      ignore: this.excludePaths.map(e => {
+        if (fs.existsSync(e)) {
+          const fileStat = fs.statSync(e)
+          if (fileStat.isFile()) {
+            return path.relative(this.root, e)
+          }
+          if (fileStat.isDirectory()) {
+            return path.join(path.relative(this.root, e), '**/*')
+          }
+        }
+        return path.join(path.relative(this.root, e), '**/*');
+      }),
     });
   }
 
   async glob(pattern: string): Promise<string[]> {
     return await globby(path.join(this.root, '**', pattern), {
-      ignore: this.excludePaths.map(e => path.join(e, '**/*')),
+      ignore: this.excludePaths.map(e => {
+        if (fs.existsSync(e)) {
+          const fileStat = fs.statSync(e)
+          if (fileStat.isFile()) {
+            return e
+          }
+          if (fileStat.isDirectory()) {
+            return path.join(e, '**/*')
+          }
+        }
+        return path.join(e, '**/*')
+      }),
     });
   }
 }

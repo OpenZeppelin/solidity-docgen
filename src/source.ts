@@ -364,9 +364,13 @@ class SourceStateVariable implements Linkable {
     return `${this.type} ${this.name}`;
   }
 
-  get natspec(): {} {
-    warnStateVariableNatspec();
-    return {}
+  @memoize
+  get natspec(): NatSpec {
+    if (this.astNode.documentation === null || this.astNode.documentation === undefined) {
+      return {};
+    }
+
+    return parseNatSpec(this.astNode.documentation, this);
   }
 }
 
@@ -452,7 +456,7 @@ class SourceStruct extends SourceContractItem {
   }
 
   get natspec(): {} {
-    warnStateVariableNatspec();
+    warnNatSpecIsNotAvailable();
     return {}
   }
 }
@@ -471,7 +475,7 @@ class SourceEnum extends SourceContractItem {
   }
 
   get natspec(): {} {
-    warnStateVariableNatspec();
+    warnNatSpecIsNotAvailable();
     return {}
   }
 }
@@ -554,7 +558,7 @@ interface NatSpec {
   };
 }
 
-function parseNatSpec(doc: string, context: SourceFunctionLike | SourceContract): NatSpec {
+function parseNatSpec(doc: string, context: SourceFunctionLike | SourceContract | SourceStateVariable): NatSpec {
   const res: NatSpec = {};
 
   const tagMatches = execall(/^(?:@(\w+|custom:[a-z][a-z-]*) )?((?:(?!^@(?:\w+|custom:[a-z][a-z-]*) )[^])*)/m, doc);
@@ -675,4 +679,4 @@ function oneTimeLogger(msg: string): () => void {
   };
 }
 
-const warnStateVariableNatspec = oneTimeLogger('Warning: NatSpec is currently not available for state variables, structs, or enums.');
+const warnNatSpecIsNotAvailable = oneTimeLogger('Warning: NatSpec is currently not available for structs and enums.');

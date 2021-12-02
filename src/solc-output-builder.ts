@@ -121,6 +121,7 @@ export class SolcOutputBuilder implements SolcOutput {
       nodeType: 'VariableDeclaration',
       visibility: 'public',
       name: variableName,
+      documentation: null,
       constant: false,
       typeName: {
         nodeType: 'ElementaryTypeName',

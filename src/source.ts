@@ -368,6 +368,14 @@ class SourceStateVariable implements Linkable {
     warnStateVariableNatspec();
     return {}
   }
+
+  get visibility(): 'internal' | 'external' | 'public' | 'private' {
+    return this.astNode.visibility;
+  }
+
+  get constant(): boolean {
+    return this.astNode.constant;
+  }
 }
 
 class SourceStructVariable {

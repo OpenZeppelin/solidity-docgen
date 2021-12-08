@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.17
+
+- Add state variable visibility and constant fields.
+
 ## 0.5.16
 
 - Change handling of circular dependencies to an incomplete but correct approach, fixing a potential issue with bad caching.

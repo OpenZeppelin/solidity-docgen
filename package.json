@@ -37,7 +37,7 @@
     "solc": "^0.6.7"
   },
   "devDependencies": {
-    "@ava/typescript": "^2.0.0",
+    "@ava/typescript": "^3.0.0",
     "@openzeppelin/contracts": "4.2.0",
     "@types/json5": "0.0.30",
     "@types/lodash": "^4.14.161",

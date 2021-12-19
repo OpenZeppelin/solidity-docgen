@@ -1,0 +1,34 @@
+{
+  "name": "solidity-docgen",
+  "version": "0.6.0",
+  "description": "Documentation generator for Solidity smart contracts.",
+  "repository": "github:OpenZeppelin/solidity-docgen",
+  "files": [
+    "dist",
+    "src",
+    "templates"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "docs": "oz-docs -c docs",
+    "docs:watch": "pnpm docs watch",
+    "test": "uvu",
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "prepare": "pnpm clean && pnpm build"
+  },
+  "dependencies": {
+    "handlebars": "^4.7.6"
+  },
+  "devDependencies": {
+    "code-style": "github:OpenZeppelin/code-style",
+    "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils",
+    "typescript": "^4.0.0"
+  },
+  "keywords": [
+    "solidity",
+    "api",
+    "documentation",
+    "generator"
+  ],
+  "license": "MIT"
+}

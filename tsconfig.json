@@ -3,10 +3,12 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "allowJs": true,
-    "experimentalDecorators": true
+    "noUncheckedIndexedAccess": true
   },
   "include": [
     "src/**/*"
-  ]
+  ],
+  "ts-node": {
+    "transpileOnly": true
+  }
 }

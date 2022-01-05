@@ -1,0 +1,33 @@
+{{h}} {{name}}
+
+{{#if modifiers}}
+{{h 1}} Modifiers
+
+{{#each modifiers}}
+{{>item hlevel=4}}
+{{/each}}
+{{/if}}
+
+{{#if events}}
+### Events
+
+{{#each events}}
+{{>item hlevel=4}}
+{{/each}}
+{{/if}}
+
+{{#if functions}}
+### Functions
+
+{{#each functions}}
+{{>item hlevel=4}}
+{{/each}}
+{{/if}}
+
+{{#if errors}}
+### Errors
+
+{{#each errors}}
+{{>item hlevel=4}}
+{{/each}}
+{{/if}}

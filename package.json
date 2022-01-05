@@ -3,6 +3,13 @@
   "version": "0.6.0",
   "description": "Documentation generator for Solidity smart contracts.",
   "repository": "github:OpenZeppelin/solidity-docgen",
+  "keywords": [
+    "solidity",
+    "documentation"
+  ],
+  "author": "Francisco Giordano <fg@frang.io>",
+  "license": "MIT",
+  "main": "dist/index.js",
   "files": [
     "dist",
     "src",
@@ -10,25 +17,26 @@
   ],
   "scripts": {
     "build": "tsc",
+    "clean": "hardhat clean && rimraf dist tsconfig.tsbuildinfo",
+    "coverage": "c8 npm run test",
     "docs": "oz-docs -c docs",
-    "docs:watch": "pnpm docs watch",
-    "test": "uvu",
-    "clean": "rimraf dist tsconfig.tsbuildinfo",
-    "prepare": "pnpm clean && pnpm build"
+    "docs:watch": "npm run docs watch",
+    "prepare": "npm run clean && npm run build",
+    "test": "hardhat compile && ava"
   },
   "dependencies": {
-    "handlebars": "^4.7.6"
+    "handlebars": "^4.7.7",
+    "solidity-ast": "^0.4.28"
   },
   "devDependencies": {
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^12.20.37",
+    "ava": "^3.15.0",
+    "c8": "^7.10.0",
     "code-style": "github:OpenZeppelin/code-style",
+    "hardhat": "^2.8.0",
     "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils",
+    "ts-node": "^10.4.0",
     "typescript": "^4.0.0"
-  },
-  "keywords": [
-    "solidity",
-    "api",
-    "documentation",
-    "generator"
-  ],
-  "license": "MIT"
+  }
 }

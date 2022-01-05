@@ -1,0 +1,19 @@
+{{h}} {{name}}
+
+{{#if signature}}
+`{{signature}}`
+{{/if}}
+
+{{natspec.notice}}
+
+{{#if natspec.dev}}
+Developer note: {{natspec.dev}}
+{{/if}}
+
+{{#each natspec.params}}
+* {{name}}: {{description}}
+{{/each}}
+
+{{#each natspec.returns}}
+* {{#if name}}{{name}}: {{/if}}{{description}}
+{{/each}}

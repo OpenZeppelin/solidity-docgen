@@ -44,7 +44,7 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
     }
 
     if (tag === 'title') {
-      res.title = content;
+      res.title = content.trim();
     }
 
     if (tag === 'param') {
@@ -52,7 +52,7 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
       if (paramMatches) {
         const [, name, description] = paramMatches as [string, string, string];
         res.params ??= [];
-        res.params.push({ name, description });
+        res.params.push({ name, description: description.trim() });
       }
     }
 
@@ -67,14 +67,14 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
         throw new Error(`Got more @return tags than expected for '${item.name}'`);
       }
       if (!p.name) {
-        res.returns.push({ description: content });
+        res.returns.push({ description: content.trim() });
       } else {
         const paramMatches = content.match(/(\w+) ([^]*)/);
         if (!paramMatches || paramMatches[1] !== p.name) {
           throw new Error(`Expected @return tag to start with name '${p.name}'`);
         }
         const [, name, description] = paramMatches as [string, string, string];
-        res.returns.push({ name, description });
+        res.returns.push({ name, description: description.trim() });
       }
     }
 

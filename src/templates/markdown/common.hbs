@@ -10,10 +10,20 @@
 Developer note: {{natspec.dev}}
 {{/if}}
 
-{{#each natspec.params}}
-* {{name}}: {{description}}
-{{/each}}
 
-{{#each natspec.returns}}
-* {{#if name}}{{name}}: {{/if}}{{description}}
+{{#if params}}
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+{{#each params}}
+| {{name}} | {{type}} | {{joinLines natspec}} |
 {{/each}}
+{{/if}}
+
+{{#if returns}}
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+{{#each returns}}
+| {{#if name}}{{name}}{{else}}[{{@index}}]{{/if}} | {{type}} | {{joinLines natspec}} |
+{{/each}}
+{{/if}}
+

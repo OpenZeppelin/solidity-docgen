@@ -1,33 +1,17 @@
-{{h}} {{name}}
-
-{{#if modifiers}}
-{{h 1}} Modifiers
+{{h 1}} {{name}}
 
 {{#each modifiers}}
-{{>item hlevel=4}}
+{{>item hlevel=2}}
 {{/each}}
-{{/if}}
-
-{{#if events}}
-### Events
 
 {{#each events}}
-{{>item hlevel=4}}
+{{>item hlevel=2}}
 {{/each}}
-{{/if}}
-
-{{#if functions}}
-### Functions
 
 {{#each functions}}
-{{>item hlevel=4}}
+{{>item hlevel=2}}
 {{/each}}
-{{/if}}
-
-{{#if errors}}
-### Errors
 
 {{#each errors}}
-{{>item hlevel=4}}
+{{>item hlevel=2}}
 {{/each}}
-{{/if}}

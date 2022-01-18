@@ -1,7 +1,8 @@
+import { TypeName } from "solidity-ast";
 import { DocItemWithContext } from "../../site";
 
 /**
- * Returns a Markdown heading prefix. An optional `hlevel` context variable increases the heading level.
+ * Returns a Markdown heading marker. An optional `hlevel` context variable increases the heading level.
  *
  * Examples:
  *     {{h}} {{name}}
@@ -9,10 +10,18 @@ import { DocItemWithContext } from "../../site";
  *     {{h}} Functions
  */
 export function h(this: DocItemWithContext & { hlevel?: number }, hsublevel: number | object) {
-  if (typeof hsublevel !== 'number') {
-    hsublevel = 1;
-  } else {
-    hsublevel = Math.max(1, hsublevel);
-  }
-  return new Array((this.hlevel ?? 0) + hsublevel).fill('#').join('');
+  hsublevel = typeof hsublevel === 'number' ? Math.max(1, hsublevel) : 1;
+  return new Array((this.hlevel ?? 1) + hsublevel - 1).fill('#').join('');
 };
+
+export function trim(text: string) {
+  if (typeof text === 'string') {
+    return text.trim();
+  }
+}
+
+export function joinLines(text?: string) {
+  if (typeof text === 'string') {
+    return text.replace(/\n+/g, ' ');
+  }
+}

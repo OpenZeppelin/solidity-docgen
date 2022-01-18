@@ -1,4 +1,4 @@
-import { ErrorDefinition, EventDefinition, FunctionDefinition, ModifierDefinition, VariableDeclaration } from 'solidity-ast';
+import { ErrorDefinition, EventDefinition, FunctionDefinition, ModifierDefinition, ParameterList, VariableDeclaration } from 'solidity-ast';
 import { findAll, isNodeType } from 'solidity-ast/utils';
 import { NatSpec, parseNatspec } from './utils/natspec';
 import { DocItemWithContext } from './site';
@@ -11,9 +11,23 @@ import { mapValues } from './utils/map-values';
  */
 export function wrapWithAccessors(item: DocItemWithContext): DocItemWithContext {
   return {
-    ...mapValues(accessors, fn => fn(item)),
     ...item,
+    ...mapValues(accessors, fn => fn(item)),
   };
+}
+
+type Param = {
+  name: string;
+  type: string;
+  natspec?: string;
+};
+
+function getParams(params: ParameterList, natspec: NatSpec): Param[] {
+  return params.parameters.map(p => ({
+    name: p.name,
+    type: p.typeDescriptions.typeString!,
+    natspec: natspec.params?.find(q => p.name === q.name)?.description,
+  }));
 }
 
 export const accessors = {
@@ -27,14 +41,37 @@ export const accessors = {
     return parseNatspec(item);
   },
 
+  name(item: DocItemWithContext): string {
+    if (item.nodeType === 'FunctionDefinition') {
+      return item.kind === 'function' ? item.name : item.kind;
+    } else {
+      return item.name;
+    }
+  },
+
   signature(item: DocItemWithContext): string | undefined {
     switch (item.nodeType) {
       case 'ContractDefinition':
         return undefined;
 
       case 'FunctionDefinition': {
-        return `${item.name}(${item.parameters.parameters.map(a => a.typeName?.typeDescriptions.typeString!).join(',')})`;
+        const name = accessors.name(item);
+        return `${name}(${item.parameters.parameters.map(a => a.typeName?.typeDescriptions.typeString!).join(',')})`;
       }
+    }
+  },
+
+  params(item: DocItemWithContext): Param[] | undefined {
+    if (item.nodeType === 'FunctionDefinition') {
+      const natspec = accessors.natspec(item);
+      return getParams(item.parameters, natspec);
+    }
+  },
+
+  returns(item: DocItemWithContext): Param[] | undefined {
+    if (item.nodeType === 'FunctionDefinition') {
+      const natspec = accessors.natspec(item);
+      return getParams(item.returnParameters, natspec);
     }
   },
 

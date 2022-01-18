@@ -1,4 +1,4 @@
-export { main } from './main';
+export { main as docgen } from './main';
 export { DocItemWithContext } from './site';
 
 import './hardhat/type-extensions';

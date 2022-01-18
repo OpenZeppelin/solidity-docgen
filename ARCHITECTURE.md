@@ -17,4 +17,4 @@ Templates use [Handlebars].
 
 [Handlebars]: https://handlebarsjs.com/
 
-There is a special template partial (i.e. a sub-template) called `item` (defined as `itemPartial`) that augments an item with custom properties we call accessors that make templates easier to write. Most things should not be accessors but helpers, which are more versatile and independent of the `item` partial. A helper may become an accessor if this significantly improves template syntax.
+There is a special template partial (i.e. a sub-template) called `item` (defined in the function `itemPartial`) that augments an item with custom properties we call accessors that make templates easier to write, defined in `accessors`. Most things should not be accessors but template helpers, which are more versatile, available anywhere independently of the `item` partial, and can be provided by the user. A helper may become an accessor if this significantly improves template syntax.

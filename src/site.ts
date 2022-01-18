@@ -1,6 +1,7 @@
 import { ContractDefinition, SourceUnit } from 'solidity-ast';
 import { SolcOutput } from 'solidity-ast/solc';
 import { astDereferencer, ASTDereferencer, findAll } from 'solidity-ast/utils';
+import { Config } from './config';
 import { DocItem, docItemTypes, isDocItem } from './doc-item';
 import { clone } from './utils/clone';
 
@@ -8,7 +9,7 @@ export interface Build {
   output: SolcOutput;
 }
 
-export type PageAssigner = (item: DocItem, file: SourceUnit) => string | undefined;
+export type PageAssigner = NonNullable<Config['pages']>;
 
 export interface Site {
   items: DocItemWithContext[];

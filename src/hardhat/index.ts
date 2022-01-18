@@ -4,6 +4,7 @@ import { BuildInfo } from 'hardhat/types';
 import './type-extensions';
 
 extendConfig((config, userConfig) => {
+  config.docgen ??= {};
   config.docgen.root = config.paths.root;
 });
 

@@ -1,12 +1,6 @@
 import { PageAssigner } from './site';
 
-export interface Config {
-  /**
-   * The root directory relative to which 'output' and 'templates' are
-   * specified. Defaults to the working directory.
-   */
-  root?: string;
-
+export interface UserConfig {
   /**
    * The directory where rendered pages will be written.
    */
@@ -22,11 +16,19 @@ export interface Config {
   /**
    * An array of directories or built-in names that should be searched
    * sequentially for templates and helpers. A single string is equal to an
-   * array with only that string.
+   * array with only that string. Defaults to built-in markdown templates.
    */
   templates?: string[] | string;
 
   collapseNewlines?: boolean;
+}
+
+export interface Config extends UserConfig {
+  /**
+   * The root directory relative to which 'output' and 'templates' are
+   * specified. Defaults to the working directory.
+   */
+  root?: string;
 }
 
 export const defaults: Required<Config> = {

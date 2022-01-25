@@ -38,8 +38,7 @@ export async function readTemplates(templates: string[], root: string): Promise<
   for (const nameOrPath of templates) {
     const dir = await findExists(
       path.resolve(root, nameOrPath),
-      // __dirname will be in dist
-      path.resolve(__dirname, '../src/templates', nameOrPath),
+      path.resolve(__dirname, './templates', nameOrPath),
     );
 
     if (dir === undefined) {

@@ -1,4 +1,5 @@
 import { promises as fs, constants } from 'fs';
+import path from 'path';
 
 export async function exists(path: string, mode: number = constants.R_OK): Promise<boolean> {
   try {
@@ -15,4 +16,8 @@ export async function findExists(...paths: string[]): Promise<string | undefined
       return p;
     }
   }
+}
+
+export async function findIn(f: string, dirs: string[]): Promise<string | undefined> {
+  return findExists(...dirs.map(d => path.resolve(d, f)));
 }

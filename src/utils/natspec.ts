@@ -86,8 +86,8 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
     }
 
     if (tag === 'inheritdoc') {
-      if (item.nodeType !== 'FunctionDefinition') {
-        throw new Error(`Expected function but saw ${accessors.type(item)}`);
+      if (!(item.nodeType === 'FunctionDefinition' || item.nodeType === 'VariableDeclaration')) {
+        throw new Error(`Expected function or variable but saw ${accessors.type(item)}`);
       }
       const parentContractName = content.trim();
       const parentContract = getContractsInScope(item)[parentContractName];

@@ -36,7 +36,7 @@ export function render(site: Site, templates: Templates, collapseNewlines?: bool
   return rendered;
 }
 
-export const itemPartialName = (item: DocItemWithContext) => accessors.type(item).replace(' ', '').toLowerCase();
+export const itemPartialName = (item: DocItemWithContext) => accessors.type(item).replace(/ /g, '-').toLowerCase();
 
 function itemPartial(item: DocItemWithContext, options?: RuntimeOptions) {
   if (!item.__item_context) {

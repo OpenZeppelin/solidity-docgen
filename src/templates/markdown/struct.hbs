@@ -1,0 +1,15 @@
+{{h}} {{name}}
+
+{{natspec.notice}}
+
+{{#if natspec.dev}}
+_{{natspec.dev}}_
+{{/if}}
+
+```
+struct {{name}} {
+{{#each members}}
+  {{name}};
+{{/each}}
+}
+```

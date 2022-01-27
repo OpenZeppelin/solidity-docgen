@@ -98,6 +98,9 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
     }
   }
 
+  if (res.dev) res.dev = res.dev.trim();
+  if (res.notice) res.notice = res.notice.trim();
+
   if (inheritFrom) {
     res = { ...parseNatspec(inheritFrom as DocItemWithContext), ...res };
   }

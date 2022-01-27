@@ -1,8 +1,10 @@
-import { ErrorDefinition, EventDefinition, FunctionDefinition, ModifierDefinition, ParameterList, VariableDeclaration } from 'solidity-ast';
+import { EnumDefinition, ErrorDefinition, EventDefinition, FunctionDefinition, ModifierDefinition, ParameterList, StructDefinition, UserDefinedValueTypeDefinition, VariableDeclaration } from 'solidity-ast';
 import { findAll, isNodeType } from 'solidity-ast/utils';
 import { NatSpec, parseNatspec } from './utils/natspec';
 import { DocItemWithContext } from './site';
 import { mapValues } from './utils/map-values';
+
+type TypeDefinition = StructDefinition | EnumDefinition | UserDefinedValueTypeDefinition;
 
 /**
  * Returns a new object with all of the item properties plus the accessors
@@ -22,11 +24,11 @@ type Param = {
   natspec?: string;
 };
 
-function getParams(params: ParameterList, natspec: NatSpec): Param[] {
-  return params.parameters.map(p => ({
+function getParams(params: ParameterList, natspec: NatSpec['params'] | NatSpec['returns']): Param[] {
+  return params.parameters.map((p, i) => ({
     name: p.name,
     type: p.typeDescriptions.typeString!,
-    natspec: natspec.params?.find(q => p.name === q.name)?.description,
+    natspec: natspec?.find((q, j) => q.name === undefined ? i === j : p.name === q.name)?.description,
   }));
 }
 
@@ -56,7 +58,15 @@ export const accessors = {
 
       case 'FunctionDefinition': {
         const name = accessors.name(item);
-        return `${name}(${item.parameters.parameters.map(a => a.typeName?.typeDescriptions.typeString!).join(',')})`;
+        const params = item.parameters.parameters.map(a =>
+          [a.typeName?.typeDescriptions.typeString!].concat(a.name || []).join(' ')
+        );
+        return `${name}(${params.join(', ')})`;
+      }
+
+      case 'VariableDeclaration': {
+        const name = accessors.name(item);
+        return `${item.typeName?.typeDescriptions.typeString!} ${name}`;
       }
     }
   },
@@ -64,14 +74,14 @@ export const accessors = {
   params(item: DocItemWithContext): Param[] | undefined {
     if (item.nodeType === 'FunctionDefinition') {
       const natspec = accessors.natspec(item);
-      return getParams(item.parameters, natspec);
+      return getParams(item.parameters, natspec.params);
     }
   },
 
   returns(item: DocItemWithContext): Param[] | undefined {
     if (item.nodeType === 'FunctionDefinition') {
       const natspec = accessors.natspec(item);
-      return getParams(item.returnParameters, natspec);
+      return getParams(item.returnParameters, natspec.returns);
     }
   },
 
@@ -95,5 +105,9 @@ export const accessors = {
     return (item.nodeType === 'ContractDefinition')
       ? item.nodes.filter(isNodeType('VariableDeclaration')).filter(v => v.stateVariable)
       : undefined;
+  },
+
+  types(item: DocItemWithContext): TypeDefinition[] | undefined {
+    return [...findAll(['StructDefinition', 'EnumDefinition', 'UserDefinedValueTypeDefinition'], item)];
   },
 };

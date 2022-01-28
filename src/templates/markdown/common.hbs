@@ -1,7 +1,7 @@
 {{h}} {{name}}
 
 {{#if signature}}
-```
+```solidity
 {{signature}}
 ```
 {{/if}}
@@ -12,7 +12,7 @@
 _{{natspec.dev}}_
 {{/if}}
 
-{{#if params}}
+{{#if natspec.params}}
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 {{#each params}}
@@ -20,7 +20,7 @@ _{{natspec.dev}}_
 {{/each}}
 {{/if}}
 
-{{#if returns}}
+{{#if natspec.returns}}
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 {{#each returns}}

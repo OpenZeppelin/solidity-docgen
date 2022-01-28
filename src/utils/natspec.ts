@@ -57,8 +57,8 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
     }
 
     if (tag === 'return') {
-      if (item.nodeType !== 'FunctionDefinition') {
-        throw new Error(`Expected function but saw ${accessors.type(item)}`);
+      if (!('returnParameters' in item)) {
+        throw new Error(`Item does not contain return parameters`);
       }
       res.returns ??= [];
       const i = res.returns.length;

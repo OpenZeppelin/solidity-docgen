@@ -3,6 +3,7 @@ import { findAll, isNodeType } from 'solidity-ast/utils';
 import { NatSpec, parseNatspec } from './utils/natspec';
 import { DocItemWithContext } from './site';
 import { mapValues } from './utils/map-values';
+import { DocItem, docItemTypes } from './doc-item';
 
 type TypeDefinition = StructDefinition | EnumDefinition | UserDefinedValueTypeDefinition;
 
@@ -32,6 +33,10 @@ function getParams(params: ParameterList, natspec: NatSpec['params'] | NatSpec['
   }));
 }
 
+function formatVariable(v: VariableDeclaration): string {
+  return [v.typeName?.typeDescriptions.typeString!].concat(v.name || []).join(' ');
+}
+
 export const accessors = {
   type(item: DocItemWithContext): string {
     return item.nodeType
@@ -57,32 +62,64 @@ export const accessors = {
         return undefined;
 
       case 'FunctionDefinition': {
-        const name = accessors.name(item);
-        const params = item.parameters.parameters.map(a =>
-          [a.typeName?.typeDescriptions.typeString!].concat(a.name || []).join(' ')
-        );
-        return `${name}(${params.join(', ')})`;
+        const { kind, name } = item;
+        const params = item.parameters.parameters;
+        const returns = item.returnParameters.parameters;
+        const head = (kind === 'function' || kind === 'freeFunction') ? [kind, name].join(' ') : kind;
+        let res = [
+          `${head}(${params.map(formatVariable).join(', ')})`,
+          item.visibility,
+        ];
+        if (item.stateMutability !== 'nonpayable') {
+          res.push(item.stateMutability);
+        }
+        if (item.virtual) {
+          res.push('virtual');
+        }
+        if (returns.length > 0) {
+          res.push(`returns (${returns.map(formatVariable).join(', ')})`);
+        }
+        return res.join(' ');
       }
 
-      case 'VariableDeclaration': {
-        const name = accessors.name(item);
-        return `${item.typeName?.typeDescriptions.typeString!} ${name}`;
+      case 'EventDefinition': {
+        const params = item.parameters.parameters;
+        return `event ${item.name}(${params.map(formatVariable).join(', ')})`;
       }
+
+      case 'ErrorDefinition': {
+        const params = item.parameters.parameters;
+        return `error ${item.name}(${params.map(formatVariable).join(', ')})`;
+      }
+
+      case 'ModifierDefinition': {
+        const params = item.parameters.parameters;
+        return `modifier ${item.name}(${params.map(formatVariable).join(', ')})`;
+      }
+
+      case 'VariableDeclaration':
+        return formatVariable(item);
     }
   },
 
   params(item: DocItemWithContext): Param[] | undefined {
-    if (item.nodeType === 'FunctionDefinition') {
+    if ('parameters' in item) {
       const natspec = accessors.natspec(item);
       return getParams(item.parameters, natspec.params);
     }
   },
 
   returns(item: DocItemWithContext): Param[] | undefined {
-    if (item.nodeType === 'FunctionDefinition') {
+    if ('returnParameters' in item) {
       const natspec = accessors.natspec(item);
       return getParams(item.returnParameters, natspec.returns);
     }
+  },
+
+  items(item: DocItemWithContext): DocItem[] | undefined {
+    return (item.nodeType === 'ContractDefinition')
+      ? item.nodes.filter(isNodeType(docItemTypes))
+      : undefined;
   },
 
   functions(item: DocItemWithContext): FunctionDefinition[] | undefined {

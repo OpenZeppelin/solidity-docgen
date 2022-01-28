@@ -1,15 +1,9 @@
-{{h}} {{name}}
+{{>common}}
 
-{{natspec.notice}}
-
-{{#if natspec.dev}}
-_{{natspec.dev}}_
-{{/if}}
-
-```
+```solidity
 struct {{name}} {
 {{#each members}}
-  {{name}};
+  {{typeName.typeDescriptions.typeString}} {{name}};
 {{/each}}
 }
 ```

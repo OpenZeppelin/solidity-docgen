@@ -6,12 +6,11 @@ type HLevel = { hlevel?: number };
 type DocItemWithHLevel = DocItemWithContext & HLevel;
 
 /**
- * Returns a Markdown heading marker. An optional `hlevel` context variable increases the heading level.
+ * Returns a Markdown heading marker. An optional number increases the heading level.
  *
- * Examples:
- *     {{h}} {{name}}
- *     {{h 1}} {{Name}}
- *     {{h}} Functions
+ *    Input                  Output
+ *    {{h}} {{name}}         # Name
+ *    {{h 2}} {{name}}       ## Name
  */
 export function h(this: DocItemWithHLevel, hsublevel: number | HelperOptions) {
   ({ hsublevel } = getHSublevel(hsublevel));
@@ -19,8 +18,15 @@ export function h(this: DocItemWithHLevel, hsublevel: number | HelperOptions) {
   return new Array(getHLevel(this) + hsublevel - 1).fill('#').join('');
 };
 
-export function hsection(this: DocItemWithHLevel, hsublevel: number, opts: HelperOptions): string;
+/**
+ * Delineates a section where headings should be increased by 1 or a custom number.
+ *
+ *    {{#hsection}}
+ *    {{>partial-with-headings}}
+ *    {{/hsection}}
+ */
 export function hsection(this: DocItemWithHLevel, opts: HelperOptions): string;
+export function hsection(this: DocItemWithHLevel, hsublevel: number, opts: HelperOptions): string;
 export function hsection(this: DocItemWithHLevel, hsublevel: number | HelperOptions, opts?: HelperOptions) {
   ({ hsublevel, opts } = getHSublevel(hsublevel, opts));
   const hlevel = getHLevel(this) + hsublevel;

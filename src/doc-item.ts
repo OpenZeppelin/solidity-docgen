@@ -11,12 +11,12 @@ export const docItemTypes = [
   'ContractDefinition',
   'EnumDefinition',
   'ErrorDefinition',
+  'EventDefinition',
   'FunctionDefinition',
+  'ModifierDefinition',
   'StructDefinition',
   'UserDefinedValueTypeDefinition',
   'VariableDeclaration',
-  'EventDefinition',
-  'ModifierDefinition',
 ] as const;
 
 // Make sure at compile time that docItemTypes contains exactly the node types of DocItem.

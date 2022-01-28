@@ -1,61 +1,8 @@
 {{>common}}
 
-{{#if types}}
-{{h 2}} Types
-
-{{#each types}}
-{{#hsection 3}}
+{{#each items}}
+{{#hsection 2}}
 {{>item}}
 {{/hsection}}
+
 {{/each}}
-{{/if}}
-
-{{#if events}}
-{{h 2}} Events
-
-{{#each events}}
-{{#hsection 3}}
-{{>item}}
-{{/hsection}}
-{{/each}}
-{{/if}}
-
-{{#if modifiers}}
-{{h 2}} Modifiers
-
-{{#each modifiers}}
-{{#hsection 3}}
-{{>item}}
-{{/hsection}}
-{{/each}}
-{{/if}}
-
-{{#if variables}}
-{{h 2}} Variables
-
-{{#each variables}}
-{{#hsection 3}}
-{{>item}}
-{{/hsection}}
-{{/each}}
-{{/if}}
-
-{{#if functions}}
-{{h 2}} Functions
-
-{{#each functions}}
-{{#hsection 3}}
-{{>item}}
-{{/hsection}}
-{{/each}}
-{{/if}}
-
-{{#if errors}}
-{{h 2}} Custom Errors
-
-{{#each errors}}
-{{#hsection 3}}
-{{>item}}
-{{/hsection}}
-{{/each}}
-{{/if}}

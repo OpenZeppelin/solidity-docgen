@@ -36,7 +36,6 @@ export async function readTemplates(templates: string[], root: string): Promise<
   const helpers: Record<string, any> = {};
 
   for (const nameOrPath of templates) {
-    // Look in src because built-in templates are not copied to dist
     const templatesDir = await findIn(nameOrPath, [root, path.join(__dirname, 'templates')]);
     if (templatesDir === undefined) {
       throw new Error(`Templates directory '${nameOrPath}' not found`);

@@ -2,6 +2,7 @@ import { FunctionDefinition } from 'solidity-ast';
 import { findAll } from 'solidity-ast/utils';
 import { accessors } from '../accessors';
 import { DocItemWithContext } from '../site';
+import { arraysEqual } from './arrays-equal';
 import { execAll } from './execall';
 import { getContractsInScope } from './scope';
 
@@ -24,13 +25,16 @@ export interface NatSpec {
 
 export function parseNatspec(item: DocItemWithContext): NatSpec {
   if (!item.__item_context) throw new Error(`Not an item or item is missing context`);
-  if (!('documentation' in item && item.documentation)) return {};
 
   let res: NatSpec = {};
 
+  const docString = 'documentation' in item && item.documentation?.text
+    ? cleanUpDocstring(item.documentation.text)
+    : '';
+
   const tagMatches = execAll(
     /^(?:@(\w+|custom:[a-z][a-z-]*) )?((?:(?!^@(?:\w+|custom:[a-z][a-z-]*) )[^])*)/m,
-    cleanUpDocstring(item.documentation.text),
+    docString,
   );
 
   let inheritFrom: FunctionDefinition | undefined;
@@ -94,7 +98,17 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
       if (!parentContract) {
         throw new Error(`Parent contract '${parentContractName}' not found`);
       }
-      inheritFrom = [...findAll('FunctionDefinition', parentContract)].find(f => f.name === item.name);
+      inheritFrom = [...findAll('FunctionDefinition', parentContract)].find(f => item.baseFunctions?.includes(f.id));
+    }
+  }
+
+  if (docString.length === 0) {
+    if ('baseFunctions' in item && item.baseFunctions?.length === 1) {
+      const baseFn = item.__item_context.build.deref('FunctionDefinition', item.baseFunctions[0]!);
+      const shouldInherit = item.nodeType === 'VariableDeclaration' || arraysEqual(item.parameters.parameters, baseFn.parameters.parameters, p => p.name);
+      if (shouldInherit) {
+        inheritFrom = baseFn;
+      }
     }
   }
 
@@ -104,7 +118,6 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
   if (inheritFrom) {
     res = { ...parseNatspec(inheritFrom as DocItemWithContext), ...res };
   }
-  // [TODO] inheritance by default as specified by solidity
 
   return res;
 }

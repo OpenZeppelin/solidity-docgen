@@ -23,7 +23,10 @@ export async function loadTemplates(defaultTheme: string, root: string, userTemp
   const themes = await readThemes();
 
   // Initialize templates with the default theme.
-  const templates = themes[defaultTheme];
+  const templates = {
+    partials: { ...themes[defaultTheme]?.partials },
+    helpers: { ...themes[defaultTheme]?.helpers },
+  };
 
   if (templates === undefined) {
     throw new Error(`Unknown theme '${defaultTheme}'`);

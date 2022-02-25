@@ -1,8 +1,9 @@
 import test from './utils/test';
 import path from 'path';
 import { buildSite, PageAssigner } from './site';
-import { itemPartialName, render, Templates } from './render';
+import { itemPartialName, render } from './render';
 import { NodeType } from 'solidity-ast/node';
+import { Templates } from './templates';
 
 interface TestSpec extends Templates {
   collapseNewlines?: boolean;
@@ -25,21 +26,23 @@ function testRender(title: string, file: string, spec: TestSpec, expected: strin
 
 testRender('static page',
   'S08_AB',
-  { page: 'a page' },
+  { partials: { page: () => 'a page' } },
   'a page',
 );
 
 testRender('items',
   'S08_AB',
-  { page: '{{#each items}}{{name}}, {{/each}}' },
+  { partials: { page: () => '{{#each items}}{{name}}, {{/each}}' } },
   'A, B, ',
 );
 
 testRender('partials',
   'S08_AB',
   {
-    page: '{{#each items}}{{>part}}, {{/each}}',
-    partials: { part: '{{name}}' },
+    partials: {
+      page: () => '{{#each items}}{{>part}}, {{/each}}',
+      part: () => '{{name}}',
+    },
   },
   'A, B, ',
 );
@@ -47,8 +50,10 @@ testRender('partials',
 testRender('item partial',
   'S08_AB',
   {
-    page: '{{#each items}}{{>item}}, {{/each}}',
-    partials: { contract: '{{name}}' },
+    partials: {
+      page: () => '{{#each items}}{{>item}}, {{/each}}',
+      contract: () => '{{name}}',
+    },
   },
   'A, B, ',
 );

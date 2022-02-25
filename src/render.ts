@@ -2,12 +2,7 @@ import Handlebars, { RuntimeOptions } from 'handlebars';
 import { Node, NodeType } from 'solidity-ast/node';
 import { Site, Page, DocItemWithContext } from './site';
 import { accessors, wrapWithAccessors } from './accessors';
-
-export interface Templates {
-  page: string;
-  partials?: Record<string, string>;
-  helpers?: Record<string, (...args: unknown[]) => string>;
-}
+import { Templates } from './templates';
 
 export interface RenderedPage {
   id: string;
@@ -21,19 +16,19 @@ interface TemplateOptions {
 }
 
 export function render(site: Site, templates: Templates, collapseNewlines?: boolean): RenderedPage[] {
-  const template = buildTemplate(templates);
-  const rendered: RenderedPage[] = [];
+  const renderPage = buildRenderer(templates);
+  const renderedPages: RenderedPage[] = [];
   for (const page of site.pages) {
-    let contents = template(page, { data: { site } });
+    let contents = renderPage(page, { data: { site } });
     if (collapseNewlines) {
       contents = contents.replace(/\n{3,}/g, '\n\n');
     }
-    rendered.push({
+    renderedPages.push({
       id: page.id,
       contents,
     });
   }
-  return rendered;
+  return renderedPages;
 }
 
 export const itemPartialName = (item: DocItemWithContext) => accessors.type(item).replace(/ /g, '-').toLowerCase();
@@ -49,11 +44,20 @@ function itemPartial(item: DocItemWithContext, options?: RuntimeOptions) {
   return partial(wrapWithAccessors(item), options);
 }
 
-function buildTemplate(templates: Templates): (page: Page, options: TemplateOptions) => string {
+function buildRenderer(templates: Templates): (page: Page, options: TemplateOptions) => string {
+  const pageTemplate = templates.partials?.page;
+  if (pageTemplate === undefined) {
+    throw new Error(`Missing 'page' template`);
+  }
+
   const H = Handlebars.create();
 
-  for (const [name, body] of Object.entries(templates.partials ?? {})) {
-    H.registerPartial(name, H.compile(body));
+  for (const [name, getBody] of Object.entries(templates.partials ?? {})) {
+    let partial: HandlebarsTemplateDelegate | undefined;
+    H.registerPartial(name, (...args) => {
+      partial ??= H.compile(getBody());
+      return partial(...args);
+    });
   }
 
   for (const [name, fn] of Object.entries(templates.helpers ?? {})) {
@@ -62,5 +66,5 @@ function buildTemplate(templates: Templates): (page: Page, options: TemplateOpti
 
   H.registerPartial('item', itemPartial);
 
-  return H.compile(templates.page);
+  return H.compile('{{>page}}');
 }

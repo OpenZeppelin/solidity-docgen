@@ -5,6 +5,7 @@ import { PageAssigner } from './site';
 export interface UserConfig {
   /**
    * The directory where rendered pages will be written.
+   * Defaults to `docs`.
    */
   output?: string;
 
@@ -17,12 +18,16 @@ export interface UserConfig {
   pages?: (item: DocItem, file: SourceUnit) => string | undefined;
 
   /**
-   * An array of directories or built-in names that should be searched
-   * sequentially for templates and helpers. A single string is equal to an
-   * array with only that string.
-   * Defaults to built-in markdown templates.
+   * A directory of custom templates that should take precedence over the
+   * theme's templates.
    */
-  templates?: string[] | string;
+  templates?: string;
+
+  /**
+   * The name of the built-in templates that will be used by default.
+   * Defaults to markdown theme.
+   */
+  theme?: string;
 
   /**
    * Clean up the output by collapsing 3 or more contiguous newlines into only 2.
@@ -43,10 +48,10 @@ export interface Config extends UserConfig {
   root?: string;
 }
 
-export const defaults: Required<Config> = {
+export const defaults: Omit<Required<Config>, 'templates'> = {
   root: process.cwd(),
   output: 'docs',
   pages: () => 'index.md',
-  templates: 'markdown',
+  theme: 'markdown',
   collapseNewlines: true,
 };

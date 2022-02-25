@@ -20,7 +20,7 @@ export async function main(builds: Build[], userConfig?: Config): Promise<void> 
   const renderedSite = render(site, templates, config.collapseNewlines);
 
   for (const { id, contents } of renderedSite) {
-    const outputFile = path.resolve(config.root, config.output, id);
+    const outputFile = path.resolve(config.root, config.outputDir, id);
     await fs.mkdir(path.dirname(outputFile), { recursive: true });
     await fs.writeFile(outputFile, contents);
   }

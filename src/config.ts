@@ -7,7 +7,7 @@ export interface UserConfig {
    * The directory where rendered pages will be written.
    * Defaults to 'docs'.
    */
-  output?: string;
+  outputDir?: string;
 
   /**
    * A directory of custom templates that should take precedence over the
@@ -52,7 +52,7 @@ export interface Config extends UserConfig {
 
 export const defaults: Omit<Required<Config>, 'templates'> = {
   root: process.cwd(),
-  output: 'docs',
+  outputDir: 'docs',
   pages: 'single',
   theme: 'markdown',
   collapseNewlines: true,

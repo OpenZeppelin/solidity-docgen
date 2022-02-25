@@ -9,7 +9,14 @@ export interface Build {
   output: SolcOutput;
 }
 
-export type PageAssigner = NonNullable<Config['pages']>;
+export type PageStructure = NonNullable<Config['pages']>;
+
+export type PageAssigner = Exclude<PageStructure, string>;
+
+const pageAssigner: Record<PageStructure & string, PageAssigner> = {
+  single: () => 'index.md',
+  items: (item) => item.name,
+};
 
 export interface Site {
   items: DocItemWithContext[];
@@ -34,7 +41,9 @@ export interface DocItemContext {
   };
 }
 
-export function buildSite(builds: Build[], assign: PageAssigner): Site {
+export function buildSite(builds: Build[], pageStructure: PageStructure): Site {
+  const assign = typeof pageStructure === 'string' ? pageAssigner[pageStructure] : pageStructure;
+
   const seen = new Set<string>();
   const items: DocItemWithContext[] = [];
   const pages: Record<string, DocItemWithContext[]> = {};

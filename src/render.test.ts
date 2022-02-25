@@ -1,6 +1,6 @@
 import test from './utils/test';
 import path from 'path';
-import { buildSite, PageAssigner } from './site';
+import { buildSite, PageStructure } from './site';
 import { itemPartialName, render } from './render';
 import { NodeType } from 'solidity-ast/node';
 import { Templates } from './templates';
@@ -14,7 +14,7 @@ interface TestSpec extends Templates {
  */
 function testRender(title: string, file: string, spec: TestSpec, expected: string) {
   const id = 'index.md';
-  const assign: PageAssigner = (_, f) => path.parse(f.absolutePath).name === file ? id : undefined;
+  const assign: PageStructure = (_, f) => path.parse(f.absolutePath).name === file ? id : undefined;
 
   test(title, t => {
     const site = buildSite(t.context.build, assign);

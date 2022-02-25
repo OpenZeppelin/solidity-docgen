@@ -1,21 +1,13 @@
 import { SourceUnit } from 'solidity-ast';
 import { DocItem } from './doc-item';
-import { PageAssigner } from './site';
+import { PageStructure } from './site';
 
 export interface UserConfig {
   /**
    * The directory where rendered pages will be written.
-   * Defaults to `docs`.
+   * Defaults to 'docs'.
    */
   output?: string;
-
-  /**
-   * A function that returns the page assigned to a documentable item
-   * (contract, function, etc.) given the AST node for the item and the source
-   * unit where it is defined.
-   * Defaults to assigning all items to an index.md file.
-   */
-  pages?: (item: DocItem, file: SourceUnit) => string | undefined;
 
   /**
    * A directory of custom templates that should take precedence over the
@@ -25,9 +17,19 @@ export interface UserConfig {
 
   /**
    * The name of the built-in templates that will be used by default.
-   * Defaults to markdown theme.
+   * Defaults to 'markdown'.
    */
   theme?: string;
+
+  /**
+   * The way documentable items (contracts, functions, etc.) will be organized
+   * in pages. Built in options are: 'single' for all items in one page, and
+   * 'items' for one page per item. More customization is possible by defining
+   * a function that returns a page path given the AST node for the item and
+   * the source unit where it is defined.
+   * Defaults to 'single'.
+   */
+  pages?: 'single' | 'items' | ((item: DocItem, file: SourceUnit) => string | undefined);
 
   /**
    * Clean up the output by collapsing 3 or more contiguous newlines into only 2.
@@ -51,7 +53,7 @@ export interface Config extends UserConfig {
 export const defaults: Omit<Required<Config>, 'templates'> = {
   root: process.cwd(),
   output: 'docs',
-  pages: () => 'index.md',
+  pages: 'single',
   theme: 'markdown',
   collapseNewlines: true,
 };

@@ -27,6 +27,9 @@
     "handlebars": "^4.7.7",
     "solidity-ast": "^0.4.30"
   },
+  "peerDependencies": {
+    "hardhat": "^2.8.0"
+  },
   "devDependencies": {
     "@types/mocha": "^7.0.2",
     "@types/node": "^12.20.37",

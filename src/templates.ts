@@ -37,7 +37,7 @@ export async function loadTemplates(defaultTheme: string, root: string, userTemp
 
   // Overwrite default theme with user templates.
   if (userTemplatesPath) {
-    const userTemplates = await readTemplates(userTemplatesPath);
+    const userTemplates = await readTemplates(path.resolve(root, userTemplatesPath));
     if (userTemplates.partials) {
       Object.assign(templates.partials, userTemplates.partials);
     }

@@ -1,11 +1,12 @@
 import { ContractDefinition, SourceUnit } from 'solidity-ast';
-import { SolcOutput } from 'solidity-ast/solc';
+import { SolcOutput, SolcInput } from 'solidity-ast/solc';
 import { astDereferencer, ASTDereferencer, findAll } from 'solidity-ast/utils';
 import { Config } from './config';
 import { DocItem, docItemTypes, isDocItem } from './doc-item';
 import { clone } from './utils/clone';
 
 export interface Build {
+  input: SolcInput;
   output: SolcOutput;
 }
 
@@ -36,6 +37,7 @@ export interface DocItemContext {
   contract?: ContractDefinition;
   file: SourceUnit;
   build: {
+    input: SolcInput;
     output: SolcOutput;
     deref: ASTDereferencer;
   };
@@ -51,8 +53,9 @@ export function buildSite(builds: Build[], pageStructure: PageStructure): Site {
   for (const originalBuild of builds) {
     // Clone because we will mutate in order to add item context.
     const output = clone(originalBuild.output);
+    const input = clone(originalBuild.input);
     const deref = astDereferencer(output);
-    const build = { output, deref };
+    const build = { input, output, deref };
 
     for (const { ast: file } of Object.values(build.output.sources)) {
       // Some files may appear in different builds but we only use one.

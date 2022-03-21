@@ -4,6 +4,7 @@ import { accessors } from '../accessors';
 import { DocItemWithContext } from '../site';
 import { arraysEqual } from './arrays-equal';
 import { execAll } from './execall';
+import { readItemDocs } from './read-item-docs';
 import { getContractsInScope } from './scope';
 
 export interface NatSpec {
@@ -28,8 +29,11 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
 
   let res: NatSpec = {};
 
-  const docString = 'documentation' in item && item.documentation?.text
-    ? cleanUpDocstring(item.documentation.text)
+  const docSource = readItemDocs(item);
+  const docString = docSource !== undefined
+    ? cleanUpDocstringFromSource(docSource)
+    : 'documentation' in item && item.documentation?.text
+    ? cleanUpDocstringFromSolc(item.documentation.text)
     : '';
 
   const tagMatches = execAll(
@@ -124,8 +128,15 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
 
 // Fix solc buggy parsing of doc comments.
 // Reverse engineered from solc behavior.
-function cleanUpDocstring(text: string) {
+function cleanUpDocstringFromSolc(text: string) {
   return text
     .replace(/\n\n?^[ \t]*(?:\*|\/\/\/)/mg, '\n\n')
     .replace(/^[ \t]?/mg, '');
+}
+
+function cleanUpDocstringFromSource(text: string) {
+  return text
+    .replace(/^\/\*\*(.*)\*\/$/s, '$1')
+    .trim()
+    .replace(/^[ \t]*(\*|\/\/\/)[ \t]?/mg, '');
 }

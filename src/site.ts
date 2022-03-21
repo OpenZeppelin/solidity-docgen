@@ -10,6 +10,10 @@ export interface Build {
   output: SolcOutput;
 }
 
+export interface BuildContext extends Build {
+  deref: ASTDereferencer;
+}
+
 export type PageStructure = NonNullable<Config['pages']>;
 
 export type PageAssigner = Exclude<PageStructure, string>;
@@ -29,18 +33,15 @@ export interface Page {
   items: DocItemWithContext[];
 }
 
-export type DocItemWithContext = DocItem & { __item_context: DocItemContext };
+export const DOC_ITEM_CONTEXT = '__item_context' as const;
+export type DocItemWithContext = DocItem & { [DOC_ITEM_CONTEXT]: DocItemContext };
 
 export interface DocItemContext {
   page: string;
   node: DocItem;
   contract?: ContractDefinition;
   file: SourceUnit;
-  build: {
-    input: SolcInput;
-    output: SolcOutput;
-    deref: ASTDereferencer;
-  };
+  build: BuildContext;
 }
 
 export function buildSite(builds: Build[], pageStructure: PageStructure): Site {

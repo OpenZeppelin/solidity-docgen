@@ -1,3 +1,5 @@
+import { config } from "hardhat";
+import { relative } from 'path';
 import { ContractDefinition, SourceUnit } from 'solidity-ast';
 import { SolcOutput, SolcInput } from 'solidity-ast/solc';
 import { astDereferencer, ASTDereferencer, findAll } from 'solidity-ast/utils';
@@ -21,6 +23,9 @@ export type PageAssigner = Exclude<PageStructure, string>;
 const pageAssigner: Record<PageStructure & string, PageAssigner> = {
   single: () => 'index.md',
   items: (item) => item.name,
+  contracts: (_item, file) => file.absolutePath.startsWith('contracts')
+  ? relative(config.paths.sources, file.absolutePath).replace('.sol', '.md')
+  : undefined,
 };
 
 export interface Site {

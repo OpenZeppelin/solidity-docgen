@@ -23,13 +23,13 @@ export interface UserConfig {
 
   /**
    * The way documentable items (contracts, functions, etc.) will be organized
-   * in pages. Built in options are: 'single' for all items in one page, and
-   * 'items' for one page per item. More customization is possible by defining
-   * a function that returns a page path given the AST node for the item and
-   * the source unit where it is defined.
+   * in pages. Built in options are: 'single' for all items in one page, 'items'
+   * for one page per item, and `contracts` for one page per contract. More
+   * customization is possible by defining a function that returns a page path
+   * given the AST node for the item and the source unit where it is defined.
    * Defaults to 'single'.
    */
-  pages?: 'single' | 'items' | ((item: DocItem, file: SourceUnit) => string | undefined);
+  pages?: 'single' | 'items' | 'contracts' | ((item: DocItem, file: SourceUnit) => string | undefined);
 
   /**
    * Clean up the output by collapsing 3 or more contiguous newlines into only 2.

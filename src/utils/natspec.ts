@@ -32,8 +32,10 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
   const docSource = readItemDocs(item);
   const docString = docSource !== undefined
     ? cleanUpDocstringFromSource(docSource)
-    : 'documentation' in item && item.documentation?.text
-    ? cleanUpDocstringFromSolc(item.documentation.text)
+    : 'documentation' in item && item.documentation
+    ? typeof item.documentation === 'string'
+    ? item.documentation
+    : cleanUpDocstringFromSolc(item.documentation.text)
     : '';
 
   const tagMatches = execAll(

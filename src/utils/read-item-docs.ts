@@ -2,7 +2,9 @@ import { DocItemWithContext, DOC_ITEM_CONTEXT, Build } from '../site';
 
 export function readItemDocs(item: DocItemWithContext): string | undefined {
   const { build } = item[DOC_ITEM_CONTEXT];
-  if ('documentation' in item && item.documentation) {
+  // Note that Solidity 0.5 has item.documentation: string even though the
+  // types do not reflect that. This is why we check typeof === object.
+  if ('documentation' in item && item.documentation && typeof item.documentation === 'object') {
     const { source, start, length } = decodeSrc(item.documentation.src, build);
     return build.input.sources[source]?.content?.slice(start, start + length);
   }

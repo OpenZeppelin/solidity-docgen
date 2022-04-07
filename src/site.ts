@@ -1,3 +1,4 @@
+import { relative } from 'path';
 import { ContractDefinition, SourceUnit } from 'solidity-ast';
 import { SolcOutput, SolcInput } from 'solidity-ast/solc';
 import { astDereferencer, ASTDereferencer, findAll } from 'solidity-ast/utils';
@@ -16,11 +17,15 @@ export interface BuildContext extends Build {
 
 export type PageStructure = NonNullable<Config['pages']>;
 
-export type PageAssigner = Exclude<PageStructure, string>;
+export type PageAssigner = ((item: DocItem, file: SourceUnit, config: Required<Config>) => string | undefined);
 
 const pageAssigner: Record<PageStructure & string, PageAssigner> = {
   single: () => 'index.md',
   items: (item) => item.name,
+  files: (_, file, config) =>
+    file.absolutePath.startsWith(config.sourcesDir)
+      ? relative(config.sourcesDir, file.absolutePath).replace('.sol', '.md')
+      : file.absolutePath,
 };
 
 export interface Site {

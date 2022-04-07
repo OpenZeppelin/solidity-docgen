@@ -1,6 +1,6 @@
-import { SourceUnit } from 'solidity-ast';
-import { DocItem } from './doc-item';
-import { PageStructure } from './site';
+import type { SourceUnit } from 'solidity-ast';
+import type { DocItem } from './doc-item';
+import type { PageAssigner, PageStructure } from './site';
 
 export interface UserConfig {
   /**
@@ -22,14 +22,17 @@ export interface UserConfig {
   theme?: string;
 
   /**
-   * The way documentable items (contracts, functions, etc.) will be organized
-   * in pages. Built in options are: 'single' for all items in one page, and
-   * 'items' for one page per item. More customization is possible by defining
-   * a function that returns a page path given the AST node for the item and
-   * the source unit where it is defined.
+   * The way documentable items (contracts, functions, custom errors, etc.)
+   * will be organized in pages. Built in options are:
+   * - 'single': all items in one page
+   * - 'items': one page per item
+   * - 'files': one page per input Solidity file
+   * More customization is possible by defining a function that returns a page
+   * path given the AST node for the item and the source unit where it is
+   * defined.
    * Defaults to 'single'.
    */
-  pages?: 'single' | 'items' | ((item: DocItem, file: SourceUnit) => string | undefined);
+  pages?: 'single' | 'items' | 'files' | PageAssigner;
 
   /**
    * Clean up the output by collapsing 3 or more contiguous newlines into only 2.
@@ -44,14 +47,20 @@ export interface UserConfig {
 // rather than by the user manually, unless using the library directly.
 export interface Config extends UserConfig {
   /**
-   * The root directory relative to which 'output' and 'templates' are
-   * specified. Defaults to the working directory.
+   * The root directory relative to which 'outputDir', 'sourcesDir', and
+   * 'templates' are specified. Defaults to the working directory.
    */
   root?: string;
+
+  /**
+   * The Solidity sources directory.
+   */
+  sourcesDir?: string;
 }
 
 export const defaults: Omit<Required<Config>, 'templates'> = {
   root: process.cwd(),
+  sourcesDir: 'contracts',
   outputDir: 'docs',
   pages: 'single',
   theme: 'markdown',

@@ -17,14 +17,15 @@ export interface BuildContext extends Build {
 
 export type PageStructure = NonNullable<Config['pages']>;
 
-export type PageAssigner = ((item: DocItem, file: SourceUnit, config: Required<Config>) => string | undefined);
+export type PageAssignerConfig = Pick<Required<Config>, 'sourcesDir' | 'pageExtension'>;
+export type PageAssigner = ((item: DocItem, file: SourceUnit, config: PageAssignerConfig) => string | undefined);
 
-const pageAssigner: Record<PageStructure & string, PageAssigner> = {
-  single: () => 'index.md',
-  items: (item) => item.name,
-  files: (_, file, config) =>
-    file.absolutePath.startsWith(config.sourcesDir)
-      ? relative(config.sourcesDir, file.absolutePath).replace('.sol', '.md')
+export const pageAssigner: Record<PageStructure & string, PageAssigner> = {
+  single: (_1, _2, { pageExtension: ext }) => 'index' + ext,
+  items: (item, _, { pageExtension: ext }) => item.name + ext,
+  files: (_, file, { sourcesDir, pageExtension: ext }) =>
+    file.absolutePath.startsWith(sourcesDir)
+      ? relative(sourcesDir, file.absolutePath).replace('.sol', ext)
       : file.absolutePath,
 };
 

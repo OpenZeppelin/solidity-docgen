@@ -39,6 +39,12 @@ export interface UserConfig {
    * Enabled by default.
    */
   collapseNewlines?: boolean;
+
+  /**
+   * The extension for generated pages.
+   * Defaults to '.md'.
+   */
+  pageExtension?: string;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,4 +71,5 @@ export const defaults: Omit<Required<Config>, 'templates'> = {
   pages: 'single',
   theme: 'markdown',
   collapseNewlines: true,
+  pageExtension: '.md',
 };

@@ -4,9 +4,11 @@
 
 The output is fully configurable through Handlebars templates, but the default templates should do a good job of displaying all of the information in the source code in Markdown format. The generated Markdown files can be used with a static site generator such as Vuepress, MkDocs, Jekyll (GitHub Pages), etc., in order to publish a documentation website.
 
+This is a newer version of the tool that has been rewritten and redesigned. Some more work is pending to ease the transition from the previous version and to help with with usage and configuration.
+
 ## Usage
 
-Install `solidity-docgen@next` from npm.
+Install `solidity-docgen` from npm.
 
 ### Hardhat
 

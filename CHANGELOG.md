@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0
+
+This version is a complete rewrite and redesign of the library that is currently in beta.
+
 ## 0.5.16
 
 - Change handling of circular dependencies to an incomplete but correct approach, fixing a potential issue with bad caching.

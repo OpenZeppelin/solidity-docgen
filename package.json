@@ -31,7 +31,7 @@
     "hardhat": "^2.8.0"
   },
   "devDependencies": {
-    "@types/mocha": "^7.0.2",
+    "@types/mocha": "^9.0.0",
     "@types/node": "^12.20.37",
     "ava": "^3.15.0",
     "c8": "^7.10.0",

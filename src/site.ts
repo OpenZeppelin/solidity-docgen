@@ -2,7 +2,7 @@ import { relative } from 'path';
 import { ContractDefinition, SourceUnit } from 'solidity-ast';
 import { SolcOutput, SolcInput } from 'solidity-ast/solc';
 import { astDereferencer, ASTDereferencer, findAll } from 'solidity-ast/utils';
-import { Config } from './config';
+import { FullConfig } from './config';
 import { DocItem, docItemTypes, isDocItem } from './doc-item';
 import { clone } from './utils/clone';
 
@@ -15,10 +15,9 @@ export interface BuildContext extends Build {
   deref: ASTDereferencer;
 }
 
-export type PageStructure = NonNullable<Config['pages']>;
-
-export type PageAssignerConfig = Pick<Required<Config>, 'sourcesDir' | 'pageExtension'>;
-export type PageAssigner = ((item: DocItem, file: SourceUnit, config: PageAssignerConfig) => string | undefined);
+export type SiteConfig = Pick<FullConfig, 'pages' | 'sourcesDir' | 'pageExtension'>;
+export type PageStructure = SiteConfig['pages'];
+export type PageAssigner = ((item: DocItem, file: SourceUnit, config: SiteConfig) => string | undefined);
 
 export const pageAssigner: Record<PageStructure & string, PageAssigner> = {
   single: (_1, _2, { pageExtension: ext }) => 'index' + ext,
@@ -50,8 +49,8 @@ export interface DocItemContext {
   build: BuildContext;
 }
 
-export function buildSite(builds: Build[], pageStructure: PageStructure): Site {
-  const assign = typeof pageStructure === 'string' ? pageAssigner[pageStructure] : pageStructure;
+export function buildSite(builds: Build[], siteConfig: SiteConfig): Site {
+  const assign = typeof siteConfig.pages === 'string' ? pageAssigner[siteConfig.pages] : siteConfig.pages;
 
   const seen = new Set<string>();
   const items: DocItemWithContext[] = [];
@@ -72,7 +71,7 @@ export function buildSite(builds: Build[], pageStructure: PageStructure): Site {
       for (const topLevelItem of file.nodes) {
         if (!isDocItem(topLevelItem)) continue;
 
-        const page = assign(topLevelItem, file);
+        const page = assign(topLevelItem, file, siteConfig);
 
         const withContext = Object.assign(topLevelItem, {
           __item_context: { page, node: topLevelItem as DocItemWithContext, file, build },

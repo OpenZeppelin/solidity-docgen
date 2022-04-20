@@ -64,7 +64,9 @@ export interface Config extends UserConfig {
   sourcesDir?: string;
 }
 
-export const defaults: Omit<Required<Config>, 'templates'> = {
+export type FullConfig = Required<Config>;
+
+export const defaults: Omit<FullConfig, 'templates'> = {
   root: process.cwd(),
   sourcesDir: 'contracts',
   outputDir: 'docs',

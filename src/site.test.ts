@@ -1,6 +1,6 @@
 import test from './utils/test';
 import path from 'path';
-import { PageAssigner, Site, buildSite, pageAssigner } from './site';
+import { PageAssigner, Site, buildSite, pageAssigner, SiteConfig } from './site';
 
 interface PageSummary {
   id: string;
@@ -12,13 +12,12 @@ interface PageSummary {
  */
 function testPages(title: string, files: string[], assign: PageAssigner, expected: PageSummary[]) {
   test(title, t => {
-    const cfg = {
+    const cfg: SiteConfig = {
       sourcesDir: 'test-contracts',
       pageExtension: '.md',
+      pages: (i, f) => files.includes(path.parse(f.absolutePath).name) ? assign(i, f, cfg) : undefined,
     };
-    const site = buildSite(t.context.build,
-      (i, f) => files.includes(path.parse(f.absolutePath).name) ? assign(i, f, cfg) : undefined
-    );
+    const site = buildSite(t.context.build, cfg);
     const pages = site.pages.map(p => ({
       id: p.id,
       items: p.items.map(i => i.name),

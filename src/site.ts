@@ -25,7 +25,7 @@ export const pageAssigner: Record<PageStructure & string, PageAssigner> = {
   files: (_, file, { sourcesDir, pageExtension: ext }) =>
     file.absolutePath.startsWith(sourcesDir)
       ? relative(sourcesDir, file.absolutePath).replace('.sol', ext)
-      : file.absolutePath,
+      : undefined,
 };
 
 export interface Site {

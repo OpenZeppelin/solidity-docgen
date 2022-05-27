@@ -123,7 +123,7 @@ export const accessors = {
   },
 
   functions(item: DocItemWithContext): FunctionDefinition[] | undefined {
-    return [...findAll('FunctionDefinition', item)];
+    return [...findAll('FunctionDefinition', item)].filter(f => f.visibility !== 'private');
   },
 
   events(item: DocItemWithContext): EventDefinition[] | undefined {
@@ -140,7 +140,7 @@ export const accessors = {
 
   variables(item: DocItemWithContext): VariableDeclaration[] | undefined {
     return (item.nodeType === 'ContractDefinition')
-      ? item.nodes.filter(isNodeType('VariableDeclaration')).filter(v => v.stateVariable)
+      ? item.nodes.filter(isNodeType('VariableDeclaration')).filter(v => v.stateVariable && v.visibility !== 'private')
       : undefined;
   },
 

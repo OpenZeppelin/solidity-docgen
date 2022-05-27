@@ -2,21 +2,21 @@
 
 {{#if signature}}
 ```solidity
-{{signature}}
+{{{signature}}}
 ```
 {{/if}}
 
-{{natspec.notice}}
+{{{natspec.notice}}}
 
 {{#if natspec.dev}}
-_{{natspec.dev}}_
+_{{{natspec.dev}}}_
 {{/if}}
 
 {{#if natspec.params}}
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 {{#each params}}
-| {{name}} | {{type}} | {{joinLines natspec}} |
+| {{name}} | {{type}} | {{{joinLines natspec}}} |
 {{/each}}
 {{/if}}
 
@@ -24,7 +24,7 @@ _{{natspec.dev}}_
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 {{#each returns}}
-| {{#if name}}{{name}}{{else}}[{{@index}}]{{/if}} | {{type}} | {{joinLines natspec}} |
+| {{#if name}}{{name}}{{else}}[{{@index}}]{{/if}} | {{type}} | {{{joinLines natspec}}} |
 {{/each}}
 {{/if}}
 

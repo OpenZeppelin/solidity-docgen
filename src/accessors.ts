@@ -19,15 +19,14 @@ export function wrapWithAccessors(item: DocItemWithContext): DocItemWithContext 
   };
 }
 
-type Param = {
-  name: string;
+interface Param extends VariableDeclaration {
   type: string;
   natspec?: string;
 };
 
 function getParams(params: ParameterList, natspec: NatSpec['params'] | NatSpec['returns']): Param[] {
   return params.parameters.map((p, i) => ({
-    name: p.name,
+    ...p,
     type: p.typeDescriptions.typeString!,
     natspec: natspec?.find((q, j) => q.name === undefined ? i === j : p.name === q.name)?.description,
   }));

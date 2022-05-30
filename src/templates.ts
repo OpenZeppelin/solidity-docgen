@@ -82,13 +82,7 @@ async function readPartials(dir: string) {
 }
 
 async function readHelpers(dir: string) {
-  let mod;
-  try {
-    mod = require.resolve(path.join(dir, 'helpers'));
-  } catch (e) {
-    return undefined;
-  }
-  const h = await import(mod);
+  const h = await import(path.join(dir, 'helpers'));
   const helpers: NonNullable<Templates['helpers']> = {};
   for (const name in h) {
     if (typeof h[name] === 'function') {

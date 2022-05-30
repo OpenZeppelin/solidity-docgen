@@ -63,10 +63,10 @@ export async function loadTemplates(defaultTheme: string, root: string, userTemp
 /**
  * Read templates and helpers from a directory.
  */
-export async function readTemplates(dir: string): Promise<Templates> {
+export async function readTemplates(partialsDir: string, helpersDir = partialsDir): Promise<Templates> {
   return {
-    partials: await readPartials(dir),
-    helpers: await readHelpers(dir),
+    partials: await readPartials(partialsDir),
+    helpers: await readHelpers(helpersDir),
   };
 }
 
@@ -109,12 +109,11 @@ async function readThemes(): Promise<Record<string, Templates>> {
   const srcThemes = path.resolve(__dirname, '../src/themes');
   const distThemes = path.resolve(__dirname, 'themes');
 
+  const partialsDir = srcThemes;
+  const helpersDir = __dirname.includes('/node_modules/') ? distThemes : srcThemes;
+
   for (const theme of await fsPromise.readdir(srcThemes)) {
-    const templates = await readTemplates(path.join(srcThemes, theme));
-    if (templates.helpers === undefined) {
-      templates.helpers = await readHelpers(path.join(distThemes, theme));
-    }
-    themes[theme] = templates;
+    themes[theme] = await readTemplates(path.join(partialsDir, theme), path.join(helpersDir, theme));
   }
 
   return themes;

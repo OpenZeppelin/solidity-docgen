@@ -244,7 +244,10 @@ class ASTReader {
 
   read(node: { src: string }): string | undefined {
     const { source, start, length } = this.decodeSrc(node.src);
-    return this.input.sources[source]?.content.slice(start, start + length);
+    const content = this.input.sources[source]?.content;
+    if (content !== undefined) {
+      return Buffer.from(content, 'utf8').slice(start, start + length).toString('utf8');
+    }
   }
 
   private decodeSrc(src: string): { source: string; start: number; length: number } {

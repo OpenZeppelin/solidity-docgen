@@ -13,3 +13,13 @@ contract Foo is Bar {
     function foo() external {
     }
 }
+
+/**
+ * Some Unicode characters: ⇌ £ ह 𐍈 ⇌ £ ह 𐍈
+ */
+contract X {
+    /**
+     * A function
+     */
+    function foo() external {}
+}

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.17
+
+- Fix handling of multi-byte UTF8 characters.
+
 ## 0.5.16
 
 - Change handling of circular dependencies to an incomplete but correct approach, fixing a potential issue with bad caching.

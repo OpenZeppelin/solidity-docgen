@@ -6,7 +6,10 @@ export function readItemDocs(item: DocItemWithContext): string | undefined {
   // types do not reflect that. This is why we check typeof === object.
   if ('documentation' in item && item.documentation && typeof item.documentation === 'object') {
     const { source, start, length } = decodeSrc(item.documentation.src, build);
-    return build.input.sources[source]?.content?.slice(start, start + length);
+    const content = build.input.sources[source]?.content;
+    if (content !== undefined) {
+      return Buffer.from(content, 'utf8').slice(start, start + length).toString('utf8');
+    }
   }
 }
 

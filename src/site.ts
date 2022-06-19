@@ -19,13 +19,18 @@ export type SiteConfig = Pick<FullConfig, 'pages' | 'sourcesDir' | 'pageExtensio
 export type PageStructure = SiteConfig['pages'];
 export type PageAssigner = ((item: DocItem, file: SourceUnit, config: SiteConfig) => string | undefined);
 
+const assignIfSource: (a: PageAssigner) => PageAssigner =
+  assign => (item, file, config) =>
+    file.absolutePath.startsWith(config.sourcesDir)
+      ? assign(item, file, config)
+      : undefined;
+
 export const pageAssigner: Record<PageStructure & string, PageAssigner> = {
-  single: (_1, _2, { pageExtension: ext }) => 'index' + ext,
-  items: (item, _, { pageExtension: ext }) => item.name + ext,
-  files: (_, file, { sourcesDir, pageExtension: ext }) =>
-    file.absolutePath.startsWith(sourcesDir)
-      ? relative(sourcesDir, file.absolutePath).replace('.sol', ext)
-      : undefined,
+  single: assignIfSource((_1, _2, { pageExtension: ext }) => 'index' + ext),
+  items: assignIfSource((item, _, { pageExtension: ext }) => item.name + ext),
+  files: assignIfSource((_, file, { pageExtension: ext, sourcesDir }) =>
+    relative(sourcesDir, file.absolutePath).replace('.sol', ext)
+  ),
 };
 
 export interface Site {

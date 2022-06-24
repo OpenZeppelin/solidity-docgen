@@ -33,7 +33,7 @@
   "devDependencies": {
     "@types/mocha": "^7.0.2",
     "@types/node": "^12.20.37",
-    "ava": "^3.15.0",
+    "ava": "^4.0.0",
     "c8": "^7.10.0",
     "code-style": "github:OpenZeppelin/code-style",
     "hardhat": "^2.8.0",

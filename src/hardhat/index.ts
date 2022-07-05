@@ -4,10 +4,13 @@ import { BuildInfo } from 'hardhat/types';
 import './type-extensions';
 
 extendConfig((config, userConfig) => {
-  const { relative } = require('path') as typeof import('path');
+  const path = require('path') as typeof import('path');
   config.docgen ??= {};
   config.docgen.root = config.paths.root;
-  config.docgen.sourcesDir = relative(config.paths.root, config.paths.sources);
+  config.docgen.sourcesDir = path
+    .relative(config.paths.root, config.paths.sources)
+    .split(path.sep)
+    .join(path.posix.sep);
 });
 
 task('docgen', async (_, hre) => {

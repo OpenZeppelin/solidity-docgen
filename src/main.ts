@@ -1,4 +1,4 @@
-import path from 'path';
+import { posix as path } from 'path';
 import { promises as fs } from 'fs';
 import { render } from './render';
 import { Build, buildSite } from './site';

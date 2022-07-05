@@ -1,10 +1,11 @@
-import { relative } from 'path';
+import path from 'path';
 import { ContractDefinition, SourceUnit } from 'solidity-ast';
 import { SolcOutput, SolcInput } from 'solidity-ast/solc';
 import { astDereferencer, ASTDereferencer, findAll } from 'solidity-ast/utils';
 import { FullConfig } from './config';
 import { DocItem, docItemTypes, isDocItem } from './doc-item';
 import { clone } from './utils/clone';
+import { isChild } from './utils/is-child';
 
 export interface Build {
   input: SolcInput;
@@ -15,22 +16,15 @@ export interface BuildContext extends Build {
   deref: ASTDereferencer;
 }
 
-export type SiteConfig = Pick<FullConfig, 'pages' | 'sourcesDir' | 'pageExtension'>;
+export type SiteConfig = Pick<FullConfig, 'pages' | 'exclude' | 'sourcesDir' | 'pageExtension'>;
 export type PageStructure = SiteConfig['pages'];
 export type PageAssigner = ((item: DocItem, file: SourceUnit, config: SiteConfig) => string | undefined);
 
-const assignIfSource: (a: PageAssigner) => PageAssigner =
-  assign => (item, file, config) =>
-    file.absolutePath.startsWith(config.sourcesDir)
-      ? assign(item, file, config)
-      : undefined;
-
 export const pageAssigner: Record<PageStructure & string, PageAssigner> = {
-  single: assignIfSource((_1, _2, { pageExtension: ext }) => 'index' + ext),
-  items: assignIfSource((item, _, { pageExtension: ext }) => item.name + ext),
-  files: assignIfSource((_, file, { pageExtension: ext, sourcesDir }) =>
-    relative(sourcesDir, file.absolutePath).replace('.sol', ext)
-  ),
+  single: (_1, _2, { pageExtension: ext }) => 'index' + ext,
+  items: (item, _, { pageExtension: ext }) => item.name + ext,
+  files: (_, file, { pageExtension: ext, sourcesDir }) =>
+    path.relative(sourcesDir, file.absolutePath).replace('.sol', ext),
 };
 
 export interface Site {
@@ -76,7 +70,7 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig): Site {
       for (const topLevelItem of file.nodes) {
         if (!isDocItem(topLevelItem)) continue;
 
-        const page = assign(topLevelItem, file, siteConfig);
+        const page = assignIfIncludedSource(assign, topLevelItem, file, siteConfig);
 
         const withContext = Object.assign(topLevelItem, {
           __item_context: { page, node: topLevelItem as DocItemWithContext, file, build },
@@ -100,4 +94,22 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig): Site {
     items,
     pages: Object.entries(pages).map(([id, items]) => ({ id, items })),
   };
+}
+
+function assignIfIncludedSource(
+  assign: PageAssigner,
+  item: DocItem,
+  file: SourceUnit,
+  config: SiteConfig,
+) {
+  return isFileIncluded(file.absolutePath, config)
+    ? assign(item, file, config)
+    : undefined;
+}
+
+function isFileIncluded(file: string, config: SiteConfig) {
+  return (
+    isChild(file, config.sourcesDir) &&
+    config.exclude.every(e => !isChild(file, path.join(config.sourcesDir, e)))
+  );
 }

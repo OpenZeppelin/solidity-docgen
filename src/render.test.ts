@@ -16,6 +16,7 @@ function testRender(title: string, file: string, spec: TestSpec, expected: strin
   const id = 'index.md';
   const cfg: SiteConfig = {
     sourcesDir: 'test-contracts',
+    exclude: [],
     pageExtension: '.md',
     pages: (_, f) => path.parse(f.absolutePath).name === file ? id : undefined,
   };

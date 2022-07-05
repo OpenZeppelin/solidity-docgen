@@ -35,6 +35,11 @@ export interface UserConfig {
   pages?: 'single' | 'items' | 'files' | PageAssigner;
 
   /**
+   * An array of sources subdirectories that should be excluded from documentation.
+   */
+  exclude?: string[];
+
+  /**
    * Clean up the output by collapsing 3 or more contiguous newlines into only 2.
    * Enabled by default.
    */
@@ -71,6 +76,7 @@ export const defaults: Omit<FullConfig, 'templates'> = {
   sourcesDir: 'contracts',
   outputDir: 'docs',
   pages: 'single',
+  exclude: [],
   theme: 'markdown',
   collapseNewlines: true,
   pageExtension: '.md',

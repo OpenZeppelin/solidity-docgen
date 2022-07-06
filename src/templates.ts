@@ -104,7 +104,7 @@ async function readThemes(): Promise<Record<string, Templates>> {
   const distThemes = path.resolve(__dirname, 'themes');
 
   const partialsDir = srcThemes;
-  const helpersDir = __dirname.includes('/node_modules/') ? distThemes : srcThemes;
+  const helpersDir = __dirname.split(path.sep).includes('node_modules') ? distThemes : srcThemes;
 
   for (const theme of await fsPromise.readdir(srcThemes)) {
     themes[theme] = await readTemplates(path.join(partialsDir, theme), path.join(helpersDir, theme));

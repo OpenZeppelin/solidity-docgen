@@ -42,7 +42,7 @@ export type DocItemWithContext = DocItem & { [DOC_ITEM_CONTEXT]: DocItemContext 
 
 export interface DocItemContext {
   page?: string;
-  node: DocItemWithContext;
+  item: DocItemWithContext;
   contract?: ContractDefinition;
   file: SourceUnit;
   build: BuildContext;
@@ -73,18 +73,18 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig): Site {
         const page = assignIfIncludedSource(assign, topLevelItem, file, siteConfig);
 
         const withContext = Object.assign(topLevelItem, {
-          __item_context: { page, node: topLevelItem as DocItemWithContext, file, build },
+          __item_context: { page, item: topLevelItem as DocItemWithContext, file, build },
         });
         items.push(withContext);
         if (page !== undefined) {
           (pages[page] ??= []).push(withContext);
         }
 
-        for (const node of findAll(docItemTypes, topLevelItem)) {
-          if (node === topLevelItem) continue;
+        for (const item of findAll(docItemTypes, topLevelItem)) {
+          if (item === topLevelItem) continue;
           const contract = topLevelItem.nodeType === 'ContractDefinition' ? topLevelItem : undefined;
-          const __item_context: DocItemContext  = { page, node: node as DocItemWithContext, contract, file, build };
-          Object.assign(node, { __item_context });
+          const __item_context: DocItemContext  = { page, item: item as DocItemWithContext, contract, file, build };
+          Object.assign(item, { __item_context });
         }
       }
     }

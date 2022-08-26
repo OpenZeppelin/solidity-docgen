@@ -1,6 +1,4 @@
 import { HelperOptions, Utils } from 'handlebars';
-import { TypeName } from 'solidity-ast';
-import { DocItemWithContext } from '../../site';
 
 /**
  * Returns a Markdown heading marker. An optional number increases the heading level.
@@ -46,16 +44,4 @@ function getHLevel(hsublevel: number | HelperOptions, opts?: HelperOptions) {
   }
   const contextHLevel: number = opts.data?.hlevel ?? 0;
   return { opts, hlevel: contextHLevel + hsublevel };
-}
-
-export function trim(text: string) {
-  if (typeof text === 'string') {
-    return text.trim();
-  }
-}
-
-export function joinLines(text?: string) {
-  if (typeof text === 'string') {
-    return text.replace(/\n+/g, ' ');
-  }
 }

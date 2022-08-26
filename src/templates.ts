@@ -28,13 +28,6 @@ export async function loadTemplates(defaultTheme: string, root: string, userTemp
     helpers: { ...themes[defaultTheme]?.helpers },
   };
 
-  if (templates === undefined) {
-    throw new Error(`Unknown theme '${defaultTheme}'`);
-  }
-
-  templates.partials ??= {};
-  templates.helpers ??= {};
-
   // Overwrite default theme with user templates.
   if (userTemplatesPath) {
     const userTemplates = await readTemplates(path.resolve(root, userTemplatesPath));

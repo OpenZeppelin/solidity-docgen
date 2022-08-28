@@ -4,8 +4,10 @@ import { SolcOutput, SolcInput } from 'solidity-ast/solc';
 import { astDereferencer, ASTDereferencer, findAll } from 'solidity-ast/utils';
 import { FullConfig } from './config';
 import { DocItem, docItemTypes, isDocItem } from './doc-item';
+import { Properties } from './templates';
 import { clone } from './utils/clone';
 import { isChild } from './utils/is-child';
+import { mapValues } from './utils/map-values';
 
 export interface Build {
   input: SolcInput;
@@ -48,17 +50,18 @@ export interface DocItemContext {
   build: BuildContext;
 }
 
-export function buildSite(builds: Build[], siteConfig: SiteConfig): Site {
+export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: Properties = {}): Site {
   const assign = typeof siteConfig.pages === 'string' ? pageAssigner[siteConfig.pages] : siteConfig.pages;
 
   const seen = new Set<string>();
-  const items: DocItemWithContext[] = [];
+  const allItems: DocItemWithContext[] = [];
+  const topLevelItems: DocItemWithContext[] = [];
   const pages: Record<string, DocItemWithContext[]> = {};
 
-  for (const originalBuild of builds) {
+  for (let { input, output } of builds) {
     // Clone because we will mutate in order to add item context.
-    const output = clone(originalBuild.output);
-    const input = clone(originalBuild.input);
+    output = { ...output, sources: clone(output.sources) };
+
     const deref = astDereferencer(output);
     const build = { input, output, deref };
 
@@ -75,7 +78,10 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig): Site {
         const withContext = Object.assign(topLevelItem, {
           __item_context: { page, item: topLevelItem as DocItemWithContext, file, build },
         });
-        items.push(withContext);
+
+        topLevelItems.push(withContext);
+        allItems.push(withContext);
+
         if (page !== undefined) {
           (pages[page] ??= []).push(withContext);
         }
@@ -84,14 +90,21 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig): Site {
           if (item === topLevelItem) continue;
           const contract = topLevelItem.nodeType === 'ContractDefinition' ? topLevelItem : undefined;
           const __item_context: DocItemContext  = { page, item: item as DocItemWithContext, contract, file, build };
-          Object.assign(item, { __item_context });
+          allItems.push(Object.assign(item, { __item_context }));
         }
       }
     }
   }
 
+  for (const item of allItems) {
+    Object.assign(
+      item,
+      mapValues(properties, fn => fn(item.__item_context)),
+    );
+  }
+
   return {
-    items,
+    items: topLevelItems,
     pages: Object.entries(pages).map(([id, items]) => ({ id, items })),
   };
 }

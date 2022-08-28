@@ -1,9 +1,9 @@
 import { FunctionDefinition } from 'solidity-ast';
 import { findAll } from 'solidity-ast/utils';
-import { accessors } from '../accessors';
 import { DocItemWithContext } from '../site';
 import { arraysEqual } from './arrays-equal';
 import { execAll } from './execall';
+import { itemType } from './item-type';
 import { readItemDocs } from './read-item-docs';
 import { getContractsInScope } from './scope';
 
@@ -97,7 +97,7 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
 
     if (tag === 'inheritdoc') {
       if (!(item.nodeType === 'FunctionDefinition' || item.nodeType === 'VariableDeclaration')) {
-        throw new Error(`Expected function or variable but saw ${accessors.type(item)}`);
+        throw new Error(`Expected function or variable but saw ${itemType(item)}`);
       }
       const parentContractName = content.trim();
       const parentContract = getContractsInScope(item)[parentContractName];

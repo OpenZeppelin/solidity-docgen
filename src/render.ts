@@ -1,8 +1,7 @@
 import Handlebars, { RuntimeOptions } from 'handlebars';
-import { Node, NodeType } from 'solidity-ast/node';
-import { Site, Page, DocItemWithContext } from './site';
-import { accessors, wrapWithAccessors } from './accessors';
+import { Site, Page, DocItemWithContext, DOC_ITEM_CONTEXT } from './site';
 import { Templates } from './templates';
+import { itemType } from './utils/item-type';
 
 export interface RenderedPage {
   id: string;
@@ -31,7 +30,7 @@ export function render(site: Site, templates: Templates, collapseNewlines?: bool
   return renderedPages;
 }
 
-export const itemPartialName = (item: DocItemWithContext) => accessors.type(item).replace(/ /g, '-').toLowerCase();
+export const itemPartialName = (item: DocItemWithContext) => itemType(item).replace(/ /g, '-').toLowerCase();
 
 function itemPartial(item: DocItemWithContext, options?: RuntimeOptions) {
   if (!item.__item_context) {
@@ -41,7 +40,7 @@ function itemPartial(item: DocItemWithContext, options?: RuntimeOptions) {
   if (!partial) {
     throw new Error(`Missing partial '${itemPartialName(item)}'`);
   }
-  return partial(wrapWithAccessors(item), options);
+  return partial(item, options);
 }
 
 function buildRenderer(templates: Templates): (page: Page, options: TemplateOptions) => string {

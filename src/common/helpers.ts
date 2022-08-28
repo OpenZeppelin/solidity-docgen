@@ -11,3 +11,11 @@ export function joinLines(text?: string) {
     return text.replace(/\n+/g, ' ');
   }
 }
+
+/**
+ * Format a variable as its type followed by its name, if available.
+ */
+export function formatVariable(v: VariableDeclaration): string {
+  return [v.typeName?.typeDescriptions.typeString!].concat(v.name || []).join(' ');
+}
+

@@ -14,9 +14,8 @@ import { loadTemplates } from './templates';
 export async function main(builds: Build[], userConfig?: Config): Promise<void> {
   const config = { ...defaults, ...userConfig };
 
-  const site = buildSite(builds, config);
-
   const templates = await loadTemplates(config.theme, config.root, config.templates);
+  const site = buildSite(builds, config, templates.properties ?? {});
   const renderedSite = render(site, templates, config.collapseNewlines);
 
   for (const { id, contents } of renderedSite) {

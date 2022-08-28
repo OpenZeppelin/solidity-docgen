@@ -101,16 +101,14 @@ async function readHelpers(dir: string, name: string) {
 async function readThemes(): Promise<Record<string, Required<Templates>>> {
   const themes: Record<string, Required<Templates>> = {};
 
+  // Handlebars partials are located in src and not in dist
   const srcThemes = path.resolve(__dirname, '../src/themes');
   const distThemes = path.resolve(__dirname, 'themes');
-
-  const partialsDir = srcThemes;
-  const helpersDir = __dirname.split(path.sep).includes('node_modules') ? distThemes : srcThemes;
 
   for (const theme of await fsPromise.readdir(srcThemes, { withFileTypes: true })) {
     if (theme.isDirectory()) {
       const { name } = theme;
-      themes[name] = await readTemplates(path.join(partialsDir, name), path.join(helpersDir, name));
+      themes[name] = await readTemplates(path.join(srcThemes, name), path.join(distThemes, name));
     }
   }
 

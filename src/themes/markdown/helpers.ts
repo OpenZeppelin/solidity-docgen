@@ -1,5 +1,7 @@
 import { HelperOptions, Utils } from 'handlebars';
 
+export * from '../../common/helpers';
+
 /**
  * Returns a Markdown heading marker. An optional number increases the heading level.
  *

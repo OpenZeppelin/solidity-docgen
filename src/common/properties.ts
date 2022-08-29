@@ -18,11 +18,11 @@ export function natspec({ item }: DocItemContext): NatSpec {
   return parseNatspec(item);
 }
 
-export function name({ item }: DocItemContext): string {
+export function name({ item }: DocItemContext, original?: unknown): string {
   if (item.nodeType === 'FunctionDefinition') {
-    return item.kind === 'function' ? item.name : item.kind;
+    return item.kind === 'function' ? original as string : item.kind;
   } else {
-    return item.name;
+    return original as string;
   }
 }
 

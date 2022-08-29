@@ -8,6 +8,7 @@ import { Properties } from './templates';
 import { clone } from './utils/clone';
 import { isChild } from './utils/is-child';
 import { mapValues } from './utils/map-values';
+import { defineGetterMemoized } from './utils/memoized-getter';
 
 export interface Build {
   input: SolcInput;
@@ -65,7 +66,7 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
     const deref = astDereferencer(output);
     const build = { input, output, deref };
 
-    for (const { ast: file } of Object.values(build.output.sources)) {
+    for (const { ast: file } of Object.values(output.sources)) {
       // Some files may appear in different builds but we only use one.
       if (seen.has(file.src)) continue;
       seen.add(file.src);
@@ -97,10 +98,10 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
   }
 
   for (const item of allItems) {
-    Object.assign(
-      item,
-      mapValues(properties, fn => fn(item.__item_context)),
-    );
+    for (const [prop, fn] of Object.entries(properties)) {
+      const original: unknown = (item as any)[prop];
+      defineGetterMemoized(item as any, prop, () => fn(item.__item_context, original));
+    }
   }
 
   return {

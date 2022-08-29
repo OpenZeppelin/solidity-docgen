@@ -8,7 +8,7 @@ import { DocItemContext } from './site';
 
 import * as defaultProperties from './common/properties';
 
-export type PropertyGetter = (ctx: DocItemContext) => unknown;
+export type PropertyGetter = (ctx: DocItemContext, original?: unknown) => unknown;
 export type Properties = Record<string, PropertyGetter>;
 
 export interface Templates {

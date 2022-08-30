@@ -56,7 +56,6 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
 
   const seen = new Set<string>();
   const allItems: DocItemWithContext[] = [];
-  const topLevelItems: DocItemWithContext[] = [];
   const pages: Record<string, DocItemWithContext[]> = {};
 
   for (let { input, output } of builds) {
@@ -67,8 +66,7 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
     const build = { input, output, deref };
 
     for (const { ast: file } of Object.values(output.sources)) {
-      // Some files may appear in different builds but we only use one.
-      if (seen.has(file.src)) continue;
+      const isNewItem = !seen.has(file.src);
       seen.add(file.src);
 
       for (const topLevelItem of file.nodes) {
@@ -80,18 +78,16 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
           __item_context: { page, item: topLevelItem as DocItemWithContext, file, build },
         });
 
-        topLevelItems.push(withContext);
-        allItems.push(withContext);
-
         if (page !== undefined) {
           (pages[page] ??= []).push(withContext);
         }
 
         for (const item of findAll(docItemTypes, topLevelItem)) {
+          if (isNewItem) allItems.push(item as DocItemWithContext);
           if (item === topLevelItem) continue;
           const contract = topLevelItem.nodeType === 'ContractDefinition' ? topLevelItem : undefined;
-          const __item_context: DocItemContext  = { page, item: item as DocItemWithContext, contract, file, build };
-          allItems.push(Object.assign(item, { __item_context }));
+          const __item_context: DocItemContext = { page, item: item as DocItemWithContext, contract, file, build };
+          Object.assign(item, { __item_context });
         }
       }
     }
@@ -105,7 +101,7 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
   }
 
   return {
-    items: topLevelItems,
+    items: allItems.filter(i => i[DOC_ITEM_CONTEXT].contract === undefined),
     pages: Object.entries(pages).map(([id, items]) => ({ id, items })),
   };
 }

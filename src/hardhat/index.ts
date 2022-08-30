@@ -1,5 +1,6 @@
 import { extendConfig, task } from 'hardhat/config';
 import { BuildInfo } from 'hardhat/types';
+import fs from 'fs/promises';
 
 import './type-extensions';
 
@@ -20,9 +21,15 @@ task('docgen', async (_, hre) => {
   const { main } = await import('../main');
 
   const buildInfoPaths = await hre.artifacts.getBuildInfoPaths();
-  const builds: BuildInfo[] = await Promise.all(
-    buildInfoPaths.map(async p => JSON.parse(await fs.readFile(p, 'utf8'))),
+  const builds = await Promise.all(
+    buildInfoPaths.map(async p => ({
+      mtime: (await fs.stat(p)).mtimeMs,
+      data: JSON.parse(await fs.readFile(p, 'utf8')) as BuildInfo,
+    })),
   );
 
-  await main(builds, hre.config.docgen);
+  // Sort most recently modified first
+  builds.sort((a, b) => b.mtime - a.mtime);
+
+  await main(builds.map(b => b.data), hre.config.docgen);
 });

@@ -1,7 +1,7 @@
 import path from 'path';
 import { ContractDefinition, SourceUnit } from 'solidity-ast';
 import { SolcOutput, SolcInput } from 'solidity-ast/solc';
-import { astDereferencer, ASTDereferencer, findAll } from 'solidity-ast/utils';
+import { astDereferencer, ASTDereferencer, findAll, isNodeType } from 'solidity-ast/utils';
 import { FullConfig } from './config';
 import { DocItem, docItemTypes, isDocItem } from './doc-item';
 import { Properties } from './templates';
@@ -55,7 +55,7 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
   const assign = typeof siteConfig.pages === 'string' ? pageAssigner[siteConfig.pages] : siteConfig.pages;
 
   const seen = new Set<string>();
-  const allItems: DocItemWithContext[] = [];
+  const items: DocItemWithContext[] = [];
   const pages: Record<string, DocItemWithContext[]> = {};
 
   for (let { input, output } of builds) {
@@ -66,8 +66,8 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
     const build = { input, output, deref };
 
     for (const { ast: file } of Object.values(output.sources)) {
-      const isNewItem = !seen.has(file.src);
-      seen.add(file.src);
+      const isNewFile = !seen.has(file.absolutePath);
+      seen.add(file.absolutePath);
 
       for (const topLevelItem of file.nodes) {
         if (!isDocItem(topLevelItem)) continue;
@@ -78,13 +78,18 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
           __item_context: { page, item: topLevelItem as DocItemWithContext, file, build },
         });
 
-        if (page !== undefined) {
+        if (isNewFile && page !== undefined) {
           (pages[page] ??= []).push(withContext);
+          items.push(withContext);
         }
 
-        for (const item of findAll(docItemTypes, topLevelItem)) {
-          if (isNewItem) allItems.push(item as DocItemWithContext);
-          if (item === topLevelItem) continue;
+        if (!isNodeType('ContractDefinition', topLevelItem)) {
+          continue;
+        }
+
+        for (const item of topLevelItem.nodes) {
+          if (!isDocItem(item)) continue;
+          if (isNewFile && page !== undefined) items.push(item as DocItemWithContext);
           const contract = topLevelItem.nodeType === 'ContractDefinition' ? topLevelItem : undefined;
           const __item_context: DocItemContext = { page, item: item as DocItemWithContext, contract, file, build };
           Object.assign(item, { __item_context });
@@ -93,7 +98,7 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
     }
   }
 
-  for (const item of allItems) {
+  for (const item of items) {
     for (const [prop, fn] of Object.entries(properties)) {
       const original: unknown = (item as any)[prop];
       defineGetterMemoized(item as any, prop, () => fn(item.__item_context, original));
@@ -101,8 +106,8 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
   }
 
   return {
-    items: allItems.filter(i => i[DOC_ITEM_CONTEXT].contract === undefined),
-    pages: Object.entries(pages).map(([id, items]) => ({ id, items })),
+    items,
+    pages: Object.entries(pages).map(([id, pageItems]) => ({ id, items: pageItems })),
   };
 }
 

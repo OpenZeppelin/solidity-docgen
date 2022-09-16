@@ -26,6 +26,14 @@ export function name({ item }: DocItemContext, original?: unknown): string {
   }
 }
 
+export function fullName({ item, contract }: DocItemContext): string {
+  if (contract) {
+    return `${contract.name}.${item.name}`;
+  } else {
+    return `${item.name}`;
+  }
+}
+
 export function signature({ item }: DocItemContext): string | undefined {
   switch (item.nodeType) {
     case 'ContractDefinition':

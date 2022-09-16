@@ -3,6 +3,7 @@ export function defineGetterMemoized<K extends keyof any, T, O extends { [k in K
   let value: T;
 
   Object.defineProperty(obj, key, {
+    enumerable: true,
     get() {
       switch (state) {
         case 'done': 

@@ -2,6 +2,7 @@ import Handlebars, { RuntimeOptions } from 'handlebars';
 import { Site, Page, DocItemWithContext, DOC_ITEM_CONTEXT } from './site';
 import { Templates } from './templates';
 import { itemType } from './utils/item-type';
+import fs from 'fs';
 
 export interface RenderedPage {
   id: string;
@@ -43,6 +44,21 @@ function itemPartial(item: DocItemWithContext, options?: RuntimeOptions) {
   return partial(item, options);
 }
 
+function readmeHelper(H: typeof Handlebars, path: string, opts: RuntimeOptions) {
+  const items: DocItemWithContext[] = opts.data.root.items;
+  const renderedItems = Object.fromEntries(
+    items.map(item => [
+      item.name,
+      new H.SafeString(
+        H.compile('{{>item}}')(item, opts),
+      ),
+    ]),
+  );
+  return new H.SafeString(
+    H.compile(fs.readFileSync(path, 'utf8'))(renderedItems, opts),
+  );
+}
+
 function buildRenderer(templates: Templates): (page: Page, options: TemplateOptions) => string {
   const pageTemplate = templates.partials?.page;
   if (pageTemplate === undefined) {
@@ -58,6 +74,8 @@ function buildRenderer(templates: Templates): (page: Page, options: TemplateOpti
       return partial(...args);
     });
   }
+
+  H.registerHelper('readme', (path: string, opts: RuntimeOptions) => readmeHelper(H, path, opts));
 
   for (const [name, fn] of Object.entries(templates.helpers ?? {})) {
     H.registerHelper(name, fn);

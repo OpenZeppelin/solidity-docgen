@@ -79,12 +79,12 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
       if (!p.name) {
         res.returns.push({ description: content.trim() });
       } else {
-        const paramMatches = content.match(/(\w+) ([^]*)/);
+        const paramMatches = content.match(/(\w+)( ([^]*))?/);
         if (!paramMatches || paramMatches[1] !== p.name) {
           throw new Error(`Expected @return tag to start with name '${p.name}'`);
         }
-        const [, name, description] = paramMatches as [string, string, string];
-        res.returns.push({ name, description: description.trim() });
+        const [, name, description] = paramMatches as [string, string, string?];
+        res.returns.push({ name, description: description?.trim() ?? '' });
       }
     }
 

@@ -74,9 +74,8 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
 
         const page = assignIfIncludedSource(assign, topLevelItem, file, siteConfig);
 
-        const withContext = Object.assign(topLevelItem, {
-          __item_context: { page, item: topLevelItem as DocItemWithContext, file, build },
-        });
+        const withContext = defineContext(topLevelItem, build, file, page);
+        defineProperties(withContext, properties);
 
         if (isNewFile && page !== undefined) {
           (pages[page] ??= []).push(withContext);
@@ -91,17 +90,10 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
           if (!isDocItem(item)) continue;
           if (isNewFile && page !== undefined) items.push(item as DocItemWithContext);
           const contract = topLevelItem.nodeType === 'ContractDefinition' ? topLevelItem : undefined;
-          const __item_context: DocItemContext = { page, item: item as DocItemWithContext, contract, file, build };
-          Object.assign(item, { __item_context });
+          const withContext = defineContext(item, build, file, page, contract);
+          defineProperties(withContext, properties);
         }
       }
-    }
-  }
-
-  for (const item of items) {
-    for (const [prop, fn] of Object.entries(properties)) {
-      const original: unknown = (item as any)[prop];
-      defineGetterMemoized(item as any, prop, () => fn(item.__item_context, original));
     }
   }
 
@@ -109,6 +101,19 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
     items,
     pages: Object.entries(pages).map(([id, pageItems]) => ({ id, items: pageItems })),
   };
+}
+
+function defineContext(item: DocItem, build: BuildContext, file: SourceUnit, page?: string, contract?: ContractDefinition): DocItemWithContext {
+  return Object.assign(item, {
+    [DOC_ITEM_CONTEXT]: { build, file, contract, page, item: item as DocItemWithContext },
+  });
+}
+
+function defineProperties(item: DocItemWithContext, properties: Properties) {
+  for (const [prop, fn] of Object.entries(properties)) {
+    const original: unknown = (item as any)[prop];
+    defineGetterMemoized(item as any, prop, () => fn(item.__item_context, original));
+  }
 }
 
 function assignIfIncludedSource(

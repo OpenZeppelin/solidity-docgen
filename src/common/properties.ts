@@ -1,3 +1,4 @@
+import path from 'path';
 import { EnumDefinition, ErrorDefinition, EventDefinition, FunctionDefinition, ModifierDefinition, ParameterList, StructDefinition, UserDefinedValueTypeDefinition, VariableDeclaration } from 'solidity-ast';
 import { findAll, isNodeType } from 'solidity-ast/utils';
 import { NatSpec, parseNatspec } from '../utils/natspec';
@@ -32,6 +33,10 @@ export function fullName({ item, contract }: DocItemContext): string {
   } else {
     return `${item.name}`;
   }
+}
+
+export function relativePath( { file, siteConfig } : DocItemContext): string {
+  return path.relative(siteConfig.sourcesDir, file.absolutePath);
 }
 
 export function signature({ item }: DocItemContext): string | undefined {

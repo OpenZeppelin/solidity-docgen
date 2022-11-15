@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "handlebars": "^4.7.7",
-    "solidity-ast": "^0.4.31"
+    "solidity-ast": "^0.4.38"
   },
   "peerDependencies": {
     "hardhat": "^2.8.0"

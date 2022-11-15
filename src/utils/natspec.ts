@@ -1,9 +1,10 @@
 import { FunctionDefinition } from 'solidity-ast';
 import { findAll } from 'solidity-ast/utils';
-import { DocItemWithContext } from '../site';
+import { DocItemWithContext, DOC_ITEM_CONTEXT } from '../site';
 import { arraysEqual } from './arrays-equal';
 import { execAll } from './execall';
 import { itemType } from './item-type';
+import { ItemError } from './ItemError';
 import { readItemDocs } from './read-item-docs';
 import { getContractsInScope } from './scope';
 
@@ -25,7 +26,7 @@ export interface NatSpec {
 }
 
 export function parseNatspec(item: DocItemWithContext): NatSpec {
-  if (!item.__item_context) throw new Error(`Not an item or item is missing context`);
+  if (!item[DOC_ITEM_CONTEXT]) throw new Error(`Not an item or item is missing context`);
 
   let res: NatSpec = {};
 
@@ -46,7 +47,7 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
   let inheritFrom: FunctionDefinition | undefined;
 
   for (const [, tag = 'notice', content] of tagMatches) {
-    if (content === undefined) throw new Error('Unexpected error');
+    if (content === undefined) throw new ItemError('Unexpected error', item);
 
     if (tag === 'dev' || tag === 'notice') {
       res[tag] ??= '';
@@ -68,20 +69,20 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
 
     if (tag === 'return') {
       if (!('returnParameters' in item)) {
-        throw new Error(`Item does not contain return parameters`);
+        throw new ItemError(`Item does not contain return parameters`, item);
       }
       res.returns ??= [];
       const i = res.returns.length;
       const p = item.returnParameters.parameters[i];
       if (p === undefined) {
-        throw new Error(`Got more @return tags than expected for '${item.name}'`);
+        throw new ItemError('Got more @return tags than expected', item);
       }
       if (!p.name) {
         res.returns.push({ description: content.trim() });
       } else {
         const paramMatches = content.match(/(\w+)( ([^]*))?/);
         if (!paramMatches || paramMatches[1] !== p.name) {
-          throw new Error(`Expected @return tag to start with name '${p.name}'`);
+          throw new ItemError(`Expected @return tag to start with name '${p.name}'`, item);
         }
         const [, name, description] = paramMatches as [string, string, string?];
         res.returns.push({ name, description: description?.trim() ?? '' });
@@ -97,12 +98,12 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
 
     if (tag === 'inheritdoc') {
       if (!(item.nodeType === 'FunctionDefinition' || item.nodeType === 'VariableDeclaration')) {
-        throw new Error(`Expected function or variable but saw ${itemType(item)}`);
+        throw new ItemError(`Expected function or variable but saw ${itemType(item)}`, item);
       }
       const parentContractName = content.trim();
       const parentContract = getContractsInScope(item)[parentContractName];
       if (!parentContract) {
-        throw new Error(`Parent contract '${parentContractName}' not found`);
+        throw new ItemError(`Parent contract '${parentContractName}' not found`, item);
       }
       inheritFrom = [...findAll('FunctionDefinition', parentContract)].find(f => item.baseFunctions?.includes(f.id));
     }
@@ -110,7 +111,7 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
 
   if (docString.length === 0) {
     if ('baseFunctions' in item && item.baseFunctions?.length === 1) {
-      const baseFn = item.__item_context.build.deref('FunctionDefinition', item.baseFunctions[0]!);
+      const baseFn = item[DOC_ITEM_CONTEXT].build.deref('FunctionDefinition', item.baseFunctions[0]!);
       const shouldInherit = item.nodeType === 'VariableDeclaration' || arraysEqual(item.parameters.parameters, baseFn.parameters.parameters, p => p.name);
       if (shouldInherit) {
         inheritFrom = baseFn;

@@ -1,7 +1,7 @@
 import path from 'path';
 import { ContractDefinition, SourceUnit } from 'solidity-ast';
 import { SolcOutput, SolcInput } from 'solidity-ast/solc';
-import { astDereferencer, ASTDereferencer, findAll, isNodeType } from 'solidity-ast/utils';
+import { astDereferencer, ASTDereferencer, findAll, isNodeType, srcDecoder, SrcDecoder } from 'solidity-ast/utils';
 import { FullConfig } from './config';
 import { DocItem, docItemTypes, isDocItem } from './doc-item';
 import { Properties } from './templates';
@@ -17,6 +17,7 @@ export interface Build {
 
 export interface BuildContext extends Build {
   deref: ASTDereferencer;
+  decodeSrc: SrcDecoder;
 }
 
 export type SiteConfig = Pick<FullConfig, 'pages' | 'exclude' | 'sourcesDir' | 'pageExtension'>;
@@ -63,7 +64,8 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
     output = { ...output, sources: clone(output.sources) };
 
     const deref = astDereferencer(output);
-    const build = { input, output, deref };
+    const decodeSrc = srcDecoder(input, output);
+    const build = { input, output, deref, decodeSrc };
 
     for (const { ast: file } of Object.values(output.sources)) {
       const isNewFile = !seen.has(file.absolutePath);

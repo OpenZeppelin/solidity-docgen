@@ -1,31 +1,36 @@
 import { ContractDefinition, SourceUnit } from "solidity-ast";
-import { findAll } from "solidity-ast/utils";
+import { findAll, isNodeType } from "solidity-ast/utils";
 import { DocItemWithContext } from "../site";
-import { mapValues } from './map-values';
+import { filterValues, mapValues } from './map-values';
 
 export function getContractsInScope(item: DocItemWithContext) {
-  const cache = new WeakMap<SourceUnit, Record<string, () => ContractDefinition>>();
-  return mapValues(run(item.__item_context.file), fn => fn());
+  const cache = new WeakMap<SourceUnit, Record<string, () => Definition>>();
 
-  function run(
-    file: SourceUnit,
-    aliasedImport = false,
-  ): Record<string, () => ContractDefinition> {
+  return filterValues(
+    mapValues(run(item.__item_context.file), getDef => getDef()),
+    isNodeType('ContractDefinition'),
+  );
+
+  type Definition = SourceUnit['nodes'][number] & { name: string };
+
+  function run(file: SourceUnit): Record<string, () => Definition> {
     if (cache.has(file)) {
       return cache.get(file)!;
     }
 
-    const scope: Record<string, () => ContractDefinition> = {};
+    const scope: Record<string, () => Definition> = {};
 
     cache.set(file, scope);
 
-    for (const c of findAll('ContractDefinition', file)) {
-      scope[c.name] = () => c;
+    for (const c of file.nodes) {
+      if ('name' in c) {
+        scope[c.name] = () => c;
+      }
     }
 
     for (const i of findAll('ImportDirective', file)) {
       const importedFile = item.__item_context.build.deref('SourceUnit', i.sourceUnit);
-      const importedScope = run(importedFile, aliasedImport || i.symbolAliases.length > 0);
+      const importedScope = run(importedFile);
       if (i.symbolAliases.length === 0) {
         Object.assign(scope, importedScope);
       } else {

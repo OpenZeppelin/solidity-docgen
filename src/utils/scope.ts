@@ -2,36 +2,40 @@ import { ContractDefinition, SourceUnit } from "solidity-ast";
 import { findAll, isNodeType } from "solidity-ast/utils";
 import { DocItemWithContext } from "../site";
 import { filterValues, mapValues } from './map-values';
+import { mapKeys } from './map-keys';
+
+type Definition = SourceUnit['nodes'][number] & { name: string };
+type Scope = { [name in string]: () => { namespace: Scope } | { definition: Definition } };
 
 export function getContractsInScope(item: DocItemWithContext) {
-  const cache = new WeakMap<SourceUnit, Record<string, () => Definition>>();
+  const cache = new WeakMap<SourceUnit, Scope>();
 
   return filterValues(
-    mapValues(run(item.__item_context.file), getDef => getDef()),
+    flattenScope(run(item.__item_context.file)),
     isNodeType('ContractDefinition'),
   );
 
-  type Definition = SourceUnit['nodes'][number] & { name: string };
-
-  function run(file: SourceUnit): Record<string, () => Definition> {
+  function run(file: SourceUnit): Scope {
     if (cache.has(file)) {
       return cache.get(file)!;
     }
 
-    const scope: Record<string, () => Definition> = {};
+    const scope: Scope = {};
 
     cache.set(file, scope);
 
     for (const c of file.nodes) {
       if ('name' in c) {
-        scope[c.name] = () => c;
+        scope[c.name] = () => ({ definition: c });
       }
     }
 
     for (const i of findAll('ImportDirective', file)) {
       const importedFile = item.__item_context.build.deref('SourceUnit', i.sourceUnit);
       const importedScope = run(importedFile);
-      if (i.symbolAliases.length === 0) {
+      if (i.unitAlias) {
+        scope[i.unitAlias] = () => ({ namespace: importedScope });
+      } else if (i.symbolAliases.length === 0) {
         Object.assign(scope, importedScope);
       } else {
         for (const a of i.symbolAliases) {
@@ -45,3 +49,15 @@ export function getContractsInScope(item: DocItemWithContext) {
   }
 }
 
+function flattenScope(scope: Scope): Record<string, Definition> {
+  return Object.fromEntries(
+    Object.entries(scope).flatMap(([k, fn]) => {
+      const v = fn();
+      if ('definition' in v) {
+        return [[k, v.definition] as const];
+      } else {
+        return Object.entries(mapKeys(flattenScope(v.namespace), k2 => k + '.' + k2));
+      }
+    }),
+  );
+}

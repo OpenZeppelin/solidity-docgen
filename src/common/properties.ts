@@ -107,7 +107,7 @@ export function returns({ item }: DocItemContext): Param[] | undefined {
 
 export function items({ item }: DocItemContext): DocItem[] | undefined {
   return (item.nodeType === 'ContractDefinition')
-    ? item.nodes.filter(isNodeType(docItemTypes))
+    ? item.nodes.filter(isNodeType(docItemTypes)).filter(n => !('visibility' in n) || n.visibility !== 'private')
     : undefined;
 }
 

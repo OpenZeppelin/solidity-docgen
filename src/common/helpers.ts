@@ -19,3 +19,4 @@ export function formatVariable(v: VariableDeclaration): string {
   return [v.typeName?.typeDescriptions.typeString!].concat(v.name || []).join(' ');
 }
 
+export const eq = (a: unknown, b: unknown) => a === b;

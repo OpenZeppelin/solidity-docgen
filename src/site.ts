@@ -48,8 +48,12 @@ export interface DocItemContext {
   page?: string;
   item: DocItemWithContext;
   contract?: ContractDefinition;
-  file: SourceUnit;
+  file: DocItemContextFile;
   build: BuildContext;
+}
+
+export interface DocItemContextFile extends SourceUnit {
+  relativePath: string;
 }
 
 export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: Properties = {}): Site {
@@ -67,9 +71,12 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
     const decodeSrc = srcDecoder(input, output);
     const build = { input, output, deref, decodeSrc };
 
-    for (const { ast: file } of Object.values(output.sources)) {
-      const isNewFile = !seen.has(file.absolutePath);
-      seen.add(file.absolutePath);
+    for (const { ast } of Object.values(output.sources)) {
+      const isNewFile = !seen.has(ast.absolutePath);
+      seen.add(ast.absolutePath);
+
+      const relativePath = path.relative(siteConfig.sourcesDir, ast.absolutePath);
+      const file = Object.assign(ast, { relativePath });
 
       for (const topLevelItem of file.nodes) {
         if (!isDocItem(topLevelItem)) continue;
@@ -105,7 +112,7 @@ export function buildSite(builds: Build[], siteConfig: SiteConfig, properties: P
   };
 }
 
-function defineContext(item: DocItem, build: BuildContext, file: SourceUnit, page?: string, contract?: ContractDefinition): DocItemWithContext {
+function defineContext(item: DocItem, build: BuildContext, file: DocItemContextFile, page?: string, contract?: ContractDefinition): DocItemWithContext {
   return Object.assign(item, {
     [DOC_ITEM_CONTEXT]: { build, file, contract, page, item: item as DocItemWithContext },
   });
@@ -121,7 +128,7 @@ function defineProperties(item: DocItemWithContext, properties: Properties) {
 function assignIfIncludedSource(
   assign: PageAssigner,
   item: DocItem,
-  file: SourceUnit,
+  file: DocItemContextFile,
   config: SiteConfig,
 ) {
   return isFileIncluded(file.absolutePath, config)

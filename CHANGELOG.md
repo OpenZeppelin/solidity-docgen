@@ -3,6 +3,7 @@
 ## 0.6.1
 
 - Added Turkish Readme File.
+- Contribution title created on global README file.
 
 ## 0.6.0
 

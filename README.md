@@ -40,3 +40,7 @@ await docgen([{ output: solcOutput }], config);
 ## Config
 
 See [`config.ts`](./src/config.ts) for the list of options and their documentation.
+
+## Contribution
+
+Turkish: [`README-tr.md`](./README-tr.md)

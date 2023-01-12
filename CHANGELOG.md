@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.1
+
+- Added Turkish Readme File.
+
 ## 0.6.0
 
 This version is a complete rewrite and redesign of the library that is currently in beta.

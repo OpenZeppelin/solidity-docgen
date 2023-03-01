@@ -20,7 +20,7 @@ export function natspec({ item }: DocItemContext): NatSpec {
 
 export function name({ item }: DocItemContext, original?: unknown): string {
   if (item.nodeType === 'FunctionDefinition') {
-    return item.kind === 'function' ? original as string : item.kind;
+    return typeof(original) === 'string' && original !== '' ? original : item.kind;
   } else {
     return original as string;
   }
@@ -43,7 +43,7 @@ export function signature({ item }: DocItemContext): string | undefined {
       const { kind, name } = item;
       const params = item.parameters.parameters;
       const returns = item.returnParameters.parameters;
-      const head = (kind === 'function' || kind === 'freeFunction') ? [kind, name].join(' ') : kind;
+      const head = (kind === 'function' || kind === 'freeFunction') ? `function ${name}` : kind;
       let res = [
         `${head}(${params.map(formatVariable).join(', ')})`,
         item.visibility,

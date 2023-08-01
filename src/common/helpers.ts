@@ -8,7 +8,7 @@ export function trim(text: string) {
 
 export function joinLines(text?: string) {
   if (typeof text === 'string') {
-    return text.replace(/\n+/g, ' ');
+    return text.replace(/[\r\n]+/g, ' ');
   }
 }
 

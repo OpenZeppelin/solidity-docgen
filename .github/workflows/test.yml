@@ -17,4 +17,6 @@ jobs:
     - run: npm install
     - run: npm test
     - run: npm run coverage
-    - uses: codecov/codecov-action@v3
+    - uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}

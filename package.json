@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "clean": "hardhat clean && rimraf dist tsconfig.tsbuildinfo",
+    "clean": "hardhat clean && rm -rf dist tsconfig.tsbuildinfo",
     "coverage": "c8 npm run test",
     "docs": "oz-docs -c docs",
     "docs:watch": "npm run docs watch",

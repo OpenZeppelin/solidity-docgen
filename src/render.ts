@@ -33,7 +33,7 @@ export function render(site: Site, templates: Templates, collapseNewlines?: bool
 
 export const itemPartialName = (item: DocItemWithContext) => itemType(item).replace(/ /g, '-').toLowerCase();
 
-function itemPartial(item: DocItemWithContext, options?: RuntimeOptions) {
+function itemPartial(H: typeof Handlebars, item: DocItemWithContext, options?: RuntimeOptions) {
   if (!item.__item_context) {
     throw new Error(`Partial 'item' used in unsupported context (not a doc item)`);
   }
@@ -41,7 +41,9 @@ function itemPartial(item: DocItemWithContext, options?: RuntimeOptions) {
   if (!partial) {
     throw new Error(`Missing partial '${itemPartialName(item)}'`);
   }
-  return partial(item, options);
+  return typeof partial === 'string'
+    ? H.compile(partial)(item, options)
+    : partial(item, options);
 }
 
 function readmeHelper(H: typeof Handlebars, path: string, opts: RuntimeOptions) {
@@ -81,7 +83,7 @@ function buildRenderer(templates: Templates): (page: Page, options: TemplateOpti
     H.registerHelper(name, fn);
   }
 
-  H.registerPartial('item', itemPartial);
+  H.registerPartial('item', (item, options) => itemPartial(H, item, options));
 
   return H.compile('{{>page}}');
 }

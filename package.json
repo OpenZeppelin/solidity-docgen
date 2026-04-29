@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "clean": "hardhat clean && rimraf dist tsconfig.tsbuildinfo",
+    "clean": "hardhat clean && rm -rf dist tsconfig.tsbuildinfo",
     "coverage": "c8 npm run test",
     "docs": "oz-docs -c docs",
     "docs:watch": "npm run docs watch",
@@ -34,7 +34,7 @@
     "@types/mocha": "^7.0.2",
     "@types/node": "^14.18.26",
     "ava": "^5.0.0",
-    "c8": "^8.0.0",
+    "c8": "^11.0.0",
     "code-style": "github:OpenZeppelin/code-style",
     "hardhat": "^2.8.0",
     "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils",

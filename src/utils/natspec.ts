@@ -8,6 +8,11 @@ import { ItemError } from './ItemError';
 import { readItemDocs } from './read-item-docs';
 import { getContractsInScope } from './scope';
 
+// Solidity identifiers may contain '$' and may start with '$' or '_', which \w does not
+// cover. ERC-7201 namespaced storage conventionally names its struct pointer '$', so a
+// tag like `@return $ the storage struct` has to match here.
+const IDENTIFIER = String.raw`[A-Za-z_$][A-Za-z0-9_$]*`;
+
 export interface NatSpec {
   title?: string;
   notice?: string;
@@ -59,7 +64,7 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
     }
 
     if (tag === 'param') {
-      const paramMatches = content.match(/(\w+) ([^]*)/);
+      const paramMatches = content.match(new RegExp(`(${IDENTIFIER}) ([^]*)`));
       if (paramMatches) {
         const [, name, description] = paramMatches as [string, string, string];
         res.params ??= [];
@@ -80,7 +85,7 @@ export function parseNatspec(item: DocItemWithContext): NatSpec {
       if (!p.name) {
         res.returns.push({ description: content.trim() });
       } else {
-        const paramMatches = content.match(/(\w+)( ([^]*))?/);
+        const paramMatches = content.match(new RegExp(`(${IDENTIFIER})( ([^]*))?`));
         if (!paramMatches || paramMatches[1] !== p.name) {
           throw new ItemError(`Expected @return tag to start with name '${p.name}'`, item);
         }

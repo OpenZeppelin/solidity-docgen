@@ -4,6 +4,7 @@ import { buildSite, PageStructure, SiteConfig } from './site';
 import { itemPartialName, render } from './render';
 import { NodeType } from 'solidity-ast/node';
 import { Templates } from './templates';
+import * as defaultProperties from './common/properties';
 
 interface TestSpec extends Templates {
   collapseNewlines?: boolean;
@@ -22,7 +23,7 @@ function testRender(title: string, file: string, spec: TestSpec, expected: strin
   };
 
   test(title, t => {
-    const site = buildSite(t.context.build, cfg);
+    const site = buildSite(t.context.build, cfg, spec.properties ?? {});
     const rendered = render(site, spec, spec.collapseNewlines);
     t.is(rendered.length, 1);
     t.is(rendered[0]!.contents, expected);
@@ -61,4 +62,18 @@ testRender('item partial',
     },
   },
   'A, B, ',
+);
+
+// Solidity identifiers may contain '$'. ERC-7201 namespaced storage names its struct
+// pointer '$', so `@return $ ...` has to resolve to that return parameter rather than
+// throwing, and `@param a$b ...` has to attach to `a$b` rather than silently missing it.
+testRender('dollar in parameter and return names',
+  'S08_Dollar',
+  {
+    properties: { ...defaultProperties },
+    partials: {
+      page: () => '{{#each items}}{{#each items}}{{#each params}}({{name}}:{{natspec}}){{/each}}{{#each returns}}[{{name}}:{{natspec}}]{{/each}}{{/each}}{{/each}}',
+    },
+  },
+  '[$:the storage struct pointer](a$b:the first operand)($c:the second operand)[$d:the sum]',
 );
